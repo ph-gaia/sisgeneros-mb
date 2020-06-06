@@ -1,0 +1,88 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+
+$idlista = $this->view->idlista;
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+        return [
+            'previous' => "{$controllerName}licitacao/idlista/{$idlista}/pagina/{$btn['previous']}",
+            'next' => "{$controllerName}licitacao/idlista/{$idlista}/pagina/{$btn['next']}",
+            'current' => "{$controllerName}licitacao/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+        ];
+    });
+
+?>
+
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Relatório de Demanda</h5>
+                <div class="alert alert-info" role="alert">
+                    Órgão:
+                    <strong>
+                        <?= $this->view->resultLicitacao['uasg']; ?> - 
+                        <?= $this->view->resultLicitacao['uasg_name']; ?>
+                    </strong><br>
+                    Número: <strong><?= $this->view->resultLicitacao['number']; ?></strong> | 
+                    Descrição: <strong><?= $this->view->resultLicitacao['description']; ?></strong>
+                </div>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <?= $pagination; ?>
+                    </div>
+                </div>
+                <table class="table table-condensed table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>UF</th>
+                            <th>Nome</th>
+                            <th>Fornecedor</th>
+                            <th>Licitado</th>
+                            <th>Demanda</th>
+                            <th>Restante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value): ?>
+                            <tr>
+                                <td style='font-size: 11px'><?= $value['number']; ?></td>
+                                <td style='font-size: 11px'><?= $value['uf']; ?></td>
+                                <td style='font-size: 11px'><?= $value['name']; ?></td>
+                                <td style='font-size: 11px'><?= $value['supplier']; ?></td>
+                                <td>
+                                    <span class="label label-success">
+                                        <?= View::normalizeFloat($value['quantity'], 3, true); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php
+                                        $demanda = $this->demanda($value['number'], $this->view->resultLicitacao['id']);
+                                        $restante = $value['quantity'] - $demanda;
+                                    ?>
+                                    <?php if ($demanda): ?>
+                                        <span class="badge badge-dark">
+                                            <?= View::normalizeFloat($demanda, 3, true); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        ---
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="badge <?= $restante < 0 ? "badge-danger" : "badge-success"; ?>">
+                                        <?= View::normalizeFloat($restante, 3, true); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>

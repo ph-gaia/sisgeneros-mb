@@ -1,0 +1,9 @@
+/nbproject
+/public/app
+/public/arquivos
+/App/Config/keys/*.txt
+/vendor/
+*.php~
+*.db
+*.bak
+*.DS_Store

@@ -1,0 +1,11 @@
+{
+    "application": {
+        "name": "SisGêneros",
+        "version": "3.0",
+        "om": "Centro de Intendência da Marinha em Belém"
+    },
+    "papeleta": {
+        "cidade": "Belém do Pará",
+        "estado": "Pará"
+    }
+}

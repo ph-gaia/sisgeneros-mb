@@ -1,0 +1,36 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5 class="page-header"><?= $this->view->title ?></h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-table fa-fw"></i> Novo arquivo
+                    </div>
+                    <div class="panel-body">
+                        <div id="resultado"></div>
+                        <form action="<?= $this->view->controller; ?>salvararquivo/idlista/<?= $this->view->idlista; ?>" method="post" id="form" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="file" name="arquivo" accept="application/pdf" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-primary"><i class="fa fa-check"></i> Enviar</button>
+                                        <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $this->view->idlista; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

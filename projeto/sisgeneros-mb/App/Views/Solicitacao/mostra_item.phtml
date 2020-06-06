@@ -1,0 +1,188 @@
+<?php
+
+use App\Helpers\View;
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="alert alert-info" role="alert">
+                    Número: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
+                    Descrição: <strong><?= $this->view->resultLicitacao['description']; ?></strong><br>
+                    Órgão:
+                    <strong><?= $this->view->resultLicitacao['uasg']; ?></strong>
+                    -
+                    <strong><?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
+                    Fornecedor: <strong><?= $this->view->result[0]['supplier']; ?></strong><br>
+                    CNPJ: <strong><?= $this->view->result[0]['cnpj']; ?></strong><br>
+                    Modalidade: <strong>Pregão Eletrônico</strong>
+                </div>
+                <div id="resultado"></div>
+                <form action="<?= $this->view->controller; ?>registra" method="post" id="form">
+                    <div class="alerta-credito" style="display: none;">
+                        <div class="alert alert-warning" role="alert">
+                            O saldo de crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
+                            O valor total da sua <strong>solicitação</strong> é de <strong id="valorTotal"></strong><br><br>
+                            <strong>Você deseja continuar com essa solicitação?</strong><br>
+                            <span class="btn btn-success btn-credito-yes">
+                                <i class="fa fa-check"></i> Sim
+                            </span>
+                            <span class="btn btn-danger btn-credito-no">
+                                <i class="fa fa-ban"></i> Não
+                            </span>
+                        </div>
+                    </div>
+                    <div class="alerta-item" style="display: none;">
+                        <div class="alert alert-danger" role="alert">
+                            A quantidade de Café <strong>disponível</strong> atualmente é de <strong>5</strong>.<br>
+                            A quantidade <strong>solicitada</strong> é de <strong>7</strong>.<br><br>
+                            <strong>Você deseja continuar com essa solicitação?</strong><br>
+                            <button class="btn btn-success">
+                                <i class="fa fa-check"></i> Sim
+                            </button>
+                            <span class="btn btn-danger btn-item-no">
+                                <i class="fa fa-ban"></i> Não
+                            </span>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="biddings_id" value="<?= $this->view->resultLicitacao['id'] ?>">
+                    <input type="hidden" name="suppliers_id" value="<?= $this->view->result[0]['suppliers_id'] ?>">
+                    <input type="hidden" name="omName" id="omName" value="<?= $this->view->resultOm['name'] ?>">
+                    <input type="hidden" name="invoice" value="S/N">
+                    <input type="hidden" name="modality" value="Pregão Eletrônico">
+                    <input type="hidden" name="observation" value="">
+                    <input type="hidden" name="purposes" id="purposes" value="">
+                    <span class="btn btn-success btn-save">
+                        <i class="fa fa-check"></i> Salvar Registro
+                    </span>
+                    <a href="<?= $this->view->controller; ?>licitacaobusca" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Cancelar</a>
+                    <div class="row">
+                        <div class="col-md-4" style="margin-top: 10px;">
+                            <label>Tipo de Empenho</label>
+                            <select name="types_invoices"
+                                    id="types_invoices"
+                                    class="form-control"
+                                    required>
+                                    <option>Selecione uma opção</option>
+                                    <option value="ESTIMATIVO">Estimativo</option>
+                                    <option value="GLOBAL">Global</option>
+                                    <option value="ORDINARIO">Ordinário</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4" style="margin-top: 10px;">
+                            <label>Plano de Contas</label>
+                            <select name="account_plan"
+                                    id="account_plan"
+                                    class="form-control"
+                                    onchange="changePurposes()"
+                                    required>
+                                    <option>Selecione uma opção</option>
+                                    <option value="339030.07">339030.07</option>
+                                    <option value="339030.21">339030.21</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style="margin-top: 10px;">
+                            <label>Observações:</label>
+                            <textarea
+                                name="complement"
+                                id="complement"
+                                class="form-control"
+                                placeholder="Observações no pedido"></textarea>
+                        </div>
+                        <div class="col-md-6" style="margin-top: 10px;">
+                            <label>Finalidade:</label>
+                            <textarea
+                                name="purposesView"
+                                id="purposesView"
+                                class="form-control"
+                                placeholder="Finalidade"
+                                disabled></textarea>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="8%">Quantidade</th>
+                                <th>Item</th>
+                                <th>Valor Unitário</th>
+                                <th>UF</th>
+                                <th>Nome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($this->view->result as $value): ?>
+                                <tr>
+                                    <td>
+                                        <input type="hidden"
+                                               name="ids[]"
+                                               value="<?= $value['id']; ?>">
+                                        <input type="hidden"
+                                               id="valueItem"
+                                               name="valueItem[]"
+                                               class="valueItem"
+                                               value="<?= $value['value']; ?>">
+                                        <input type="text"
+                                               name="quantity[]"
+                                               id="quantity"
+                                               class="form-control">
+                                    </td>
+                                    <td><?= $value['number']; ?></td>
+                                    <td><?= View::floatToMoney($value['value']) ?></td>
+                                    <td><?= $value['uf']; ?></td>
+                                    <td><?= $value['name']; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changePurposes() {
+        if ($('#account_plan').val() === '339030.07') {
+            let generoAli = `Aquisição de gêneros alimentícios para confecção do rancho do ${$('#omName').val()}`;
+            $('#purposes').val(generoAli);
+            $('#purposesView').val(generoAli);
+        } else {
+            let materialDesc = `Aquisição de material descartável para utilização no rancho do ${$('#omName').val()}`;
+            $('#purposes').val(materialDesc);
+            $('#purposesView').val(materialDesc);
+        }
+    }
+    $('.btn-save').click(function() {
+        var total = 0;
+        $('input[name="quantity[]"]').each(function() {
+            if ($(this).val() != '') {
+                var quantity = parseFloat($(this).val());
+                var price = parseFloat($(this).closest("td").find("input.valueItem:hidden").val());
+                
+                var subTot = (quantity * price);
+                total += subTot;
+            }
+        });
+        $('#valorTotal').html('R$ ' + total.toFixed(2));
+        $(this).hide()
+        $('.alerta-credito').show()
+    });
+    $('.btn-credito-yes').click(function() {
+        $('.alerta-credito').hide()
+        $('.alerta-item').show()
+    });
+    $('.btn-credito-no').click(function() {
+        $('.alerta-credito').hide()
+        $('.btn-save').show()
+    });
+    $('.btn-item-no').click(function() {
+        $('.alerta-credito').show()
+        $('.alerta-item').hide()
+    });
+</script>

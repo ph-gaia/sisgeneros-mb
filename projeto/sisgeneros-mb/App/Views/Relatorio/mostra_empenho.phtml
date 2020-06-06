@@ -1,0 +1,121 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+
+$pagination = Pagination::make($this);
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Relatório</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                <div id="resultado"></div>
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <form action="<?= $this->view->controller; ?>ver/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="Nº Empenho, OM, Status ou Data (DD-MM-YYYY)">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nº. Empenho</th>
+                            <th>OM</th>
+                            <th>Valor</th>
+                            <th>Crédito</th>
+                            <th>Crédito disponível</th>
+                            <th>Status</th>
+                            <th>Data de criação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value) : ?>
+                            <tr>
+                                <td><strong><?= $value['code']; ?></strong></td>
+                                <td><?= $value['naval_indicative']; ?></td>
+                                <td><?= $value['total']; ?></td>
+                                <td><?= $value['credit_note']; ?></td>
+                                <td><?= $value['credit']; ?></td>
+                                <td><?= $value['status']; ?></td>
+                                <td>
+                                    <span class="badge badge-danger">
+                                        <?= View::humanDate($value['created_at']); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="text-center">
+                                                    <strong> Pedidos do empenho <?= $value['code']; ?> </strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nº</td>
+                                                <td>OM</td>
+                                                <td>Fornecedor</td>
+                                                <td>NF</td>
+                                                <td>Tipo</td>
+                                                <td>Total</td>
+                                                <td>Status</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($value['items'] as $items) : ?>
+                                                <tr>
+                                                    <td><?= $items['number']; ?></td>
+                                                    <td><?= $items['naval_indicative']; ?></td>
+                                                    <td><?= View::limitString($items['suppliers_name'], 17); ?></td>
+                                                    <td><?= $items['invoice'] ?: ''; ?></td>
+                                                    <td>
+                                                        <?php if ($items['biddings_id']) : ?>
+                                                            <i class="fa fa-group"></i> LIC
+                                                        <?php else : ?>
+                                                            <i class="fa fa-shopping-cart"></i> NL
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td><?= View::floatToMoney($items['total']); ?></td>
+                                                    <td> <?= $items['status']; ?> </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.search-button').click(function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var formAction = $('.search-form').attr('action');
+        if (searchValue && formAction) {
+            window.location = formAction + '/busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    });
+</script>

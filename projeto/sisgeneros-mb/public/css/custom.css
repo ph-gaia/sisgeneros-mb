@@ -1,0 +1,73 @@
+
+.search-input-box {
+    margin-top: 10px;
+}
+
+.search-button {
+    height: 38px;
+    border-radius: 0px 8px 8px 0px;
+}
+
+table.table {
+    margin-top: 10px;
+}
+
+table.table td, .badge {
+    font-size: 12px;
+}
+
+table.table th {
+    font-size: 14px;
+}
+
+.label {
+    font-size: 12px;
+}
+
+.btn-group-sm>.btn, .btn-sm {
+    padding: .25rem .5rem;
+    font-size: .7rem;
+    line-height: 1.5;
+    border-radius: .2rem;
+}
+
+.container, .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.topbar {
+    height: 3.375rem;
+}
+
+.billboard-container {
+    margin-bottom: 10px;
+}
+
+.billboard-container .billboard-content {
+    color: #080808 !important;
+}
+
+.billboard-container .billboard-title {
+    font-weight: bold;
+}
+
+.billboard-container .billboard-body {
+    font-size: 14px;
+}
+
+.bg-gradient-primary {
+    background-color: #4e73df;
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(10%,#2e4792),to(#081331));
+    background-image: linear-gradient(180deg,#2e4792 10%,#081331 100%);
+    background-size: cover;
+}
+.highlight {
+    background-color: #FFFF00;
+}
+.pagination {
+    margin-top: 10px;
+}
+.hide {
+    display: none;
+}

@@ -1,0 +1,398 @@
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= App\Config\Configurations::DEFAULT_URI ?>">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">
+            <?= $cfg->application->name ?>
+            <sup>
+                <?= $cfg->application->version ?>
+            </sup>
+        </div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item active  ">
+        <a class="nav-link" href="<?= App\Config\Configurations::DEFAULT_URI ?>">
+            <i class="fa fa-home fa-fw"></i>
+            <span>Home</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Recursos
+    </div>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+           href="#"
+           data-toggle="collapse"
+           data-target="#menuSolicitacoes"
+           aria-expanded="true"
+           aria-controls="menuSolicitacoes">
+            <i class="fa fa-list fa-fw"></i>
+            Solicitações <span class="fa arrow"></span>
+        </a>
+        <div id="menuSolicitacoes"
+             class="collapse"
+             aria-labelledby="headingTwo"
+             data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="solicitacao/ver">
+                    <i class="fa fa-history"></i> Histórico
+                </a>
+                <a class="collapse-item" href="solicitacao/licitacao/">
+                    <i class="fa fa-group"></i> Licitado - PE/Empresa
+                </a>
+                <a class="collapse-item" href="solicitacao/licitacaobusca/">
+                    <i class="fa fa-group"></i> Licitado - Item
+                </a>
+                <a class="collapse-item" href="solicitacao/formnaolicitado/">
+                    <i class="fa fa-shopping-cart"></i> Não Licitado
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#empenho"
+            aria-expanded="false"
+            aria-controls="empenho">
+            <i class="fa fa-bank fa-fw"></i> Empenhos
+            <span class="fa arrow"></span>
+        </a>
+        <div id="empenho"
+            class="collapse"
+            aria-labelledby="headingPages"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="empenho/ver/">
+                    <i class="fa fa-history"></i> Histórico
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR']) === false) : ?>
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuFornecedor"
+               aria-expanded="true"
+               aria-controls="menuFornecedor">
+                <i class="fa fa-suitcase fa-fw"></i> Fornecedor
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuFornecedor"
+                 class="collapse"
+                 aria-labelledby="headingUtilities"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="fornecedor/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuReport"
+               aria-expanded="false"
+               aria-controls="menuReport">
+                <i class="fa fa-list-ol fa-fw"></i> Relatórios
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuReport"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="relatorio/solicitacao/">
+                        <i class="fa fa-list"></i> Rel. de Solicitação
+                    </a>
+                    <a class="collapse-item" href="relatorio/demanda/">
+                        <i class="fa fa-list"></i> Rel. Demanda de Itens
+                    </a>
+                    <a class="collapse-item" href="relatorio/entrega/">
+                        <i class="fa fa-list"></i> Rel. Aval. de Entrega
+                    </a>
+                    <a class="collapse-item" href="relatorio/empenho/">
+                        <i class="fa fa-list"></i> Rel. de Empenhos
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuCredito"
+               aria-expanded="false"
+               aria-controls="menuCredito">
+                <i class="fa fa-credit-card fa-fw"></i> Crédito Provisionado
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuCredito"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="creditoprovisionado/ver/">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="creditoprovisionado/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuQuadros"
+               aria-expanded="false"
+               aria-controls="menuQuadros">
+                <i class="fa fa-newspaper-o fa-fw"></i> Quadro de Avisos
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuQuadros"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="avisos/ver/">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="avisos/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#OrgMilitar"
+               aria-expanded="false"
+               aria-controls="OrgMilitar">
+                <i class="fa fa-university fa-fw"></i> Organização Militar
+                <i class="fa arrow-down"></i>
+            </a>
+            <div id="OrgMilitar"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="om/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="om/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuFornecedor"
+               aria-expanded="true"
+               aria-controls="menuFornecedor">
+                <i class="fa fa-suitcase fa-fw"></i> Fornecedor
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuFornecedor"
+                 class="collapse"
+                 aria-labelledby="headingUtilities"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="fornecedor/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="fornecedor/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#Licitacoes"
+               aria-expanded="false"
+               aria-controls="Licitacoes">
+                <i class="fa fa-list fa-fw"></i> Licitações
+                <span class="fa arrow"></span>
+            </a>
+            <div id="Licitacoes"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="licitacao/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="licitacao/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#ingredientes"
+               aria-expanded="false"
+               aria-controls="ingredientes">
+                <i class="fa fa-cutlery fa-fw"></i> Ingredientes
+                <span class="fa arrow"></span>
+            </a>
+            <div id="ingredientes"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="ingredientes/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="ingredientes/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#recipespatterns"
+               aria-expanded="false"
+               aria-controls="recipespatterns">
+                <i class="fa fa-table fa-fw"></i> Receitas Padrões
+                <span class="fa arrow"></span>
+            </a>
+            <div id="recipespatterns"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="recipespatterns/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="recipespatterns/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#meals"
+               aria-expanded="false"
+               aria-controls="meals">
+                <i class="fa fa-spoon fa-fw"></i> Refeições
+                <span class="fa arrow"></span>
+            </a>
+            <div id="meals"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="meals/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="meals/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+    <?php endif; ?>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+           href="#"
+           data-toggle="collapse"
+           data-target="#cardapio"
+           aria-expanded="false"
+           aria-controls="cardapio">
+            <i class="fa fa-bars fa-fw"></i> Cardápio
+            <span class="fa arrow"></span>
+        </a>
+        <div id="cardapio"
+             class="collapse"
+             aria-labelledby="headingPages"
+             data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="cardapio/ver">
+                    <i class="fa fa-cog"></i> Gerenciar
+                </a>
+                <a class="collapse-item" href="cardapio/novo/">
+                    <i class="fa fa-plus-circle"></i> Novo Registro
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR') : ?>
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+               href="#"
+               data-toggle="collapse"
+               data-target="#menuUsuario"
+               aria-expanded="false"
+               aria-controls="menuUsuario">
+                <i class="fa fa-users fa-fw"></i> Usuários
+                <span class="fa arrow"></span>
+            </a>
+            <div id="menuUsuario"
+                 class="collapse"
+                 aria-labelledby="headingPages"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="acesso/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <a class="collapse-item" href="acesso/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                </div>
+            </div>
+        </li>
+    <?php endif; ?>
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+</ul>
+<!-- End of Sidebar -->

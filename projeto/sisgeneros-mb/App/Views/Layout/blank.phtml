@@ -1,0 +1,94 @@
+<?php
+
+use App\Config\Configurations as cfg;
+
+$cfg = cfg::htrFileConfigs();
+
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="Edson B S Monteiro">
+        <base href="//<?= cfg::DOMAIN; ?><?= cfg::DEFAULT_URI; ?>">
+        <title>
+            <?= $this->view->title ?? '' ?>
+            <?= ' :: ' . $cfg->application->name . ' ' . $cfg->application->version . ' ::' ?>
+        </title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="attach/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- MetisMenu CSS -->
+        <link href="attach/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="css/sb-admin-2.css" rel="stylesheet">
+        <link href="css/custom.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="attach/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+        <!-- jQuery -->
+        <script src="attach/jquery/dist/jquery.min.js"></script>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+
+    <body>
+        <?= $this->content(); ?> 
+        <!-- Bootstrap Core JavaScript -->
+        <script src="attach/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <!-- Metis Menu Plugin JavaScript -->
+        <script src="attach/metisMenu/dist/metisMenu.min.js"></script>
+
+        <!-- Mask Money Plugin JavaScript -->
+        <script src="attach/maskMoney/jquery.maskMoney.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="js/sb-admin-2.min.js"></script>
+        <!-- Script padrão de envio de formulário -->
+        <script type="text/javascript">
+            function resetForm() {
+                document.getElementById("form").reset();
+            }
+            function focusOn(idCampo) {
+                //document.getElementsById( nameCampo ).focus();
+                document.getElementById(idCampo).focus();
+            }
+            function confirmar(texto, url) {
+                if (confirm(texto)) {
+                    window.location = url;
+                }
+            }
+
+            $(document).ready(function () {
+                $("#preco").maskMoney({prefix: '', allowNegative: true, thousands: '.', decimal: ',', affixesStay: false});
+                $('#form').submit(function () {
+                    var dados = $(this).serialize();
+                    $.ajax({
+                        type: "POST", // Tipo de metodo
+                        url: $(this).attr("action"), //Recebe o valor da action do form
+                        data: dados,
+                        success: function (data) //Se tiver sucesso...
+                        {
+                            $("#resultado").html(data);
+                        }
+                    });
+                    return false;
+                });
+                //Requisita                           
+            });
+        </script>
+    </body>
+</html>
+

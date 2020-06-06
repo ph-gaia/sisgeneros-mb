@@ -1,0 +1,291 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5 class="page-header"><?= $this->view->title ?></h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-table fa-fw"></i> Formulário de Cadastro
+                    </div>
+                    <div id="resultado"></div>
+                    <form action="<?= $this->view->controller; ?>altera/" method="post" id="form">
+                        <div class="panel-body">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="oms-tab" data-toggle="tab" href="#cadastro" role="tab" aria-controls="cadastro" aria-selected="true">Cadastro</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="solemp-tab" data-toggle="tab" href="#solemp" role="tab" aria-controls="solemp" aria-selected="false">Dados SOLEMP DE GÊNEROS</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="cadastro" role="tabpanel" aria-labelledby="oms-tab">
+                                    <input type="hidden" name="id" value="<?= $this->view->result['id']; ?>">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>UASG</label>
+                                                <input type="text"
+                                                    id="uasg"
+                                                    name="uasg"
+                                                    placeholder="UASG da OM"
+                                                    class="form-control"
+                                                    maxlength="6"
+                                                    value="<?= $this->view->result['uasg']; ?>"
+                                                    required>
+                                                <p class="help-block">UASG (Deve ser um número <b>INTEIRO</b>)</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Nome</label>
+                                                <input type="text"
+                                                    id="name"
+                                                    name="name"
+                                                    placeholder="Nome da OM"
+                                                    class="form-control"
+                                                    maxlength="100"
+                                                    value="<?= $this->view->result['name']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Indicativo Naval</label>
+                                                <input type="text"
+                                                    id="naval_indicative"
+                                                    name="naval_indicative"
+                                                    placeholder="Indicativo Naval da OM"
+                                                    class="form-control"
+                                                    maxlength="6"
+                                                    value="<?= $this->view->result['naval_indicative']; ?>"
+                                                    required>
+                                                <p class="help-block">Ex.: QRTDIS; CITBEL.</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Ordenador de Despesa</label>
+                                                <input type="text"
+                                                    id="expense_originator"
+                                                    name="expense_originator"
+                                                    placeholder="Ordenador de Despesa"
+                                                    class="form-control"
+                                                    value="<?= $this->view->result['expense_originator']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Ordenador de Despesa Posto</label>
+                                                <input type="text"
+                                                    id="expense_originator_graduation"
+                                                    name="expense_originator_graduation"
+                                                    placeholder="Ordenador de Despesa Posto"
+                                                    class="form-control"
+                                                    value="<?= $this->view->result['expense_originator_graduation']; ?>"
+                                                    required>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-6">
+
+                                            <div class="form-group">
+                                                <label>Agente Fiscal</label>
+                                                <input type="text"
+                                                    id="fiscal_agent"
+                                                    name="fiscal_agent"
+                                                    placeholder="Nome do Agente Fiscal"
+                                                    class="form-control"
+                                                    maxlength="100"
+                                                    value="<?= $this->view->result['fiscal_agent']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Agente Fiscal Posto</label>
+                                                <input type="text"
+                                                    id="fiscal_agent_graduation"
+                                                    name="fiscal_agent_graduation"
+                                                    placeholder="Posto/Graduação do Agente Fiscal"
+                                                    class="form-control"
+                                                    maxlength="50"
+                                                    value="<?= $this->view->result['fiscal_agent_graduation']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Gestor de Municiamento</label>
+                                                <input type="text"
+                                                    id="munition_manager"
+                                                    name="munition_manager"
+                                                    placeholder="Nome do Gestor de Municiamento"
+                                                    class="form-control"
+                                                    maxlength="100"
+                                                    value="<?= $this->view->result['munition_manager']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Gestor de Municiamento Posto</label>
+                                                <input type="text"
+                                                    id="munition_manager_graduation"
+                                                    name="munition_manager_graduation"
+                                                    placeholder="Posto/Graduação do Gestor de Municiamento"
+                                                    class="form-control"
+                                                    maxlength="50"
+                                                    value="<?= $this->view->result['munition_manager_graduation']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Fiel de Municiamento</label>
+                                                <input type="text"
+                                                    id="munition_fiel"
+                                                    name="munition_fiel"
+                                                    placeholder="Nome do Fiel de Municiamento"
+                                                    class="form-control"
+                                                    maxlength="100"
+                                                    value="<?= $this->view->result['munition_fiel']; ?>"
+                                                    required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Fiel de Municiamento Posto</label>
+                                                <input type="text"
+                                                    id="munition_fiel_graduation"
+                                                    name="munition_fiel_graduation"
+                                                    placeholder="Posto/Graduação do Fiel de Municiamento"
+                                                    class="form-control"
+                                                    maxlength="50"
+                                                    value="<?= $this->view->result['munition_fiel_graduation']; ?>"
+                                                    required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="solemp" role="tabpanel" aria-labelledby="solemp-tab">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="ug" class="col-form-label">UG:</label>
+                                                <input 
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="ug"
+                                                    name="ug"
+                                                    value="<?= $this->view->result['ug']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="ptres" class="col-form-label">PTRES:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="ptres"
+                                                    name="ptres"
+                                                    value="<?= $this->view->result['ptres']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="ai" class="col-form-label">AI:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="ai"
+                                                    name="ai"
+                                                    value="<?= $this->view->result['ai']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="do" class="col-form-label">DO:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="do"
+                                                    name="do"
+                                                    value="<?= $this->view->result['do']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="bi" class="col-form-label">BI:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="bi"
+                                                    name="bi"
+                                                    value="<?= $this->view->result['bi']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fr" class="col-form-label">FR:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="fr"
+                                                    name="fr"
+                                                    value="<?= $this->view->result['fr']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nd" class="col-form-label">ND:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="nd"
+                                                    name="nd"
+                                                    value="<?= $this->view->result['nd']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="centro_custo" class="col-form-label">Centro de Custo:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="cost_center"
+                                                    name="cost_center"
+                                                    value="<?= $this->view->result['cost_center']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="classification_items" class="col-form-label">Classificação de Itens:</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="classification_items"
+                                                    name="classification_items"
+                                                    value="<?= $this->view->result['classification_items']; ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary"><i class="fa fa-check"></i> Registrar</button>
+                                    <a href="<?= $this->view->controller; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

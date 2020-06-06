@@ -1,0 +1,248 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+use App\Config\Configurations as cfg;
+
+$busca = $this->getParametro('busca');
+$busca = $busca ? '/busca/' . $busca : '';
+$userNivel = $this->view->userLoggedIn['level'];
+
+$pathSolemp = getcwd() . cfg::DS . 'arquivos' . cfg::DS . 'solemps' . cfg::DS;
+
+/**
+ * This function build the string used in src attribute of action buttons
+ * @param array $value The current solicitation
+ * @param string $action The action to be executed
+ * @return string The build string
+ */
+$buildUrlBtnAction = function (array $value, string $action = 'proximo'): string {
+    return $this->view->controller
+        . 'processar/acao/'
+        . $action
+        . '/status/'
+        . $value['status']
+        . '/id/'
+        . $value['id'];
+};
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($busca) {
+        return [
+            'previous' => "{$controllerName}ver/pagina/{$btn['previous']}" . $busca,
+            'next' => "{$controllerName}ver/pagina/{$btn['next']}" . $busca,
+            'current' => "{$controllerName}ver/pagina/" . Pagination::CURRENT_PAGE . $busca
+        ];
+    });
+
+?>
+<!-- Modal da cancelamento e rejeição -->
+<div class="modal fade" id="modalAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Descreva um motivo para essa ação</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>rejeitarCancelar" method="post">
+                <div class="modal-body">
+                    <div id="resultado"></div>
+                    <input type="hidden" name="action" id="action" />
+                    <input type="hidden" name="request_id" id="request_id" />
+                    <div class="form-group">
+                        <label>Motivo da ação</label>
+                        <textarea
+                            id="reason"
+                            name="reason"
+                            placeholder="Descreva aqui..."
+                            class="form-control"
+                            rows="3"
+                            required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Solicitações</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?><br>
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <form
+                            action="<?= $this->view->controller; ?>ver/pagina/<?= $this->view->btn['current']; ?>"
+                            class="search-form"
+                            onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="Nº Solicitação, OM, Status ou Data (DD-MM-YYYY)">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>OM</th>
+                            <th>Fornecedor</th>
+                            <th>NF</th>
+                            <th>Total</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Alteração</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value): ?>
+                            <tr>
+                                <td><?= $value['number']; ?></td>
+                                <td><?= $value['naval_indicative']; ?></td>
+                                <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
+                                <td><?= $value['invoice'] ?: ''; ?></td>
+                                <td><?= View::floatToMoney($value['total']) ?></td>
+                                <td>
+                                    <?php if ($value['biddings_id']) : ?>
+                                        <i class="fa fa-group"></i> LIC
+                                    <?php else : ?>
+                                        <i class="fa fa-shopping-cart"></i> NL
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?= $value['status'] ?>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">
+                                        <?= View::humanDate($value['updated_at']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php if (!in_array($userNivel, ['NORMAL']) && !in_array($value['status'], ['REJEITADO', 'ELABORADO', 'CANCELADO'])): ?>
+                                        <button class="btn btn-default btn-sm" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <i class="fa fa-bars"></i>
+                                        </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+                                        <li style="margin-top: 5px">
+                                            <a href="<?= $this->view->controller; ?>visualizar/id/<?= $value['id']; ?>" data-id="<?= $value['id']; ?>" class="btn btn-info btn-sm" style="width: 100%;">
+                                                <i class="fa fa-file-pdf-o"></i> Visualizar
+                                            </a>
+                                        </li>
+                                        <li style="margin-top: 5px">
+                                            <button data-id="<?= $value['id']; ?>" class="btn btn-warning btn-sm btn-reject" style="width: 100%;">
+                                                <i class="fa fa-repeat"></i> Rejeitar
+                                            </button>
+                                        </li>
+                                        <li style="margin-top: 5px">
+                                            <button data-id="<?= $value['id']; ?>" class="btn btn-danger btn-sm btn-cancel" style="width: 100%;">
+                                                <i class="fa fa-ban"></i> Cancelar
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <?php endif; ?>
+
+                                    <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-copy"></i> Itens
+                                    </a>
+
+                                    <!-- BUTTONS -->
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && in_array($value['status'], ['ELABORADO', 'REJEITADO'])): ?>
+                                        <a href="<?= $this->view->controller; ?>encaminhar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-forward"></i> Encaminhar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO']) && $value['status'] == 'ENCAMINHADO'): ?>
+                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Provisionar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'FISCAL']) && $value['status'] == 'PROVISIONADO'): ?>
+                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Verificar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ORDENADOR']) && $value['status'] == 'VERIFICADO'): ?>
+                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Autorizar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']) && $value['status'] == 'AUTORIZADO'): ?>
+                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Conferir
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'CONTROLADOR_FINANCA']) && $value['status'] == 'CONFERIDO'): ?>
+                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Empenhar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $value['status'] == 'ELABORADO'): ?>
+                                        <a
+                                            onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($value['status'], ['SOLICITADO', 'RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA'])): ?>
+                                        <a href="<?= $this->view->controller; ?>pdf/id/<?= $value['id']; ?>" class="btn btn-secondary btn-sm">
+                                            <i class="fa fa-file-pdf-o"></i> PDF
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'OBTENCAO', 'FINANCAS']) && !in_array($value['status'], ['CANCELADO', 'REJEITADO', 'ELABORADO'])): ?>
+                                        <a href="<?= $buildUrlBtnAction($value, 'anterior') ?>" class="btn btn-warning btn-sm">
+                                            <i class="fa fa-rotate-left"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <!-- END BUTTOS -->
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.search-button').click(function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var formAction = $('.search-form').attr('action');
+        if (searchValue && formAction) {
+            window.location = formAction + '/busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    });
+    $('.btn-reject').click(function() {
+        var id = $(this).attr('data-id');
+
+        $('#action').val('REJEITADO');
+        $('#request_id').val(id);
+        $('#modalAction').modal('show');
+    });
+    $('.btn-cancel').click(function() {
+        var id = $(this).attr('data-id');
+
+        $('#action').val('CANCELADO');
+        $('#request_id').val(id);
+        $('#modalAction').modal('show');
+    });
+</script>

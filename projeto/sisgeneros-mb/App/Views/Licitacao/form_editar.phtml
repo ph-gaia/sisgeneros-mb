@@ -1,0 +1,106 @@
+<?php
+
+use App\Helpers\View;
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5 class="page-header"><?= $this->view->title ?></h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-table fa-fw"></i> Formulário de Cadastro
+                    </div>
+                    <div class="panel-body">
+                        <div id="resultado"></div>
+                        <form action="<?= $this->view->controller; ?>altera/" method="post" id="form">
+                            <input type="hidden" name="id" value="<?= $this->view->result['id']; ?>">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Número</label>
+                                        <input type="text"
+                                               name="number"
+                                               id="number"
+                                               placeholder="Número da Licitação"
+                                               class="form-control"
+                                               maxlength="10"
+                                               value="<?= $this->view->result['number']; ?>"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Validade</label>
+                                        <input type="text"
+                                               name='validate'
+                                               id='validate'
+                                               placeholder="Data de Validade da Licitação"
+                                               class="form-control"
+                                               data-mask="##-##-####"
+                                               data-mask-reverse="true"
+                                               maxlength="10"
+                                               value="<?= View::humanDate($this->view->result['validate']); ?>"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Descrição</label>
+                                        <input type="text"
+                                               name="description"
+                                               id="description"
+                                               placeholder="Descrição da Licitação"
+                                               class="form-control"
+                                               maxlength="30"
+                                               value="<?= $this->view->result['description']; ?>"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>UASG</label>
+                                        <input type="text"
+                                               name="uasg"
+                                               id="uasg"
+                                               placeholder="Número da UASG da Licitação"
+                                               class="form-control"
+                                               maxlength="6"
+                                               value="<?= $this->view->result['uasg']; ?>"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Órgão Resposável</label>
+                                        <input type="text"
+                                               name="uasg_name"
+                                               id="uasg_name"
+                                               placeholder="Nome do Órgão Resposável pela Licitação"
+                                               class="form-control"
+                                               maxlength="50"
+                                               value="<?= $this->view->result['uasg_name']; ?>"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-primary">
+                                            <i class="fa fa-check"></i> Alterar
+                                        </button>
+                                        <a href="<?= $this->view->controller; ?>" class="btn btn-warning">
+                                            <i class="fa fa-arrow-left"></i> Voltar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

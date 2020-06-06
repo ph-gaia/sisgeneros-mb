@@ -1,0 +1,25 @@
+version: "3.2"
+
+services:
+  php:
+    build: './php/'
+    container_name: sg-app
+    networks:
+      - backend
+    volumes:
+      - ./projeto/:/var/www/html/
+
+  apache:
+    build: './apache/'
+    container_name: sg-webserver
+    depends_on:
+      - php
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./projeto/:/var/www/html/
+
+networks:
+  backend:

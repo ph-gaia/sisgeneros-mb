@@ -1,0 +1,46 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5 class="page-header"><?= $this->view->title ?></h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-table fa-fw"></i> Formulário de Edição
+                    </div>
+                    <div class="panel-body">
+                        <div id="resultado"></div>
+                        <form action="<?= $this->view->controller; ?>altera/idlista/<?= $this->view->idlista; ?>" method="post" id="form">
+                            <input type="hidden" name="id" value="<?= $this->view->result['id']; ?>">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Quantidade</label>
+                                        <input type="text"
+                                               name="quantity"
+                                               id="quantity"
+                                               placeholder="Quantidade Solicitada"
+                                               class="form-control"
+                                               value="<?= intval($this->view->result['quantity']); ?>"
+                                               data-mask="000000"
+                                               data-mask-reverse="true"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-primary"><i class="fa fa-check"></i> Alterar</button>
+                                        <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $this->view->idlista; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

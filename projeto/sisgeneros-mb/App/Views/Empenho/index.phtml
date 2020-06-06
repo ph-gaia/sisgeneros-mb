@@ -1,0 +1,105 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+
+$pagination = Pagination::make($this);
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Empenhos</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <form action="<?= $this->view->controller; ?>ver/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="Nº Empenho, OM, Status ou Data (DD-MM-YYYY)">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 10px; padding-top: 10px;">
+                    <div class="col-lg-12">
+                        <div class="float-right">
+                            <button type="button" class="btn btn-success btn-sm exportToExcel">
+                                <i class="fa fa-file-excel-o"></i> Exportar para excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <table class="table2excel table">
+                    <thead>
+                        <tr>
+                            <th>Nº. Empenho</th>
+                            <th>OM</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Data de criação</th>
+                            <th class="noExl"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value) : ?>
+                            <tr>
+                                <td><?= $value['code']; ?></td>
+                                <td><?= $value['naval_indicative']; ?></td>
+                                <td><?= $value['total']; ?></td>
+                                <td><?= $value['status']; ?></td>
+                                <td>
+                                    <span class="badge badge-danger">
+                                        <?= View::humanDate($value['created_at']); ?>
+                                    </span>
+                                </td>
+                                <td class="noExl">
+                                    <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-list"></i> Pedidos
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.search-button').click(function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var formAction = $('.search-form').attr('action');
+        if (searchValue && formAction) {
+            window.location = formAction + '/busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    });
+    $(function() {
+        $(".exportToExcel").click(function(e) {
+            $('.table2excel').table2excel({
+                exclude: ".noExl",
+                name: "Excel Empenho",
+                filename: "Empenho" + new Date().toISOString().replace(/[\-\:\.]/g, "") + ".xlsx",
+                fileext: ".xlsx",
+                exclude_img: true,
+                exclude_links: true,
+                exclude_inputs: true,
+                preserveColors: true
+            });
+        });
+    });
+</script>

@@ -1,0 +1,192 @@
+<?php
+
+use App\Helpers\View;
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3></h3>
+                <div id="resultado"></div>
+                <?php if (isset($this->view->resultLicitacao['number'])): ?>
+                    <div class="alert alert-info" role="alert">
+                        Licitação: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
+                        Órgão: <strong><?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
+                        Fornecedor:
+                        <strong>
+                            <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
+                            - <?= $this->view->resultSolicitacao['suppliers_name']; ?>
+                        </strong>
+                        (<a href="#"
+                            class="text-danger"
+                            data-toggle="modal"
+                            data-target="#modalSuppliersDetails">
+                            mais detalhes
+                        </a>)
+                        <br>
+                        OM:
+                        <strong>
+                            <?= $this->view->resultSolicitacao['naval_indicative']; ?>
+                        </strong>
+                        <br>
+                        NF:
+                        <strong>
+                            <?= $this->view->resultSolicitacao['invoice']; ?>
+                        </strong>
+                        <br>
+                        Solicitação:
+                        <strong>
+                            <?= $this->view->resultSolicitacao['number']; ?>
+                            - <?= $this->view->resultSolicitacao['status']; ?>
+                        </strong>
+                        <br>
+                        Data para entrega: <strong><?= View::humanDate($this->view->resultSolicitacao['delivery_date']); ?></strong>
+                        <?php if ($this->view->resultSolicitacao['complement']): ?>
+                            <br>
+                            Observações do pedido:
+                            <strong>
+                                <?= $this->view->resultSolicitacao['complement']; ?>
+                            </strong>
+                        <?php endif; ?>
+                        <?php if ($this->view->resultSolicitacao['observation']): ?>
+                            <br>
+                            Observações do recebimento:
+                            <strong>
+                                <?= $this->view->resultSolicitacao['observation']; ?>
+                            </strong>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($this->view->result[0])): ?>
+                    <form action="<?= $this->view->controller; ?>registrarrecebimento/id/<?= $this->view->result[0]['requests_id']; ?>" method="post" id="form">
+                        <input type="hidden" name="suppliers_id" value="<?= $this->view->result[0]['suppliers_id'] ?>">
+                        <input type="hidden" name="biddings_id" value="<?= $this->view->result[0]['biddings_id'] ?>">
+                        <input type="hidden" name="delivery_date" value="<?= View::humanDate($this->view->result[0]['delivery_date']); ?>">
+                        <button class="btn btn-success" id='btn_enviar'>
+                            <i class="fa fa-check"></i> Confirmar Recebimento
+                        </button>
+                        <a href="<?= $this->view->controller; ?>" class="btn btn-warning" id="btn_voltar"><i class="fa fa-arrow-left"></i> Voltar</a>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-lg-4" id="invoice_container">
+                                <label>Número da Nota Fiscal: </label>
+                                <input type="text" name="invoice"
+                                       id="invoice"
+                                       class="form-control"
+                                       maxlength="20"
+                                       placeholder="Número da nota fiscal"
+                                       autofocus
+                                       required>
+                            </div>
+                            <?php if (isset($this->view->result[0]['biddings_id']) && $this->view->result[0]['biddings_id'] != '0'): ?>
+                                <div class="col-lg-4" id='evaluation'>
+                                    <label>Avaliação da entrega: </label><br>
+                                    <input type="radio" name='evaluation' value="1">
+                                    <span class="badge badge-danger">
+                                        1
+                                    </span>&nbsp;
+                                    <input type="radio" name='evaluation' value="2">
+                                    <span class="badge badge-warning">
+                                        2
+                                    </span>&nbsp;
+                                    <input type="radio" name='evaluation' value="3" checked>
+                                    <span class="badge badge-dark">
+                                        3
+                                    </span>&nbsp;
+                                    <input type="radio" name='evaluation' value="4">
+                                    <span class="badge badge-info">
+                                        4
+                                    </span>&nbsp;
+                                    <input type="radio" name='evaluation' value="5">
+                                    <span class="badge badge-success">
+                                        5
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="row" style="padding-top: 10px; margin-bottom: 20px;">
+                            <div class="col-lg-4" id="observation">
+                                <label>Observação: </label>
+                                <textarea name="observation"
+                                          placeholder="Observações"
+                                          class="form-control"></textarea>
+                            </div>
+                            <?php if (isset($this->view->result[0]['biddings_id']) && $this->view->result[0]['biddings_id'] != '0'): ?>
+                                <div class="col-lg-6" id="legenda">
+                                    <label>Legenda:</label><br>
+                                    <span class="badge badge-danger" style="font-size: 14px !important;">1 - Muito insatisfeito</span> à
+                                    <span class="badge badge-success" style="font-size: 14px !important;">5 - Muito satisfeito</span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <table class="table" id='tabela_result'>
+                            <thead>
+                                <tr>
+                                    <th width="8%">Entregue</th>
+                                    <th width="8%">Solicitado</th>
+                                    <th>Item</th>
+                                    <th>Valor Unitário</th>
+                                    <th>UF</th>
+                                    <th>Nome</th>
+                                    <th>Fornecedor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($this->view->result as $value): ?>
+                                    <tr>
+                                        <td>
+                                            <input type="hidden"
+                                                   name="ids[]"
+                                                   value="<?= $value['id']; ?>">
+                                            <input type="hidden"
+                                                   name="uf[]"
+                                                   value="<?= $value['uf']; ?>">
+                                            <input type="hidden"
+                                                   name="value[]"
+                                                   value="<?= $value['value']; ?>">
+                                            <input type="hidden"
+                                                   name="name[]"
+                                                   value="---">
+                                            <input type="text"
+                                                   name="quantity[]"
+                                                   id="quantity"
+                                                   value="<?= intval($value['quantity']); ?>"
+                                                   class="form-control">
+                                        </td>
+                                        <td><?= intval($value['quantity']); ?></td>
+                                        <td><?= $value['number']; ?></td>
+                                        <td><?= View::floatToMoney($value['value']); ?></td>
+                                        <td><?= $value['uf']; ?></td>
+                                        <td><?= $value['name']; ?></td>
+                                        <td>
+                                            <span class="badge badge-dark">
+                                                <?= $value['suppliers_name']; ?>
+                                            </span>
+                                            <br>
+                                            <span>
+                                                <?= $value['cnpj']; ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </form>
+
+                <?php else: ?>
+                    <div class="alert alert-info">
+                        Esta solicitação já foi recebida.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function mostrar(id) {
+        $("#" + id).show();
+    }
+    function ocultar(id) {
+        $("#" + id).hide();
+    }
+</script>

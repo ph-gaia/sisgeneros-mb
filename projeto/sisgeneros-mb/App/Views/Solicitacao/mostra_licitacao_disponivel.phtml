@@ -1,0 +1,71 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) {
+        return [
+            'previous' => "{$controllerName}novo/pagina/{$btn['previous']}",
+            'next' => "{$controllerName}novo/pagina/{$btn['next']}",
+            'current' => "{$controllerName}novo/pagina/" . Pagination::CURRENT_PAGE
+        ];
+    });
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Licitações Disponíveis</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>number</th>
+                            <th>Descrição</th>
+                            <th>UASG</th>
+                            <th>Órgão</th>
+                            <th>Validade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value): ?>
+                            <tr class="table-licitacao" data-id="<?= $value['id']; ?>">
+                                <td><?= $value['number']; ?></td>
+                                <td><?= $value['description']; ?></td>
+                                <td><?= $value['uasg']; ?></td>
+                                <td><?= $value['uasg_name']; ?></td>
+                                <td>
+                                    <span class="label label-danger">
+                                        <?= View::humanDate($value['validate']); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('.table-licitacao').click(function link() {
+        var id = this.dataset.id;
+        if (id) {
+            window.location = '<?= $this->view->controller; ?>fornecedor/idlista/' + id;
+        }
+    });
+</script>
+<style>
+    .table-licitacao:hover {
+        cursor: pointer;
+    }
+</style>

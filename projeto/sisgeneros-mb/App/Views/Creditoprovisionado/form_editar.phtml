@@ -1,0 +1,116 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\View;
+use App\Helpers\Utils;
+
+$id = $this->view->result['id'];
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($id) {
+    return [
+        'previous' => "{$controllerName}detalhar/id/{$id}/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}detalhar/id/{$id}/pagina/{$btn['next']}",
+        'current' => "{$controllerName}detalhar/id/{$id}/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Detalhes do Crédito Provisionado</h5>
+                <div class="alert alert-info" role="alert">
+                    Crédito Provisionado: <strong><?= $this->view->result['credit_note']; ?></strong><br>
+                    OM: <strong><?= $this->view->result['naval_indicative']; ?></strong><br>
+                    Valor: <strong><?= Utils::floatToMoney($this->view->result['value']); ?></strong><br>
+                </div>
+            </div>
+        </div>
+        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+        <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
+            <div class="col-md-12">
+                <i class="fa fa-plus-circle"></i> Novo Registro
+            </div>
+        </div>
+        <div id="resultado"></div>
+        <form action="<?= $this->view->controller; ?>registraOperacao/" method="post">
+            <div class="row">
+                <input type="hidden" name="provisioned_credits_id" value="<?= $this->view->result['id']; ?>">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Operação</label>
+                        <select name="operation_type"
+                                id="operation_type"
+                                class="form-control"
+                                required>
+                                <option value="CREDITO">Crédito</option>
+                                <option value="DEBITO">Débito</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Valor</label>
+                        <input type="text"
+                                id="value"
+                                name="value"
+                                placeholder="Valor da operação"
+                                class="form-control"
+                                data-mask="000.000.000,00"
+                                data-mask-reverse="true"
+                                maxlength="12"
+                                required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Observação</label>
+                        <textarea id="observation"
+                                name="observation"
+                                placeholder="Observação da operação"
+                                class="form-control"
+                                required></textarea>
+                    </div>
+                    <div class="form-group pull-right">
+                        <br>
+                        <button class="btn btn-primary"><i class="fa fa-check"></i> Registrar</button>
+                        <a href="<?= $this->view->controller; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <?php endif; ?>
+        <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
+            <div class="col-md-12">
+                <i class="fa fa-list"></i> Histórico de Débitos e Créditos
+            </div>
+        </div>
+        <?= $pagination; ?>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Operação</th>
+                    <th>Valor</th>
+                    <th>Observação</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->historico as $value) : ?>
+                    <tr>
+                        <td>
+                            <span class="badge badge-<?= ($value['operation_type'] == 'CREDITO') ? 'primary' : 'danger' ?>">
+                                <?= $value['operation_type']; ?>
+                            </span>
+                        </td>
+                        <td><?= Utils::floatToMoney($value['value']); ?></td>
+                        <td><?= $value['observation']; ?></td>
+                        <td><?= View::humanDate($value['created_at']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?= $pagination; ?>
+    </div>
+</div>

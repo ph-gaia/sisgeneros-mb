@@ -1,0 +1,80 @@
+<?php
+
+use App\Helpers\Pagination;
+
+$idlista = $this->view->idlista;
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+        return [
+            'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
+            'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
+            'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+        ];
+    });
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Itens da Solicitação</h5>
+                <div class="alert alert-info" role="alert">
+                    Número da Solicitação: <strong><?= $this->view->resultSolicitacao['number_solicitacao']; ?></strong><br>
+                    Organização Militar: <strong><?= $this->view->resultSolicitacao['om_nome']; ?></strong><br>
+                    Data da Solicitação: 
+                    <span class="text-danger">
+                        <?= date('d-m-Y', $this->view->resultSolicitacao['created_at']); ?>
+                    </span><br>
+                    Data estipulada para entrega: 
+                    <span class="text-danger">
+                        <?= $this->view->resultSolicitacao['delivery_date']; ?>
+                    </span>
+                    <br>
+                    <?php if ($this->view->resultSolicitacao['nao_licitado'] == 0): ?>
+                        Fornecedor: <strong><?= $this->view->resultSolicitacao['suppliers_name']; ?></strong><br>
+                        Licitação: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
+                        Órgão:
+                        <strong>
+                            <?= $this->view->resultLicitacao['uasg']; ?> - 
+                            <?= $this->view->resultLicitacao['uasg_name']; ?>
+                        </strong>
+                    <?php else: ?>
+                        <br>
+                        <strong>
+                            <i class="fa fa-info-circle"></i> Não Licitado
+                        </strong>
+                    <?php endif; ?>
+                </div>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <?= $pagination; ?>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Solicitado</th>
+                            <th>Fornecido</th>
+                            <th>UF</th>
+                            <th>Nº Item</th>
+                            <th>Nome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->view->result as $value): ?>
+                            <tr>
+                                <td><?= $value['quantity']; ?></td>
+                                <td><?= $value['delivered']; ?></td>
+                                <td><?= $value['uf']; ?></td>
+                                <td><?= $value['item_number']; ?></td>
+                                <td><?= $value['name']; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
