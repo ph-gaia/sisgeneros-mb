@@ -189,6 +189,8 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $solicitacaoItem->paginator($this->getParametro('pagina'), $this->view->idlista);
         $this->view->result = $solicitacaoItem->getResultadoPaginator();
         $this->view->btn = $solicitacaoItem->getNavePaginator();
+        $this->view->totalSolicitacao = $solicitacaoItem->findTotalValueByRequestId($this->view->idlista);
+        $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item_solicitacao');
     }
 

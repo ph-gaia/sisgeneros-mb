@@ -21,7 +21,7 @@ use App\Helpers\View;
                 <div id="resultado"></div>
                 <form action="<?= $this->view->controller; ?>registra" method="post" id="form">
                     <div class="alerta-credito" style="display: none;">
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-danger" role="alert">
                             O saldo de crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
                             O valor total da sua <strong>solicitação</strong> é de <strong id="valorTotal"></strong><br><br>
                             <strong>Você deseja continuar com essa solicitação?</strong><br>
@@ -35,10 +35,9 @@ use App\Helpers\View;
                     </div>
                     <div class="alerta-item" style="display: none;">
                         <div class="alert alert-danger" role="alert">
-                            A quantidade de Café <strong>disponível</strong> atualmente é de <strong>5</strong>.<br>
-                            A quantidade <strong>solicitada</strong> é de <strong>7</strong>.<br><br>
+                            <div class="listItem"></div>
                             <strong>Você deseja continuar com essa solicitação?</strong><br>
-                            <button class="btn btn-success">
+                            <button class="btn btn-success btn-item-yes">
                                 <i class="fa fa-check"></i> Sim
                             </button>
                             <span class="btn btn-danger btn-item-no">
@@ -105,12 +104,13 @@ use App\Helpers\View;
                                 disabled></textarea>
                         </div>
                     </div>
-                    <table class="table">
+                    <table class="table table-responsive">
                         <thead>
                             <tr>
                                 <th width="8%">Quantidade</th>
                                 <th>Item</th>
                                 <th>Valor Unitário</th>
+                                <th width="20%">Quantidade Disponível</th>
                                 <th>UF</th>
                                 <th>Nome</th>
                             </tr>
@@ -124,9 +124,19 @@ use App\Helpers\View;
                                                value="<?= $value['id']; ?>">
                                         <input type="hidden"
                                                id="valueItem"
-                                               name="valueItem[]"
                                                class="valueItem"
+                                               name="valueItem[]"
                                                value="<?= $value['value']; ?>">
+                                        <input type="hidden"
+                                               id="qtdAvailable"
+                                               class="qtdAvailable"
+                                               name="qtdAvailable[]"
+                                               value="<?= $value['quantity_available']; ?>">
+                                        <input type="hidden"
+                                               id="itemName"
+                                               class="itemName"
+                                               name="itemName[]"
+                                               value="<?= $value['name']; ?>">
                                         <input type="text"
                                                name="quantity[]"
                                                id="quantity"
@@ -134,6 +144,7 @@ use App\Helpers\View;
                                     </td>
                                     <td><?= $value['number']; ?></td>
                                     <td><?= View::floatToMoney($value['value']) ?></td>
+                                    <td><?= $value['quantity_available']; ?></td>
                                     <td><?= $value['uf']; ?></td>
                                     <td><?= $value['name']; ?></td>
                                 </tr>
@@ -160,15 +171,32 @@ use App\Helpers\View;
     }
     $('.btn-save').click(function() {
         var total = 0;
+        var ItensPedidos = [];
+        $('.listItem').html("");
         $('input[name="quantity[]"]').each(function() {
             if ($(this).val() != '') {
                 var quantity = parseFloat($(this).val());
                 var price = parseFloat($(this).closest("td").find("input.valueItem:hidden").val());
-                
+                var qtdAvailable = parseFloat($(this).closest("td").find("input.qtdAvailable:hidden").val());
+                var name = $(this).closest("td").find("input.itemName:hidden").val();
+
                 var subTot = (quantity * price);
                 total += subTot;
+
+                if (qtdAvailable <= quantity) {
+                    ItensPedidos.push({"name": name, "available": qtdAvailable, "quantity": quantity})
+                }
             }
+            $(this).prop("disabled", true);
         });
+        if (ItensPedidos.length > 0) {
+            for(let i = 0; i < ItensPedidos.length; i++) {
+                addItemList(ItensPedidos[i].name, ItensPedidos[i].available, ItensPedidos[i].quantity);
+            }
+        } else {
+            $('.listItem').append("Todos os itens solicitados possuem saldo disponíveis para o pedido.");
+        }
+        
         $('#valorTotal').html('R$ ' + total.toFixed(2));
         $(this).hide()
         $('.alerta-credito').show()
@@ -180,9 +208,21 @@ use App\Helpers\View;
     $('.btn-credito-no').click(function() {
         $('.alerta-credito').hide()
         $('.btn-save').show()
+        $('input[name="quantity[]"]').each(function() {
+            $(this).prop("disabled", false);
+        });
     });
     $('.btn-item-no').click(function() {
         $('.alerta-credito').show()
         $('.alerta-item').hide()
     });
+    $('.btn-item-yes').click(function() {
+        $('input[name="quantity[]"]').each(function() {
+            $(this).prop("disabled", false);
+        });
+    });
+    function addItemList(name, available, requested) {
+        var html = `A quantidade de ${name} <strong>disponível</strong> atualmente é de <strong>${available}</strong>.<br>A quantidade <strong>solicitada</strong> é de <strong>${requested}</strong>.<br><br>`;
+        $('.listItem').append(html);
+    }
 </script>

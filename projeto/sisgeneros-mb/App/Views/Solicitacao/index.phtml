@@ -168,7 +168,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                         </a>
                                     <?php endif; ?>
                                     <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO']) && $value['status'] == 'ENCAMINHADO'): ?>
-                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                        <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-check"></i> Provisionar
                                         </a>
                                     <?php endif; ?>

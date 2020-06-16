@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -44,12 +45,18 @@ class SolicitacaoItemModel extends CRUD
 
     public function paginator($pagina, $idlista)
     {
+        $inner = " as items " .
+            " INNER JOIN requests as req ON req.id = items.requests_id " .
+            " INNER JOIN biddings_items as bidding ON bidding.biddings_id = req.biddings_id 
+          and bidding.name LIKE items.name ";
+
         $dados = [
-            'entidade' => $this->entidade,
+            'select' => 'items.*, bidding.quantity_available',
+            'entidade' => $this->entidade . $inner,
             'pagina' => $pagina,
             'maxResult' => 50,
             'orderBy' => 'number ASC',
-            'where' => 'requests_id = ?',
+            'where' => 'items.requests_id = ?',
             'bindValue' => [$idlista]
         ];
 
@@ -209,6 +216,18 @@ class SolicitacaoItemModel extends CRUD
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$requestId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findTotalValueByRequestId($requestId)
+    {
+        $query = ""
+            . " SELECT SUM(items.value * items.quantity) as total "
+            . " FROM requests "
+            . " INNER JOIN requests_items as items ON items.requests_id = requests.id "
+            . " WHERE items.requests_id = ? ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$requestId]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     private function setAll($dados)
