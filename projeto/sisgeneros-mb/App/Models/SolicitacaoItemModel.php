@@ -88,6 +88,7 @@ class SolicitacaoItemModel extends CRUD
                 'value' => $value['value']
             ];
             parent::novo($dados);
+            $item->atualizarQtdComprometida($idItem, $quantity);
         }
     }
 

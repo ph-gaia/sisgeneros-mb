@@ -63,6 +63,9 @@ class ItemModel extends CRUD
             'name' => $this->getName(),
             'uf' => $this->getUf(),
             'quantity' => $this->getQuantity(),
+            'quantity_compromised' => $this->getQuantity(),
+            'quantity_commited' => $this->getQuantity(),
+            'quantity_available' => $this->getQuantity(),
             'value' => $this->getValue(),
             'active' => $this->getActive()
         ];
@@ -97,6 +100,25 @@ class ItemModel extends CRUD
 
         if (parent::editar($dados, $this->getId())) {
             msg::showMsg('001', 'success');
+        }
+    }
+
+    /**
+     * função para atualizar a quantidade de itens da licitação
+     * 
+     * @param $id identificador do item
+     * @param $quantity quantidade solicitada
+     */
+    public function atualizarQtdComprometida($id, $quantity)
+    {
+        $result = $this->findById($id);
+
+        $dados = [
+            'quantity_compromised' => $result['quantity_compromised'] + $quantity
+        ];
+
+        if (parent::editar($dados, $id)) {
+            return true;
         }
     }
 
