@@ -79,6 +79,7 @@ class HistoricoCreditoProvisionadoModel extends CRUD
             'created_at' => date('Y-m-d')
         ];
         if (parent::novo($dados)) {
+            $this->atualizaSaldoCredito($id);
             return true;
         }
     }

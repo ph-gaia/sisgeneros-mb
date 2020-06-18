@@ -318,7 +318,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
         (new SolicitacaoModel())->processStatus($id, $status, $action, $this->view->userLoggedIn['id']);
 
-        if ($status == 'APROVADO' && $action == 'PROXIMO') {
+        if ($status == 'AUTORIZADO' && $action == 'PROXIMO') {
             $solicitacao = (new SolicitacaoModel())->findById($id);
             header('location: '
                 . $this->view->controller
@@ -326,6 +326,17 @@ class SolicitacaoController extends Controller implements CtrlInterface
         } else {
             header('location: ' . $this->view->controller);
         }
+    }
+
+    public function autorizarAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ORDENADOR']);
+
+        $id = (int) $this->getParametro('id');
+
+        (new SolicitacaoModel())->autorizar($id);
     }
 
     public function presolempAction()

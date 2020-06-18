@@ -11,9 +11,11 @@ use App\Models\AvaliacaoFornecedorModel;
 use App\Config\Configurations as cfg;
 use HTR\System\ControllerAbstract;
 use App\Helpers\Utils;
+use App\Helpers\View;
 use App\Models\CardapioModel;
 use App\Models\EmpenhoModel;
 use App\Models\HistoricoAcaoModel;
+use App\Models\HistoricoCreditoProvisionadoModel;
 
 class SolicitacaoModel extends CRUD
 {
@@ -493,7 +495,7 @@ class SolicitacaoModel extends CRUD
     {
         $query = "
             SELECT SUM(quantity * value) as total 
-            FROM requests_items items 
+            FROM requests_items as items 
             WHERE items.requests_id = ?;";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id]);
@@ -519,26 +521,34 @@ class SolicitacaoModel extends CRUD
     }
 
     /**
-     * aprova o pedido e abate o valor do pedido no crédito provisionado para OM
+     * autoriza o pedido e abate o valor do pedido no crédito provisionado para OM
      */
-    public function aprovar($id)
+    public function autorizar($id)
     {
-        $empenhoModel = new CreditoProvisionadoModel();
+        $creditoModel = new CreditoProvisionadoModel();
         $total = $this->totalByPedido($id);
         $pedido = $this->findById($id);
-        $creditoProvisionado = $empenhoModel->creditProvisionedByOmId($pedido['oms_id']);
+        $creditoProvisionado = $creditoModel->findByOmId($pedido['oms_id']);
+
+        if ($pedido['status'] != 'VERIFICADO') {
+            msg::showMsg("A solicitação não está apta para ser autorizada!", "danger");
+        }
 
         if ($total['total'] > $creditoProvisionado['value']) {
             msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
         }
 
         $dados = [
-            'status' => 'APROVADO',
+            'status' => 'AUTORIZADO',
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
         if (parent::editar($dados, $id)) {
-            $empenhoModel->abaterValor($creditoProvisionado['id'], $total['total']);
+            (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+                $creditoProvisionado['id'],
+                $total['total'],
+                'DEBITO',
+                "DEBITADO ". View::floatToMoney($total['total']) ."; REFERENTE A SOLICITAÇÃO ". $pedido['number']);
 
             header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
         }
@@ -632,7 +642,7 @@ class SolicitacaoModel extends CRUD
         $request = $this->requestByMenu($menuId);
         $menus = (new CardapioModel)->findById($menuId);
 
-        if (count($request) && $menus['status'] == 'APROVADO') {
+        if (count($request) && $menus['status'] == 'AUTORIZADO') {
             (new CardapioModel)->changeStatus('GERADO', intval($menuId));
             foreach($request as $values) {
                 # ITENS LICITADOS

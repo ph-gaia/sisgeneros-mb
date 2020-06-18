@@ -178,7 +178,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                         </a>
                                     <?php endif; ?>
                                     <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ORDENADOR']) && $value['status'] == 'VERIFICADO'): ?>
-                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
+                                        <a href="<?= $this->view->controller; ?>autorizar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-check"></i> Autorizar
                                         </a>
                                     <?php endif; ?>
