@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -417,7 +418,7 @@ class SolicitacaoModel extends CRUD
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d H:i:s'),
             'biddings_id' => 0,
-            'modality' => $this->getModality(), 
+            'modality' => $this->getModality(),
             'types_invoices' => $this->getTypesInvoices(),
             'account_plan' => $this->getAccountPlan(),
             'purposes' => $this->getPurposes()
@@ -454,7 +455,7 @@ class SolicitacaoModel extends CRUD
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d H:i:s'),
             'biddings_id' => $this->getBiddingsId(),
-            'modality' => $this->getModality(), 
+            'modality' => $this->getModality(),
             'types_invoices' => $this->getTypesInvoices(),
             'account_plan' => $this->getAccountPlan(),
             'purposes' => $this->getPurposes()
@@ -508,6 +509,20 @@ class SolicitacaoModel extends CRUD
         $reason = filter_input(INPUT_POST, 'reason');
         $action = filter_input(INPUT_POST, 'action');
 
+        $pedido = $this->findById($id);
+
+        if (in_array($pedido['status'], ['AUTORIZADO', 'CONFERIDO', 'EMPENHADO'])) {
+            $total = $this->totalByPedido($id);
+            $credito = (new CreditoProvisionadoModel())->findByOmId($pedido['oms_id']);
+
+            (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+                $credito['id'],
+                $total['total'],
+                'CREDITO',
+                "CRÉDITO DE " . View::floatToMoney($total['total']) . "; REFERENTE A SOLICITAÇÃO " . $pedido['number'] . ", QUE FOI " . $action
+            );
+        }
+
         $dados = [
             'status' => $action,
             'reason_action' => $reason,
@@ -548,7 +563,8 @@ class SolicitacaoModel extends CRUD
                 $creditoProvisionado['id'],
                 $total['total'],
                 'DEBITO',
-                "DEBITADO ". View::floatToMoney($total['total']) ."; REFERENTE A SOLICITAÇÃO ". $pedido['number']);
+                "DÉBITO DE " . View::floatToMoney($total['total']) . "; REFERENTE A SOLICITAÇÃO " . $pedido['number']
+            );
 
             header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
         }
@@ -644,7 +660,7 @@ class SolicitacaoModel extends CRUD
 
         if (count($request) && $menus['status'] == 'AUTORIZADO') {
             (new CardapioModel)->changeStatus('GERADO', intval($menuId));
-            foreach($request as $values) {
+            foreach ($request as $values) {
                 # ITENS LICITADOS
                 if ($values['biddingsId']) {
                     $dados = [
@@ -657,15 +673,15 @@ class SolicitacaoModel extends CRUD
                         'updated_at' => date('Y-m-d H:i:s')
                     ];
                     $numbers[] = $dados['number'];
-    
+
                     if (parent::novo($dados)) {
                         $lastId = $this->pdo->lastInsertId();
-    
+
                         $itemsList = $this->requestItemsByMenuAndSuppliers($menuId, $values['suppliersId']);
-    
+
                         (new Itens())->novoRegistroByMenu($itemsList, $lastId);
                     }
-                } 
+                }
                 # ITENS NÃO LICITADOS
             }
         }
@@ -675,7 +691,7 @@ class SolicitacaoModel extends CRUD
 
     public function requestByMenu($menuId)
     {
-        $query = "".
+        $query = "" .
             " SELECT " .
             " D.biddings_id AS biddingsId, A.oms_id AS omsId, E.id AS suppliersId, A.beginning_date AS date " .
             " FROM menus A " .
@@ -684,7 +700,7 @@ class SolicitacaoModel extends CRUD
             " LEFT JOIN biddings_items D ON D.id = C.biddings_items_id " .
             " LEFT JOIN suppliers E ON E.id = D.suppliers_id " .
             " WHERE A.id = :menuId " .
-            " GROUP BY D.biddings_id, E.id ".
+            " GROUP BY D.biddings_id, E.id " .
             " ORDER BY D.biddings_id, E.id ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':menuId' => $menuId]);
@@ -846,8 +862,8 @@ class SolicitacaoModel extends CRUD
         }
 
         return $this->pdo
-                ->query($query)
-                ->fetch((\PDO::FETCH_ASSOC));
+            ->query($query)
+            ->fetch((\PDO::FETCH_ASSOC));
     }
 
     /**
@@ -1001,7 +1017,7 @@ class SolicitacaoModel extends CRUD
         $value = str_replace(",", ".", $value);
         $value = intval($value);
         $validate = v::intVal()->validate($value);
-        if ((!$validate) || ( $value <= 0)) {
+        if ((!$validate) || ($value <= 0)) {
             msg::showMsg('O(s) valor(es)  do(s) campo(s) QUANTIDADE deve(m) ser'
                 . ' número INTEIRO não negativo e maior que zero', 'danger');
         }

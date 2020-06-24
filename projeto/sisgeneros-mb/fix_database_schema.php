@@ -127,7 +127,7 @@ new class ($argv)
                     . "    `id` INT NOT NULL AUTO_INCREMENT, "
                     . "    `operation_type` VARCHAR(7) NOT NULL DEFAULT 'CREDITO', "
                     . "    `value` FLOAT(9,2) NOT NULL, "
-                    . "    `observation` VARCHAR(60) NULL, "
+                    . "    `observation` VARCHAR(100) NULL, "
                     . "    `user_id` INT NOT NULL, "
                     . "    `provisioned_credits_id` INT NOT NULL, "
                     . "    `created_at` DATETIME NOT NULL, "
