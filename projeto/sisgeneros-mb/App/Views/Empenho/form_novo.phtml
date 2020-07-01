@@ -1,0 +1,82 @@
+<?php
+
+use App\Helpers\View;
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Pedidos disponíveis para empenhar</h5>
+                <div id="resultado"></div>
+                <form action="<?= $this->view->controller; ?>registra" method="post" id="form">
+                    <div class="row">
+                        <div class="col-md-4" style="margin-top: 10px;">
+                            <label>Número do Empenho</label>
+                            <input
+                                type="text"
+                                name="code_invoice"
+                                id="code_invoice"
+                                class="form-control"
+                                placeholder="Informe o código do empenho"
+                                required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style="margin-top: 10px;">
+                            <label>Observações:</label>
+                            <textarea
+                                name="complement"
+                                id="complement"
+                                class="form-control"
+                                placeholder="Observações no empenho"></textarea>
+                        </div>
+                    </div>
+                    <div class="btn-option" style="margin-top: 10px;">
+                        <button class="btn btn-success btn-save">
+                            <i class="fa fa-check"></i> Salvar Registro
+                        </button>
+                        <a href="<?= $this->view->controller; ?>" class="btn btn-warning">
+                            <i class="fa fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
+                        <div class="col-md-12">
+                            <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="15%">Marque as opções</th>
+                                    <th>Nº</th>
+                                    <th>OM</th>
+                                    <th>Fornecedor</th>
+                                    <th>Total</th>
+                                    <th>Alteração</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($this->view->result as $value): ?>
+                                    <tr>
+                                        <td><input type="checkbox" name="requests[]" value="<?= $value['id']; ?>"></td>
+                                        <td><?= $value['number']; ?></td>
+                                        <td><?= $value['naval_indicative']; ?></td>
+                                        <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
+                                        <td><?= View::floatToMoney($value['total']) ?></td>
+                                        <td>
+                                            <span class="badge badge-info">
+                                                <?= View::humanDate($value['updated_at']); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -7,8 +7,6 @@ use HTR\Helpers\Paginator\Paginator;
 use Respect\Validation\Validator as v;
 use App\Config\Configurations as cfg;
 use App\Models\EmpenhoItemsModel;
-use App\Models\CreditoProvisionadoModel;
-use App\Models\SolicitacaoItemModel;
 use App\Helpers\Utils;
 
 class EmpenhoModel extends CRUD
@@ -29,9 +27,9 @@ class EmpenhoModel extends CRUD
     public function paginator($pagina, $user, $busca = null)
     {
         $innerJoin = " INNER JOIN oms ON oms.id = invoices.oms_id ";
-        $innerJoin .= " INNER JOIN provisioned_credits as credit ON credit.id = invoices.provisioned_credits_id ";
+
         $dados = [
-            'select' => 'invoices.*, oms.naval_indicative, credit.credit_note, credit.value as credit',
+            'select' => 'invoices.*, oms.naval_indicative',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 100,
@@ -41,11 +39,6 @@ class EmpenhoModel extends CRUD
         if (!in_array($user['level'], ['ADMINISTRADOR'])) {
             $dados['where'] = 'invoices.oms_id = :omsId ';
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
-        }
-
-        if ($user['level'] === 'CONTROLADOR') {
-            $dados['where'] = 'status != :status ';
-            $dados['bindValue'] = [':status' => 'ABERTO'];
         }
 
         if ($busca) {
@@ -108,79 +101,23 @@ class EmpenhoModel extends CRUD
     {
         // Valida dados
         $this->validaAll($omsId);
-        $model = new SolicitacaoModel();
-
-        foreach($this->getNumbers() as $value) {
-            $requestId = $model->findByNumber($value);
-            $this->verificaSaldoItem($requestId['id']);
-        }
 
         $dados = [
             'oms_id' => $this->getOmsId(),
-            'provisioned_credits_id' => $this->getProvisionedCredits(),
             'code' => $this->getCode(),
-            'total' => $this->getTotal(),
-            'status' => 'ABERTO',
+            'complement' => $this->getComplement(),
+            'status' => 'EMPENHADO',
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
         if (parent::novo($dados)) {
             $lastId = $this->pdo->lastInsertId();
-            (new EmpenhoItemsModel())->novoRegistro($this->getNumbers(), $lastId);
-
-            foreach($this->getNumbers() as $value) {
-                //$requestId = $model->findByNumber($value);
-                $model->processStatus($value, 'PROCESSADO', 'PROXIMO');
-            }
+            (new EmpenhoItemsModel())->novoRegistro($this->getRequests(), $lastId);
 
             msg::showMsg('Empenho realizado com sucesso!'
                 . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'solicitacao/" />'
                 . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'solicitacao/"; }, 2000); </script>', 'success');
-        }
-    }
-
-    public function verificaSaldoItem($idSolicitacao)
-    {
-        $solicitacao = (new SolicitacaoModel())->findById($idSolicitacao);
-        $itens = (new SolicitacaoItemModel())->findAllItemsByRequestId($idSolicitacao);
-
-        foreach ($itens as $item) {
-            $demanda = (new SolicitacaoItemModel())->quantidadeDemanda($item['item_number'], $solicitacao['biddings_id']);
-            $restante = $item['quantity'] - $demanda;
-
-            if ($restante < (float) $item['quantidade_solicitada']) {
-                msg::showMsg('O item ' . $item['name']
-                .' da solicitação nº.' . $solicitacao['number']
-                .', não possui saldo na licitação nº.' . $item['licitacao']
-                .', por favor revise seu pedido!', 'danger');
-            }
-        }
-        return true;
-    }
-
-    public function abaterValor($userId)
-    {
-        $id = filter_input(INPUT_POST, 'id');
-        $value = filter_input(INPUT_POST, 'value');
-        $observation = filter_input(INPUT_POST, 'observation');
-
-        $empenho = $this->findById($id);
-        if ($value >= $empenho['total']) {
-            msg::showMsg('O valor informado é superior ou igual ao valor do empenho', 'danger');
-        }
-
-        $atual = $empenho['total'] - $value;
-
-        $dados = [
-            'total' => $atual
-        ];
-
-        if (parent::editar($dados, $id)) {
-            (new CreditoProvisionadoModel())->adicionarValor($empenho['provisioned_credits_id'], $value);
-            (new HistoricoEmpenhoModel())->novoRegistro($empenho['id'], $userId, $value, $observation);
-
-            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/'.$id);
         }
     }
 
@@ -192,32 +129,6 @@ class EmpenhoModel extends CRUD
         ];
 
         parent::editar($dados, $id);
-    }
-
-    public function findTotalByNumberRequests($ids)
-    {
-        $query = ""
-            . " SELECT SUM(quantity * value) as total "
-            . " FROM requests "
-            . " INNER JOIN "
-            . "     requests_items ON "
-            . " requests.id = requests_items.requests_id "
-            . " WHERE requests.id IN (". implode(',', $ids) .");";
-
-        return $this->pdo->query($query)->fetch((\PDO::FETCH_ASSOC));
-    }
-
-    public function findInvoiceByRequestId($id)
-    {
-        $query = ""
-            . " SELECT invoices.* "
-            . " FROM invoices_has_requests "
-            . " INNER JOIN 
-                    invoices 
-                ON invoices.id = invoices_has_requests.invoices_id "
-            . " WHERE invoices_has_requests.requests_id = $id ";
-
-        return $this->pdo->query($query)->fetch((\PDO::FETCH_ASSOC));
     }
 
     public function removerRegistro($id)
@@ -241,18 +152,19 @@ class EmpenhoModel extends CRUD
 
     private function validaAll($omsId)
     {
+        $value = filter_input_array(INPUT_POST);
         // Seta todos os valores
         $this->setId(filter_input(INPUT_POST, 'id') ?? time())
             ->setOmsId($omsId)
             ->setCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS))
-            ->setNumbers(explode(',', filter_input(INPUT_POST, 'empenhos_id')));
+            ->setComplement(filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS));
 
-        $creditoModel = new CreditoProvisionadoModel();
-        $creditoProvisionado = $creditoModel->creditProvisionedByOmId($this->getOmsId());
-        $this->setProvisionedCredits($creditoProvisionado['id']);
-
-        $consulta = $this->findTotalByNumberRequests($this->getNumbers());
-        $this->setTotal($consulta['total']);
+        $result = [];
+        foreach($value['requests'] as $value) {
+            $id = filter_var($value, FILTER_VALIDATE_INT);
+            $result[] = $id;
+        }
+        $this->setRequests($result);
 
         // Inicia a Validação dos dados
         $this->validaId();

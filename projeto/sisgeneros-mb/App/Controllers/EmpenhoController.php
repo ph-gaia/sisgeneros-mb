@@ -6,10 +6,10 @@ use HTR\System\ControllerAbstract as Controller;
 use HTR\Interfaces\ControllerInterface as CtrlInterface;
 use HTR\Helpers\Access\Access;
 use App\Models\EmpenhoModel;
+use App\Models\EmpenhoItemsModel;
 use App\Models\SolicitacaoItemModel as SolicitacaoItem;
 use App\Models\SolicitacaoModel;
 use App\Config\Configurations as cfg;
-use App\Models\HistoricoEmpenhoModel;
 
 class EmpenhoController extends Controller implements CtrlInterface
 {
@@ -31,7 +31,7 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR','CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
         $this->view->title = 'Lista de Todos os Empenhos';
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, $this->getParametro('busca'));
@@ -42,22 +42,34 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function detalharAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
-        $solicitacao = new SolicitacaoModel();
-        $historico = new HistoricoEmpenhoModel();
-        $this->view->title = 'Pedidos do empenho';
+        $items = new EmpenhoItemsModel();
+        $this->view->title = 'Itens do empenho';
         $this->view->resultEmpenho = $model->findByIdlista($this->getParametro('idlista'));
-        $this->view->resultPedidos = $solicitacao->findByInvoiceId($this->getParametro('idlista'));
-        $this->view->historico = $historico->historicByInvoiceId($this->getParametro('idlista'));
+        $items->paginator($this->getParametro('pagina'), $this->getParametro('idlista'));
+        $this->view->result = $items->getResultadoPaginator();
+        $this->view->btn = $items->getNavePaginator();
 
         $this->render('detalhar');
     }
 
-    public function abaterValorEmpenhoAction()
+    public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR','CONTROLADOR_FINANCA']);
+        $this->view->title = 'Novo registro de empenho';
+
+        $solicitacao = new SolicitacaoModel();
+        $solicitacao->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, 'CONFERIDO');
+        $this->view->result = $solicitacao->getResultadoPaginator();
+
+        $this->render('form_novo');
+    }
+
+    public function registraAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
-        $model->abaterValor($this->view->userLoggedIn['id']);
+        $model->novoRegistro($user['oms_id']);
     }
 }

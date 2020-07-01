@@ -1,45 +1,19 @@
 <?php
 
-use App\Helpers\View;
+use App\Helpers\Pagination;
+use App\Helpers\Utils;
 
 $idlista = $this->view->idlista;
 
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+    return [
+        'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
+        'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
+
 ?>
-<!-- Modal Empenho -->
-<div class="modal fade" id="modalEmpenho">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Abater valor do Empenho</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="<?= $this->view->controller; ?>abaterValorEmpenho" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="id" value="<?= $this->view->resultEmpenho['id']; ?>" />
-                    <div class="form-group">
-                        <label>Valor que deseja cancelar:</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="value"
-                            name="value"
-                            placeholder="Valor para ser abatido do Empenho">
-                    </div>
-                    <div class="form-group">
-                        <label>Observação:</label>
-                        <textarea class="form-control" name="observation" placeholder="Adicione uma nota informando mais detalhes..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Registrar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <div id="page-wrapper">
     <div class="container-fluid">
         <div class="row">
@@ -49,13 +23,9 @@ $idlista = $this->view->idlista;
                     <div class="alert alert-info" role="alert">
                         Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><br>
                         OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
-                        Total: <strong><?= $this->view->resultEmpenho['total']; ?></strong><br>
                         Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
                     </div>
                 <?php endif; ?>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEmpenho">
-                    <i class="fa fa-edit"></i> Altenar Saldo do Empenho
-                </button>
                 <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
                     <i class="fa fa-arrow-left"></i> Voltar
                 </a>
@@ -68,54 +38,44 @@ $idlista = $this->view->idlista;
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nº</th>
-                            <th>OM</th>
-                            <th>Fornecedor</th>
-                            <th>NF</th>
-                            <th>Tipo</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Alteração</th>
-                            <th>Entrega</th>
-                            <th></th>
+                            <th>Item</th>
+                            <th>Empenhado</th>
+                            <th>Solicitado</th>
+                            <th>Disponível</th>
+                            <th>UF</th>
+                            <th>Nome</th>
+                            <th>Valor (R$)</th>
+                            <th>Subtotal (R$)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($this->view->resultPedidos as $value) : ?>
+                        <?php
+                        $total = 0;
+                        foreach ($this->view->result as $value):
+                            $total += $value['value'] * $value['quantity'];
+                        ?>
                             <tr>
-                                <td><?= $value['number']; ?></td>
-                                <td><?= $value['naval_indicative']; ?></td>
-                                <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
-                                <td><?= $value['invoice'] ?: ''; ?></td>
-                                <td>
-                                    <?php if ($value['biddings_id']) : ?>
-                                        <i class="fa fa-group"></i> LIC
-                                    <?php else : ?>
-                                        <i class="fa fa-shopping-cart"></i> NL
-                                    <?php endif; ?>
-                                </td>
-                                <td><?= View::floatToMoney($value['total']) ?></td>
-                                <td>
-                                    <?= $value['status'] ?>
-                                </td>
-                                <td>
-                                    <span class="badge badge-danger">
-                                        <?= View::humanDate($value['updated_at']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-danger">
-                                        <?= View::humanDate($value['delivery_date']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="solicitacao/detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-share"></i>
-                                    </a>
-                                </td>
+                                <td><?= $value['number'] ?: ''; ?></td>
+                                <td><?= floatval($value['quantity']); ?></td>
+                                <td><?= intval($value['delivered']); ?></td>
+                                <td><?= floatval($value['quantity_available']); ?></td>
+                                <td><?= $value['uf']; ?></td>
+                                <td><?= $value['name']; ?></td>
+                                <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                <td><?= Utils::floatToMoney( ($value['value'] * $value['quantity']) ); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-right" colspan="7">Total (R$)</th>
+                            <td class="text-left">
+                                <span class="badge badge-danger">
+                                    <?= Utils::floatToMoney($total); ?>
+                                </span>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
                 <?= $pagination; ?>
 
@@ -199,53 +159,6 @@ $idlista = $this->view->idlista;
                     </div>
                 </div>
 
-                <?php if (isset($this->view->historico[0])): ?>
-                <div class="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button
-                                    class="btn btn-link"
-                                    type="button"
-                                    data-toggle="collapse"
-                                    data-target="#collapseHistorico"
-                                    aria-expanded="true"
-                                    aria-controls="collapseHistorico">
-                                    Histórico
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseHistorico" class="collapse">
-                            <div class="card-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Valor retirado</th>
-                                            <th>Usuário responsável</th>
-                                            <th>Observação</th>
-                                            <th>Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($this->view->historico as $value) : ?>
-                                            <tr>
-                                                <td><?= View::floatToMoney($value['value']) ?></td>
-                                                <td><?= $value['name']; ?></td>
-                                                <td><?= $value['observation']; ?></td>
-                                                <td>
-                                                    <span class="badge badge-danger">
-                                                        <?= View::humanDate($value['created_at']); ?>
-                                                    </span>    
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>

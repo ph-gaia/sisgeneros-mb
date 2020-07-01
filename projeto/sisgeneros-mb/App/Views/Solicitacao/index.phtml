@@ -187,11 +187,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                             <i class="fa fa-check"></i> Conferir
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'CONTROLADOR_FINANCA']) && $value['status'] == 'CONFERIDO'): ?>
-                                        <a href="<?= $buildUrlBtnAction($value); ?>" class="btn btn-success btn-sm">
-                                            <i class="fa fa-check"></i> Empenhar
-                                        </a>
-                                    <?php endif; ?>
                                     <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $value['status'] == 'ELABORADO'): ?>
                                         <a
                                             onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')"
