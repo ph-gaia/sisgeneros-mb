@@ -61,6 +61,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
                 ->setaFiltros()
                 ->orderBy('suppliers.name ASC');
         });
+        $this->view->resultOm = (new OmModel())->findById($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item_nao_licitado');
     }
 
@@ -210,7 +211,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
             ->clearAccessList()
             ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
-        (new SolicitacaoModel())->novoNaoLicitado($this->view->userLoggedIn['oms_id'], getcwd());
+        (new SolicitacaoModel())->novoNaoLicitado($this->view->userLoggedIn, getcwd());
     }
 
     public function alteraAction()

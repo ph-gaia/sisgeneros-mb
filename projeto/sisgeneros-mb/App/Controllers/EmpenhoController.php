@@ -7,9 +7,10 @@ use HTR\Interfaces\ControllerInterface as CtrlInterface;
 use HTR\Helpers\Access\Access;
 use App\Models\EmpenhoModel;
 use App\Models\EmpenhoItemsModel;
-use App\Models\SolicitacaoItemModel as SolicitacaoItem;
+use App\Models\SolicitacaoEmpenhoModel;
 use App\Models\SolicitacaoModel;
 use App\Config\Configurations as cfg;
+use App\Helpers\Pdf;
 
 class EmpenhoController extends Controller implements CtrlInterface
 {
@@ -45,11 +46,14 @@ class EmpenhoController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
         $items = new EmpenhoItemsModel();
+        $itemsEmpenho = new SolicitacaoEmpenhoModel();
         $this->view->title = 'Itens do empenho';
         $this->view->resultEmpenho = $model->findByIdlista($this->getParametro('idlista'));
         $items->paginator($this->getParametro('pagina'), $this->getParametro('idlista'));
         $this->view->result = $items->getResultadoPaginator();
         $this->view->btn = $items->getNavePaginator();
+
+        $this->view->resultItems = $itemsEmpenho->findAllByInvoiceId($this->getParametro('idlista'));
 
         $this->render('detalhar');
     }
@@ -66,10 +70,54 @@ class EmpenhoController extends Controller implements CtrlInterface
         $this->render('form_novo');
     }
 
+    public function receberAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+
+        $this->view->title = 'Lista de itens solicitados';
+
+        $empenho = new EmpenhoModel();
+        $itens = new EmpenhoItemsModel();
+        //$this->view->resultSolicitacao = $empenho->findByinvoices_id($this->getParametro('id'));
+        $this->view->result = $empenho->retornaDadosPapeleta($this->getParametro('id'), $this->view->userLoggedIn);
+
+        $this->render('mostra_item_recebimento');
+    }
+
+    public function pdfAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+
+        $id = $this->getParametro('id');
+        $pdf = new Pdf();
+        $pdf->number = $id;
+        $pdf->url = $this->view->controller . 'papeleta/id/' . $id;
+        $pdf->gerar();
+    }
+
+    public function papeletaAction()
+    {
+        $model = new EmpenhoModel();
+        $this->view->title = 'Solicitação de Material';
+        $this->view->result = $model->retornaDadosPapeleta($this->getParametro('id'));
+        $this->render('papeleta_solicitacao', true, 'blank');
+    }
+
     public function registraAction()
     {
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
         $model->novoRegistro($user['oms_id']);
+    }
+
+    public function registraItensEmpenhoAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new SolicitacaoEmpenhoModel();
+        $model->novoRegistro();
     }
 }

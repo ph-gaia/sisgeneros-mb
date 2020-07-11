@@ -144,24 +144,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?= $this->view->resultSolicitacao['number']; ?>
                             - <?= $this->view->resultSolicitacao['status']; ?>
                         </strong>
-                        <br>
-                        Data para entrega: <strong><?= View::humanDate($this->view->resultSolicitacao['delivery_date']); ?></strong>
-                        <?php
-                        if ($this->view->resultSolicitacao['status'] === 'ABERTO'):
-                            $solicitacaoId = $this->view->resultSolicitacao['id'];
-                            $url = $this->view->controller . 'alterardata/id/' . $solicitacaoId;
-
-                            ?>
-                            (<a href="<?= $url; ?>"
-                                class="text-danger">
-                                Alterar <i class="fa fa-edit"></i>
-                            </a>)
-                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
                 <?php
                 $ruleCredit = ($this->view->totalSolicitacao['total'] > $this->view->credito['value']);
-                if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO'): ?>
+                if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO' && isset($this->view->resultLicitacao['number'])): ?>
                 <div class="alerta-credito">
                     <div class="alert alert-warning" role="alert">
                         O saldo do crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
@@ -260,7 +247,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <tr>
                             <th>Item</th>
                             <th>Solicitado</th>
-                            <th>Solicitado</th>
+                            <th>Entregue</th>
                             <th>Disponível</th>
                             <th>UF</th>
                             <th>Nome</th>
@@ -277,7 +264,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             $total += $value['value'] * $value['quantity'];
                         ?>
                             <tr>
-                                <td><?= $value['number'] ?: ''; ?></td>
+                                <td><?= $value['number'] ?: '-'; ?></td>
                                 <td><?= floatval($value['quantity']); ?></td>
                                 <td><?= intval($value['delivered']); ?></td>
                                 <td><?= floatval($value['quantity_available']); ?></td>
@@ -304,7 +291,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th class="text-right" colspan="6">Total (R$)</th>
+                            <th class="text-right" colspan="7">Total (R$)</th>
                             <td class="text-left">
                                 <?= Utils::floatToMoney($total); ?>
                             </td>

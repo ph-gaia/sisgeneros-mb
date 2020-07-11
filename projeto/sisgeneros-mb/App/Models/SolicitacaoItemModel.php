@@ -47,7 +47,7 @@ class SolicitacaoItemModel extends CRUD
     {
         $inner = " as items " .
             " INNER JOIN requests as req ON req.id = items.requests_id " .
-            " INNER JOIN biddings_items as bidding ON bidding.biddings_id = req.biddings_id 
+            " LEFT JOIN biddings_items as bidding ON bidding.biddings_id = req.biddings_id 
           and bidding.name LIKE items.name ";
 
         $dados = [

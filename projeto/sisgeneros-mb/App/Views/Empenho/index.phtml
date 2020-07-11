@@ -14,7 +14,12 @@ $pagination = Pagination::make($this);
                 <i class="fa fa-list"></i> <?= $this->view->title; ?>
 
                 <div class="row">
-                    <div class="col-md-7">
+                    <div class="col-md-2">
+                        <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
+                            <i class="fa fa-plus-circle"></i> Novo Registro
+                        </a>
+                    </div>
+                    <div class="col-md-5">
                         <?= $pagination; ?>
                     </div>
 

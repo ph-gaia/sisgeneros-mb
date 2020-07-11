@@ -20,14 +20,10 @@ class EmpenhoItemsModel extends CRUD
 
     public function paginator($pagina, $idlista)
     {
-        $inner = " as items " .
-            " INNER JOIN requests as req ON req.id = items.requests_id " .
-            " INNER JOIN biddings_items as bidding ON bidding.biddings_id = req.biddings_id 
-          and bidding.name LIKE items.name ";
 
         $dados = [
-            'select' => 'items.*, bidding.quantity_available',
-            'entidade' => $this->entidade . $inner,
+            'select' => 'items.*',
+            'entidade' => $this->entidade . " as items ",
             'pagina' => $pagina,
             'maxResult' => 50,
             'orderBy' => 'number ASC',

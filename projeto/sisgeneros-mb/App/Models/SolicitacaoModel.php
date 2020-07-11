@@ -409,6 +409,7 @@ class SolicitacaoModel extends CRUD
         $this->validaAll($oms);
 
         $this->validaFiles();
+        $this->validaValorPedidoNaoLicitado();
         $dados = [
             'biddings_id' => $this->getBiddingsId(),
             'oms_id' => $this->getOmsId(),
@@ -1008,6 +1009,19 @@ class SolicitacaoModel extends CRUD
         if (empty($this->getItemsList())) {
             msg::showMsg('Para realizar uma solicitação, é imprescindível'
                 . ' fornecer a quantidade de no mínimo um Item.', 'danger');
+        }
+        return $this;
+    }
+
+    public function validaValorPedidoNaoLicitado()
+    {
+        $total = 0;
+        foreach ($this->getItemsList() as $value) {
+            $total += $value['quantity'] * floatval($value['value']);
+        }
+
+        if ($total > 17.600) {
+            msg::showMsg('Solicitação da modalidade Não Licitado, tem a restrição de valor até R$ 17.600,00', 'danger');
         }
         return $this;
     }

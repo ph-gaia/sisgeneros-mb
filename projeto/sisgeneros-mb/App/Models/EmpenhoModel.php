@@ -7,6 +7,7 @@ use HTR\Helpers\Paginator\Paginator;
 use Respect\Validation\Validator as v;
 use App\Config\Configurations as cfg;
 use App\Models\EmpenhoItemsModel;
+use App\Models\SolicitacaoModel;
 use App\Helpers\Utils;
 
 class EmpenhoModel extends CRUD
@@ -113,6 +114,11 @@ class EmpenhoModel extends CRUD
 
         if (parent::novo($dados)) {
             $lastId = $this->pdo->lastInsertId();
+            
+            foreach($this->getRequests() as $requestId) {
+                (new SolicitacaoModel())->processStatus($requestId, '', 'PROXIMO', 1);
+            }
+
             (new EmpenhoItemsModel())->novoRegistro($this->getRequests(), $lastId);
 
             msg::showMsg('Empenho realizado com sucesso!'
@@ -148,6 +154,30 @@ class EmpenhoModel extends CRUD
             . " WHERE id = :invoicesId ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':invoicesId' => $result['id']]);
+    }
+
+    public function retornaDadosPapeleta($id, $user = null)
+    {
+        $where = '';
+        if (isset($user['level']) && $user['level'] !== 'ADMINISTRADOR') {
+            $where = ' AND oms.id = ' . $user['oms_id'];
+        }
+        
+        $query = "
+            SELECT 
+                oms.*, oms.name AS oms_name,
+                item.number AS requests_number, item.name,
+                item.uf, item.quantity,
+                item.value, item.delivered,
+                item.invoice
+            FROM invoices AS inv
+                INNER JOIN requests_invoices AS item ON item.invoices_id = inv.id
+                INNER JOIN oms ON oms.id = inv.oms_id
+            WHERE item.code = ? {$where} ";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$id]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     private function validaAll($omsId)

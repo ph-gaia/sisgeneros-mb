@@ -9,52 +9,25 @@ use App\Helpers\View;
             <div class="col-lg-12">
                 <h3></h3>
                 <div id="resultado"></div>
-                <?php if (isset($this->view->resultLicitacao['number'])): ?>
+                <?php if ($this->view->result[0]['requests_number']): ?>
                     <div class="alert alert-info" role="alert">
-                        Licitação: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
-                        Órgão: <strong><?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
-                        Fornecedor:
-                        <strong>
-                            <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
-                            - <?= $this->view->resultSolicitacao['suppliers_name']; ?>
-                        </strong>
-                        (<a href="#"
-                            class="text-danger"
-                            data-toggle="modal"
-                            data-target="#modalSuppliersDetails">
-                            mais detalhes
-                        </a>)
-                        <br>
+                        Licitação: <strong><?= $this->view->result[0]['requests_number']; ?></strong><br>
+                        Órgão: <strong><?= $this->view->result[0]['uasg']; ?> - <?= $this->view->result[0]['name']; ?></strong><br>
                         OM:
                         <strong>
-                            <?= $this->view->resultSolicitacao['naval_indicative']; ?>
+                            <?= $this->view->result[0]['oms_name']; ?>
                         </strong>
                         <br>
                         NF:
                         <strong>
-                            <?= $this->view->resultSolicitacao['invoice']; ?>
+                            <?= $this->view->result[0]['invoice']; ?>
                         </strong>
                         <br>
                         Solicitação:
                         <strong>
-                            <?= $this->view->resultSolicitacao['number']; ?>
-                            - <?= $this->view->resultSolicitacao['status']; ?>
+                            <?= $this->view->result[0]['requests_number']; ?>
+                            - <?= $this->view->result[0]['status']; ?>
                         </strong>
-                        <br>                        
-                        <?php if ($this->view->resultSolicitacao['complement']): ?>
-                            <br>
-                            Observações do pedido:
-                            <strong>
-                                <?= $this->view->resultSolicitacao['complement']; ?>
-                            </strong>
-                        <?php endif; ?>
-                        <?php if ($this->view->resultSolicitacao['observation']): ?>
-                            <br>
-                            Observações do recebimento:
-                            <strong>
-                                <?= $this->view->resultSolicitacao['observation']; ?>
-                            </strong>
-                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
                 <?php if (isset($this->view->result[0])): ?>
