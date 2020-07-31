@@ -86,6 +86,16 @@ class EmpenhoController extends Controller implements CtrlInterface
         $this->render('mostra_item_recebimento');
     }
 
+    public function registrarrecebimentoAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+
+        $solicitacao = new SolicitacaoEmpenhoModel();
+        $solicitacao->recebimento($this->getParametro('id'));
+    }
+
     public function pdfAction()
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
@@ -111,7 +121,14 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
-        $model->novoRegistro($user['oms_id']);
+        $model->novoRegistro($user);
+    }
+
+    public function cancelaAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new SolicitacaoEmpenhoModel();
+        $model->cancelarRegistro($this->getParametro('id'));
     }
 
     public function registraItensEmpenhoAction()

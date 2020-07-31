@@ -209,10 +209,11 @@ class SolicitacaoItemModel extends CRUD
         $query = ""
             . " SELECT items.number as item_number, "
             . " items.quantity as quantidade_solicitada, "
-            . " lic_items.*, lic.number as licitacao "
+            . " lic_items.*, lic.number as licitacao, sol.suppliers_id "
             . " FROM requests_items as items "
             . " INNER JOIN biddings_items as lic_items ON lic_items.number = items.number "
             . " INNER JOIN biddings	as lic ON lic.id = lic_items.biddings_id "
+            . " INNER JOIN requests as sol ON sol.id = items.requests_id "
             . " WHERE items.requests_id = ? ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$requestId]);

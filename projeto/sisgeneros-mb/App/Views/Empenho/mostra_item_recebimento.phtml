@@ -12,7 +12,7 @@ use App\Helpers\View;
                 <?php if ($this->view->result[0]['requests_number']): ?>
                     <div class="alert alert-info" role="alert">
                         Licitação: <strong><?= $this->view->result[0]['requests_number']; ?></strong><br>
-                        Órgão: <strong><?= $this->view->result[0]['uasg']; ?> - <?= $this->view->result[0]['name']; ?></strong><br>
+                        Órgão: <strong><?= $this->view->result[0]['uasg'] . " - ". $this->view->result[0]['naval_indicative']; ?></strong><br>
                         OM:
                         <strong>
                             <?= $this->view->result[0]['oms_name']; ?>
@@ -25,15 +25,15 @@ use App\Helpers\View;
                         <br>
                         Solicitação:
                         <strong>
-                            <?= $this->view->result[0]['requests_number']; ?>
+                            <?= $this->view->result[0]['code']; ?>
                             - <?= $this->view->result[0]['status']; ?>
                         </strong>
                     </div>
                 <?php endif; ?>
                 <?php if (isset($this->view->result[0])): ?>
-                    <form action="<?= $this->view->controller; ?>registrarrecebimento/id/<?= $this->view->result[0]['requests_id']; ?>" method="post" id="form">
+                    <form action="<?= $this->view->controller; ?>registrarrecebimento" method="post" id="form">
                         <input type="hidden" name="suppliers_id" value="<?= $this->view->result[0]['suppliers_id'] ?>">
-                        <input type="hidden" name="biddings_id" value="<?= $this->view->result[0]['biddings_id'] ?>">
+                        <input type="hidden" name="request_id" value="<?= $this->view->result[0]['code']; ?>">
                         <button class="btn btn-success" id='btn_enviar'>
                             <i class="fa fa-check"></i> Confirmar Recebimento
                         </button>
@@ -49,7 +49,7 @@ use App\Helpers\View;
                                        autofocus
                                        required>
                             </div>
-                            <?php if (isset($this->view->result[0]['biddings_id']) && $this->view->result[0]['biddings_id'] != '0'): ?>
+                            
                                 <div class="col-lg-4" id='evaluation'>
                                     <label>Avaliação da entrega: </label><br>
                                     <input type="radio" name='evaluation' value="1">
@@ -73,7 +73,6 @@ use App\Helpers\View;
                                         5
                                     </span>
                                 </div>
-                            <?php endif; ?>
                         </div>
                         <div class="row" style="padding-top: 10px; margin-bottom: 20px;">
                             <div class="col-lg-4" id="observation">
@@ -82,13 +81,11 @@ use App\Helpers\View;
                                           placeholder="Observações"
                                           class="form-control"></textarea>
                             </div>
-                            <?php if (isset($this->view->result[0]['biddings_id']) && $this->view->result[0]['biddings_id'] != '0'): ?>
-                                <div class="col-lg-6" id="legenda">
-                                    <label>Legenda:</label><br>
-                                    <span class="badge badge-danger" style="font-size: 14px !important;">1 - Muito insatisfeito</span> à
-                                    <span class="badge badge-success" style="font-size: 14px !important;">5 - Muito satisfeito</span>
-                                </div>
-                            <?php endif; ?>
+                            <div class="col-lg-6" id="legenda">
+                                <label>Legenda:</label><br>
+                                <span class="badge badge-danger" style="font-size: 14px !important;">1 - Muito insatisfeito</span> à
+                                <span class="badge badge-success" style="font-size: 14px !important;">5 - Muito satisfeito</span>
+                            </div>
                         </div>
                         <table class="table" id='tabela_result'>
                             <thead>
@@ -113,8 +110,11 @@ use App\Helpers\View;
                                                    name="uf[]"
                                                    value="<?= $value['uf']; ?>">
                                             <input type="hidden"
-                                                   name="value[]"
-                                                   value="<?= $value['value']; ?>">
+                                                   name="requested[]"
+                                                   value="<?= intval($value['quantity']); ?>">
+                                            <input type="hidden"
+                                                   name="delivered[]"
+                                                   value="<?= intval($value['delivered']); ?>">
                                             <input type="hidden"
                                                    name="name[]"
                                                    value="---">

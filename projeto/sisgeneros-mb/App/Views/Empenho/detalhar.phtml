@@ -64,6 +64,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <tr>
                                     <td>
                                         <input type="hidden" name="ids[]" value="<?= $value['id']; ?>">
+                                        <input type="hidden" name="requested[]" id="requested[]" value="0">
                                         <input type="text" name="quantity[]" id="quantity" class="form-control">
                                     </td>
                                     <td><?= $value['number'] ?: ''; ?></td>
@@ -91,32 +92,57 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 </form>
                 <?= $pagination; ?>
 
-                <div class="accordion" id="accordionExample">
+                <?php
+                    $request = 0;
+                    foreach ($this->view->resultItems as $result) :
+                        if ($request == $result['code']) {
+                            continue;
+                        }
+                ?>
+                <div class="accordion">
                     <div class="card">
                         <div class="card-header" id="headingOne">
                             <h5 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Solicitações do Empenho
+                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
+                                    Solicitação <?= $result['code'] ?> do Empenho
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseOne" class="collapse show">
+                        <div id="collapseOne<?= $result['code'] ?>" class="collapse">
                             <div class="card-body">
                                 <?php
-                                    if (isset($this->view->resultItems[0])) {
-                                        $code = current($this->view->resultItems)['code'];
+                                    if ($result['code']) {
+                                        $code = $result['code'];
                                     }
                                 ?>
-                                <?php if (isset($code)): ?>
                                 <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>" class="btn btn-secondary btn-sm">
                                     <i class="fa fa-file-pdf-o"></i> PDF
                                 </a>
+                                <?php if (isset($code) && in_array($result['status'], ['ABERTO', 'RECEBIDO-PARCIAL'])): ?>
                                 <a href="<?= $this->view->controller; ?>receber/id/<?= $code ?>" class="btn btn-success btn-sm">
                                     <i class="fa fa-check"></i> Receber
                                 </a>
-                                <a href="<?= $this->view->controller; ?>cancelar/id/<?= $code ?>" class="btn btn-danger btn-sm">
+                                <?php endif; ?>
+                                <?php if (isset($code) && $result['status'] == 'ABERTO'): ?>
+                                <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>')"
+                                    class="btn btn-danger btn-sm">
                                     <i class="fa fa-ban"></i> Cancelar
                                 </a>
+                                <?php endif; ?>
+                                <?php if (isset($code) && $result['status'] == 'RECEBIDO'): ?>
+                                    <a href="<?= $this->view->controller; ?>entregar/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                        <i class="fa fa-check"></i> Entregar NF
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (isset($code) && $result['status'] == 'NF-ENTREGUE'): ?>
+                                    <a href="<?= $this->view->controller; ?>entregue/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                        <i class="fa fa-check-square-o"></i> Enc. NF
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (isset($code) && $result['status'] == 'NF-FINANCAS'): ?>
+                                    <a href="<?= $this->view->controller; ?>pagar/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                        <i class="fa fa-dollar"></i> Pagar NF
+                                    </a>
                                 <?php endif; ?>
                                 <table class="table">
                                     <thead>
@@ -136,6 +162,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         <?php
                                         $total = 0;
                                         foreach ($this->view->resultItems as $value) :
+                                            if ($value['code'] != $result['code']) {
+                                                continue;
+                                            }
                                             $total += $value['value'] * $value['quantity'];
                                         ?>
                                             <tr>
@@ -166,7 +195,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         </div>
                     </div>
                 </div>
-
+                <?php
+                $request = $result['code'];
+                endforeach; ?>
             </div>
         </div>
     </div>

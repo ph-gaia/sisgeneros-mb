@@ -37,7 +37,7 @@ if (!isset($this->view->result[0])) {
     </tr>
     <tr>
         <td colspan="2" class="fornecedor">
-            
+        FORNECEDOR: <?= ($this->view->result[0]['cnpj']); ?> - <?= ($this->view->result[0]['suppliers_name']); ?>
         </td>
         <td class="tipo-documento">
             <?=

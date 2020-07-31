@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -98,10 +99,10 @@ class EmpenhoModel extends CRUD
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function novoRegistro($omsId)
+    public function novoRegistro($user)
     {
         // Valida dados
-        $this->validaAll($omsId);
+        $this->validaAll($user);
 
         $dados = [
             'oms_id' => $this->getOmsId(),
@@ -114,16 +115,16 @@ class EmpenhoModel extends CRUD
 
         if (parent::novo($dados)) {
             $lastId = $this->pdo->lastInsertId();
-            
-            foreach($this->getRequests() as $requestId) {
-                (new SolicitacaoModel())->processStatus($requestId, '', 'PROXIMO', 1);
+
+            foreach ($this->getRequests() as $requestId) {
+                (new SolicitacaoModel())->processStatus($requestId, 'CONFERIDO', 'PROXIMO', $this->getUserId());
             }
 
             (new EmpenhoItemsModel())->novoRegistro($this->getRequests(), $lastId);
 
             msg::showMsg('Empenho realizado com sucesso!'
-                . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'solicitacao/" />'
-                . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'solicitacao/"; }, 2000); </script>', 'success');
+                . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'empenho/" />'
+                . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/"; }, 2000); </script>', 'success');
         }
     }
 
@@ -162,16 +163,20 @@ class EmpenhoModel extends CRUD
         if (isset($user['level']) && $user['level'] !== 'ADMINISTRADOR') {
             $where = ' AND oms.id = ' . $user['oms_id'];
         }
-        
+
         $query = "
             SELECT 
                 oms.*, oms.name AS oms_name,
-                item.number AS requests_number, item.name,
+                item.number AS requests_number,
+                item.name, item.code, item.suppliers_id,
                 item.uf, item.quantity,
                 item.value, item.delivered,
-                item.invoice
+                item.invoice, item.status, item.id, item.number,
+                suppliers.name AS suppliers_name,
+                suppliers.cnpj
             FROM invoices AS inv
                 INNER JOIN requests_invoices AS item ON item.invoices_id = inv.id
+                INNER JOIN suppliers ON suppliers.id = item.suppliers_id
                 INNER JOIN oms ON oms.id = inv.oms_id
             WHERE item.code = ? {$where} ";
 
@@ -180,17 +185,18 @@ class EmpenhoModel extends CRUD
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    private function validaAll($omsId)
+    private function validaAll($user)
     {
         $value = filter_input_array(INPUT_POST);
         // Seta todos os valores
         $this->setId(filter_input(INPUT_POST, 'id') ?? time())
-            ->setOmsId($omsId)
+            ->setOmsId($user['oms_id'])
+            ->setUserId($user['id'])
             ->setCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS))
             ->setComplement(filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS));
 
         $result = [];
-        foreach($value['requests'] as $value) {
+        foreach ($value['requests'] as $value) {
             $id = filter_var($value, FILTER_VALIDATE_INT);
             $result[] = $id;
         }
