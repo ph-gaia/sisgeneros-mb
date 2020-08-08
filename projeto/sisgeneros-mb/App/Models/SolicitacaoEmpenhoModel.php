@@ -73,6 +73,36 @@ class SolicitacaoEmpenhoModel extends CRUD
         }
     }
 
+    public function entregarNf($id)
+    {
+        $data = [
+            "status" => "NF-ENTREGUE",
+            "updated_at" => date('Y-m-d H:i:s')
+        ];
+
+        parent::editar($data, $id);
+    }
+
+    public function liquidarNf($id)
+    {
+        $data = [
+            "status" => "NF-LIQUIDADA",
+            "updated_at" => date('Y-m-d H:i:s')
+        ];
+
+        parent::editar($data, $id);
+    }
+
+    public function pagarNf($id)
+    {
+        $data = [
+            "status" => "NF-PAGA",
+            "updated_at" => date('Y-m-d H:i:s')
+        ];
+
+        parent::editar($data, $id);
+    }
+
     /**
      * Make the itens of Biggings requests
      * @param array $values The input values
@@ -164,9 +194,9 @@ class SolicitacaoEmpenhoModel extends CRUD
     private function validaQtdRecebidaMenorQtdSol()
     {
         foreach ($this->getItemsList() as $value) {
-            if (($value['quantidade'] - $value['entregue']) < $value['solicitada']) {
-                msg::showMsg('A quantidade recebida é maior do que a quantidade solicitada.', 'danger');
-            }
+            // if (($value['quantidade'] - $value['entregue']) > $value['solicitada']) {
+            //     msg::showMsg('A quantidade recebida é maior do que a quantidade solicitada.', 'danger');
+            // }
             if (($value['quantidade'] - $value['entregue']) != $value['solicitada']) {
                 return true;
             }
@@ -182,7 +212,7 @@ class SolicitacaoEmpenhoModel extends CRUD
             $disponivel = floatval($result['quantity'] - $result['delivered']);
             if ($value['quantidade'] > $disponivel) {
                 msg::showMsg('A quantidade solicitada de ' . $result['name']
-                . ' é superior a quantidade disponível.', 'danger');
+                    . ' é superior a quantidade disponível.', 'danger');
             }
         }
     }

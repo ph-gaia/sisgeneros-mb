@@ -192,6 +192,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $this->view->btn = $solicitacaoItem->getNavePaginator();
         $this->view->totalSolicitacao = $solicitacaoItem->findTotalValueByRequestId($this->view->idlista);
         $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
+        $this->view->creditoComprometido = (new CreditoProvisionadoModel())->saldoComprometido($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item_solicitacao');
     }
 

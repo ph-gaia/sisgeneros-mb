@@ -32,7 +32,7 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR','CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new EmpenhoModel();
         $this->view->title = 'Lista de Todos os Empenhos';
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, $this->getParametro('busca'));
@@ -60,7 +60,7 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR','CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $this->view->title = 'Novo registro de empenho';
 
         $solicitacao = new SolicitacaoModel();
@@ -136,5 +136,26 @@ class EmpenhoController extends Controller implements CtrlInterface
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
         $model->novoRegistro();
+    }
+
+    public function entregarNfAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new SolicitacaoEmpenhoModel();
+        $model->entregarNf($this->getParametro('id'));
+    }
+
+    public function liquidarNfAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new SolicitacaoEmpenhoModel();
+        $model->liquidarNf();
+    }
+
+    public function pagarNfAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new SolicitacaoEmpenhoModel();
+        $model->pagarNf();
     }
 }

@@ -152,6 +152,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div class="alerta-credito">
                     <div class="alert alert-warning" role="alert">
                         O saldo do crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
+                        O crédito está <strong>comprometido</strong> com o valor de <strong><?= View::floatToMoney($this->view->creditoComprometido['sum_value']) ?></strong>.<br>
                         O valor total da sua <strong>solicitação</strong> é de <strong><?= View::floatToMoney($this->view->totalSolicitacao['total']) ?></strong><br><br>
                         <?php if ($ruleCredit): ?>
                         <strong>O Crédito disponível é INSUFICIENTE para essa solicitação de Gêneros</strong><br>
