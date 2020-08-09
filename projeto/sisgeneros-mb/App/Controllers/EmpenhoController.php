@@ -48,6 +48,7 @@ class EmpenhoController extends Controller implements CtrlInterface
         $items = new EmpenhoItemsModel();
         $itemsEmpenho = new SolicitacaoEmpenhoModel();
         $this->view->title = 'Itens do empenho';
+        $this->view->idlista = $this->getParametro('idlista');
         $this->view->resultEmpenho = $model->findByIdlista($this->getParametro('idlista'));
         $items->paginator($this->getParametro('pagina'), $this->getParametro('idlista'));
         $this->view->result = $items->getResultadoPaginator();
@@ -149,13 +150,13 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->liquidarNf();
+        $model->liquidarNf($this->getParametro('id'));
     }
 
     public function pagarNfAction()
     {
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->pagarNf();
+        $model->pagarNf($this->getParametro('id'));
     }
 }

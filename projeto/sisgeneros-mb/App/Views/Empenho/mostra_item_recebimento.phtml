@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\View;
+$idlista = $this->getParametro('idlista');
 
 ?>
 <div id="page-wrapper">
@@ -37,7 +38,7 @@ use App\Helpers\View;
                         <button class="btn btn-success" id='btn_enviar'>
                             <i class="fa fa-check"></i> Confirmar Recebimento
                         </button>
-                        <a href="<?= $this->view->controller; ?>" class="btn btn-warning" id="btn_voltar"><i class="fa fa-arrow-left"></i> Voltar</a>
+                        <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $idlista ?>" class="btn btn-warning" id="btn_voltar"><i class="fa fa-arrow-left"></i> Voltar</a>
                         <div class="row" style="padding-top: 10px;">
                             <div class="col-lg-4" id="invoice_container">
                                 <label>Número da Nota Fiscal: </label>

@@ -47,6 +47,7 @@ class EmpenhoItemsModel extends CRUD
     public function novoRegistro($dados, $invoicesId)
     {
         $solItem = new SolicitacaoItemModel();
+        $item = new Item();
         foreach ($dados as $requestId) {
             $result = $solItem->findAllItemsByRequestId($requestId);
             foreach ($result as $value) {
@@ -57,11 +58,12 @@ class EmpenhoItemsModel extends CRUD
                     'number' => $value['number'],
                     'name' => $value['name'],
                     'uf' => $value['uf'],
-                    'quantity' => $value['quantity'],
+                    'quantity' => $value['quantidade_solicitada'],
                     'delivered' => 0,
                     'value' => $value['value']
                 ];
                 parent::novo($dados);
+                $item->atualizarQtdEmpenhada($result['item_id'], $value['quantidade_solicitada']);
             }
         }
     }

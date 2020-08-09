@@ -64,7 +64,7 @@ class ItemModel extends CRUD
             'uf' => $this->getUf(),
             'quantity' => $this->getQuantity(),
             'quantity_compromised' => $this->getQuantity(),
-            'quantity_commited' => $this->getQuantity(),
+            'quantity_committed' => $this->getQuantity(),
             'quantity_available' => $this->getQuantity(),
             'value' => $this->getValue(),
             'active' => $this->getActive()
@@ -118,6 +118,35 @@ class ItemModel extends CRUD
         ];
 
         if (parent::editar($dados, $id)) {
+            $this->atualizarQtdDisponivel();
+            return true;
+        }
+    }
+
+    /**
+     * função para atualizar a quantidade de itens da licitação
+     * 
+     * @param $id identificador do item
+     * @param $quantity quantidade Empenhada
+     */
+    public function atualizarQtdEmpenhada($id, $quantity)
+    {
+        $result = $this->findById($id);
+
+        $dados = [
+            'quantity_committed' => $result['quantity_committed'] + $quantity
+        ];
+
+        if (parent::editar($dados, $id)) {
+            $this->atualizarQtdDisponivel();
+            return true;
+        }
+    }
+
+    private function atualizarQtdDisponivel()
+    {
+        $stmt = $this->pdo->prepare("UPDATE biddings_items SET quantity_available = quantity - quantity_committed");
+        if ($stmt->execute()) {
             return true;
         }
     }

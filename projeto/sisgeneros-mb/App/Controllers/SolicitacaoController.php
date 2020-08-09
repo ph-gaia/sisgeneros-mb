@@ -133,7 +133,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
             $licitacao = new Licitacao();
             $this->view->title = 'Forncedores e itens encontrados';
-            $this->view->result = $licitacao->listaItemFornecedor($this->getParametro('busca'));
+            $this->view->result = $licitacao->listaItemFornecedor($this->view->userLoggedIn['oms_id'], $this->getParametro('busca'));
             $this->render('mostra_item_buscado');
         } else {
             $this->licitacaobuscaAction();

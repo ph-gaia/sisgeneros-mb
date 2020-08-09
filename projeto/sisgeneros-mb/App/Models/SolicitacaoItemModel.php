@@ -207,7 +207,7 @@ class SolicitacaoItemModel extends CRUD
     public function findAllItemsByRequestId($requestId)
     {
         $query = ""
-            . " SELECT items.number as item_number, "
+            . " SELECT items.number as item_number, lic_items.id as item_id, "
             . " items.quantity as quantidade_solicitada, "
             . " lic_items.*, lic.number as licitacao, sol.suppliers_id "
             . " FROM requests_items as items "

@@ -75,32 +75,47 @@ class SolicitacaoEmpenhoModel extends CRUD
 
     public function entregarNf($id)
     {
-        $data = [
-            "status" => "NF-ENTREGUE",
-            "updated_at" => date('Y-m-d H:i:s')
-        ];
+        $result = $this->findByCode($id);
 
-        parent::editar($data, $id);
+        $query = "UPDATE {$this->entidade} SET
+        status = 'NF-ENTREGUE', 
+        updated_at = '" . date('Y-m-d H:i:s') . "'
+        WHERE code = ?";
+
+        $stmt = $this->pdo->prepare($query);
+        if ($stmt->execute([$id])) {
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+        }
     }
 
     public function liquidarNf($id)
     {
-        $data = [
-            "status" => "NF-LIQUIDADA",
-            "updated_at" => date('Y-m-d H:i:s')
-        ];
+        $result = $this->findByCode($id);
 
-        parent::editar($data, $id);
+        $query = "UPDATE {$this->entidade} SET 
+        status = 'NF-LIQUIDADA', 
+        updated_at = '" . date('Y-m-d H:i:s') . "'
+        WHERE code = ?";
+
+        $stmt = $this->pdo->prepare($query);
+        if ($stmt->execute([$id])) {
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+        }
     }
 
     public function pagarNf($id)
     {
-        $data = [
-            "status" => "NF-PAGA",
-            "updated_at" => date('Y-m-d H:i:s')
-        ];
+        $result = $this->findByCode($id);
 
-        parent::editar($data, $id);
+        $query = "UPDATE {$this->entidade} SET 
+        status = 'NF-PAGA', 
+        updated_at = '" . date('Y-m-d H:i:s') . "'
+        WHERE code = ?";
+
+        $stmt = $this->pdo->prepare($query);
+        if ($stmt->execute([$id])) {
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+        }
     }
 
     /**

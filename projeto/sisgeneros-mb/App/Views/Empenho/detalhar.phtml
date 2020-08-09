@@ -52,14 +52,17 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <th>UF</th>
                                 <th>Nome</th>
                                 <th>Valor (R$)</th>
-                                <th>Subtotal (R$)</th>
+                                <th>Subtotal</th>
+                                <th>Subtotal Disponível</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $total = 0;
                             foreach ($this->view->result as $value) :
-                                $total += $value['value'] * $value['quantity'];
+                                $subTotal = $value['value'] * $value['quantity'];
+                                $total += $subTotal;
+                                $totalDisponivel += ($value['value'] * $value['quantity']) - ($value['value'] * $value['delivered']);
                             ?>
                                 <tr>
                                     <td>
@@ -70,11 +73,16 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                     <td><?= $value['number'] ?: ''; ?></td>
                                     <td><?= floatval($value['quantity']); ?></td>
                                     <td><?= intval($value['delivered']); ?></td>
-                                    <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
+                                    <td>
+                                        <span class="badge badge-primary">
+                                            <?= floatval($value['quantity'] - $value['delivered']); ?>
+                                        </span>
+                                    </td>
                                     <td><?= $value['uf']; ?></td>
                                     <td><?= $value['name']; ?></td>
                                     <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                    <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal - ($value['value'] * $value['delivered'])); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -86,6 +94,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         <?= Utils::floatToMoney($total); ?>
                                     </span>
                                 </td>
+                                <td class="text-left">
+                                    <span class="badge badge-danger">
+                                        <?= Utils::floatToMoney($totalDisponivel); ?>
+                                    </span>
+                                </td>
                             </tr>
                         </tfoot>
                     </table>
@@ -93,110 +106,109 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <?= $pagination; ?>
 
                 <?php
-                    $request = 0;
-                    foreach ($this->view->resultItems as $result) :
-                        if ($request == $result['code']) {
-                            continue;
-                        }
+                $request = 0;
+                foreach ($this->view->resultItems as $result) :
+                    if ($request == $result['code']) {
+                        continue;
+                    }
                 ?>
-                <div class="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                    Solicitação <?= $result['code'] ?> do Empenho
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseOne<?= $result['code'] ?>" class="collapse">
-                            <div class="card-body">
-                                <?php
+                    <div class="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
+                                        Solicitação <?= $result['code'] ?> do Empenho
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOne<?= $result['code'] ?>" class="collapse">
+                                <div class="card-body">
+                                    <?php
                                     if ($result['code']) {
                                         $code = $result['code'];
                                     }
-                                ?>
-                                <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>" class="btn btn-secondary btn-sm">
-                                    <i class="fa fa-file-pdf-o"></i> PDF
-                                </a>
-                                <?php if (isset($code) && in_array($result['status'], ['ABERTO', 'RECEBIDO-PARCIAL'])): ?>
-                                <a href="<?= $this->view->controller; ?>receber/id/<?= $code ?>" class="btn btn-success btn-sm">
-                                    <i class="fa fa-check"></i> Receber
-                                </a>
-                                <?php endif; ?>
-                                <?php if (isset($code) && $result['status'] == 'ABERTO'): ?>
-                                <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>')"
-                                    class="btn btn-danger btn-sm">
-                                    <i class="fa fa-ban"></i> Cancelar
-                                </a>
-                                <?php endif; ?>
-                                <?php if (isset($code) && $result['status'] == 'RECEBIDO'): ?>
-                                    <a href="<?= $this->view->controller; ?>entregar/id/<?= $code ?>" class="btn btn-success btn-sm">
-                                        <i class="fa fa-check"></i> Entregar NF
+                                    ?>
+                                    <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>" class="btn btn-secondary btn-sm">
+                                        <i class="fa fa-file-pdf-o"></i> PDF
                                     </a>
-                                <?php endif; ?>
-                                <?php if (isset($code) && $result['status'] == 'NF-ENTREGUE'): ?>
-                                    <a href="<?= $this->view->controller; ?>entregue/id/<?= $code ?>" class="btn btn-success btn-sm">
-                                        <i class="fa fa-check-square-o"></i> Enc. NF
-                                    </a>
-                                <?php endif; ?>
-                                <?php if (isset($code) && $result['status'] == 'NF-FINANCAS'): ?>
-                                    <a href="<?= $this->view->controller; ?>pagar/id/<?= $code ?>" class="btn btn-success btn-sm">
-                                        <i class="fa fa-dollar"></i> Pagar NF
-                                    </a>
-                                <?php endif; ?>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Nº</th>
-                                            <th>Solicitado</th>
-                                            <th>Entregue</th>
-                                            <th>Disponível</th>
-                                            <th>Status</th>
-                                            <th>UF</th>
-                                            <th>Nome</th>
-                                            <th>Valor (R$)</th>
-                                            <th>Subtotal (R$)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $total = 0;
-                                        foreach ($this->view->resultItems as $value) :
-                                            if ($value['code'] != $result['code']) {
-                                                continue;
-                                            }
-                                            $total += $value['value'] * $value['quantity'];
-                                        ?>
+                                    <?php if (isset($code) && in_array($result['status'], ['ABERTO'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>receber/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Receber
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'ABERTO') : ?>
+                                        <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>')" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-ban"></i> Cancelar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Entregar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'NF-ENTREGUE') : ?>
+                                        <a href="<?= $this->view->controller; ?>liquidarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check-square-o"></i> Liquidar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'NF-LIQUIDADA') : ?>
+                                        <a href="<?= $this->view->controller; ?>pagarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-dollar"></i> Pagar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <table class="table">
+                                        <thead>
                                             <tr>
-                                                <td><?= $value['code'] ?: ''; ?></td>
-                                                <td><?= floatval($value['quantity']); ?></td>
-                                                <td><?= intval($value['delivered']); ?></td>
-                                                <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
-                                                <td><?= $value['status']; ?></td>
-                                                <td><?= $value['uf']; ?></td>
-                                                <td><?= $value['name']; ?></td>
-                                                <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                                <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                <th>Nº</th>
+                                                <th>Solicitado</th>
+                                                <th>Entregue</th>
+                                                <th>Disponível</th>
+                                                <th>Status</th>
+                                                <th>UF</th>
+                                                <th>Nome</th>
+                                                <th>Valor (R$)</th>
+                                                <th>Subtotal (R$)</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th class="text-right" colspan="8">Total (R$)</th>
-                                            <td class="text-left">
-                                                <span class="badge badge-danger">
-                                                    <?= Utils::floatToMoney($total); ?>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $total = 0;
+                                            foreach ($this->view->resultItems as $value) :
+                                                if ($value['code'] != $result['code']) {
+                                                    continue;
+                                                }
+                                                $total += $value['value'] * $value['quantity'];
+                                            ?>
+                                                <tr>
+                                                    <td><?= $value['code'] ?: ''; ?></td>
+                                                    <td><?= floatval($value['quantity']); ?></td>
+                                                    <td><?= intval($value['delivered']); ?></td>
+                                                    <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
+                                                    <td><?= $value['status']; ?></td>
+                                                    <td><?= $value['uf']; ?></td>
+                                                    <td><?= $value['name']; ?></td>
+                                                    <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                                    <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th class="text-right" colspan="8">Total (R$)</th>
+                                                <td class="text-left">
+                                                    <span class="badge badge-danger">
+                                                        <?= Utils::floatToMoney($total); ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 <?php
-                $request = $result['code'];
+                    $request = $result['code'];
                 endforeach; ?>
             </div>
         </div>

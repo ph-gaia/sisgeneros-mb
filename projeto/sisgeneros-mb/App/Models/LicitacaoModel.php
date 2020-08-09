@@ -74,7 +74,7 @@ class LicitacaoModel extends CRUD
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function listaItemFornecedor($search)
+    public function listaItemFornecedor($omId, $search)
     {
         $stmt = $this->pdo->prepare("
             SELECT
@@ -88,6 +88,8 @@ class LicitacaoModel extends CRUD
             FROM biddings
             INNER JOIN biddings_items AS item
                 ON item.biddings_id = biddings.id AND item.active = 'yes'
+            INNER JOIN biddings_oms_lists AS biddings_oms
+                ON biddings_oms.biddings_id = biddings.id AND biddings_oms.oms_id = {$omId}
             INNER JOIN suppliers
                 ON suppliers.id = item.suppliers_id
             WHERE item.name LIKE :search AND biddings.validate >= '" . date('Y-m-d') . "'
@@ -114,6 +116,16 @@ class LicitacaoModel extends CRUD
 
         if (parent::novo($dados)) {
             $lastId = $this->pdo->lastInsertId();
+            $licitacaoListaOms = new LicitacaoListaOmsModel();
+
+            foreach ($this->buildOmsId() as $omId) {
+                $dados = [
+                    'oms_id' => $omId,
+                    'biddings_id' => $lastId
+                ];
+                $licitacaoListaOms->novo($dados);
+            }
+
             msg::showMsg('Licitação Registrada com Sucesso. '
                 . "<a href='" . cfg::DEFAULT_URI . "item/novo/idlista/" . $lastId . "' class='btn btn-info'>"
                 . "<i class='fa fa-plus-circle'></i> Adicionar Item</a>"
@@ -145,6 +157,92 @@ class LicitacaoModel extends CRUD
     {
         if (parent::remover($id)) {
             header('Location: ' . cfg::DEFAULT_URI . 'biddings/ver/');
+        }
+    }
+
+    public function fetchDataToEdit(int $id): array
+    {
+        $result = [];
+        $licitacao = $this->findById($id);
+        if ($licitacao) {
+            $result['result'] = $licitacao;
+            $query = ""
+                . "SELECT "
+                . " bol.id, oms.naval_indicative, oms.name "
+                . " FROM biddings_oms_lists AS bol "
+                . " INNER JOIN oms "
+                . "     ON oms.id = bol.oms_id "
+                . " WHERE bol.biddings_id = {$licitacao['id']} "
+                . " ORDER BY oms.name ";
+            $result['oms'] = $this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            return $result;
+        }
+        header('Location: ' . cfg::DEFAULT_URI . 'licitacao/ver');
+    }
+
+    public function fetchOmOut(int $id)
+    {
+        $result = [];
+        $omCount = count((new OmModel())->findAll());
+        $omInsertedCount = count((new LicitacaoListaOmsModel())->findAllByBiddings_id($id));
+
+        if ($omCount != $omInsertedCount) {
+            $query = ""
+                . " SELECT "
+                . " oms.id, oms.naval_indicative, oms.name "
+                . " FROM oms "
+                . " WHERE oms.id NOT IN ("
+                . "     SELECT "
+                . "         oms.id "
+                . "     FROM biddings_oms_lists AS bol "
+                . "     INNER JOIN oms "
+                . "         ON oms.id = bol.oms_id "
+                . "     WHERE bol.biddings_id = {$id} "
+                . " ) "
+                . " ORDER BY oms.name";
+            $result = $this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        return $result;
+    }
+
+    public function adicionarNovaOM()
+    {
+        $this->setId(filter_input(INPUT_POST, 'id') ?? time())
+            ->setOmsId(filter_input(INPUT_POST, 'oms'));
+
+        $this->validaId()
+            ->validaInt($this->getOmsId());
+
+        $query = ""
+            . " SELECT "
+            . " id "
+            . " FROM biddings_oms_lists AS bol "
+            . " WHERE bol.oms_id = :omId AND bol.biddings_id = :biddId";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([
+            ':omId' => $this->getOmsId(),
+            ':biddId' => $this->getId()
+        ]);
+
+        if ($stmt->fetch(\PDO::FETCH_ASSOC)) {
+            msg::showMsg('Esta oms já foi adicionada.', 'danger');
+        }
+
+        $dados = [
+            'oms_id' => $this->getOmsId(),
+            'biddings_id' => $this->getId()
+        ];
+
+        if ((new LicitacaoListaOmsModel())->novo($dados)) {
+            msg::showMsg('111', 'success');
+        }
+    }
+
+    public function eliminarOm(int $id, $avisoId)
+    {
+        if ((new LicitacaoListaOmsModel())->remover($id)) {
+            header('Location: ' . cfg::DEFAULT_URI . 'licitacao/editar/id/' . $avisoId);
         }
     }
 
@@ -201,6 +299,15 @@ class LicitacaoModel extends CRUD
             ->validaDescription()
             ->validaUasgName()
             ->validaValidate();
+    }
+
+    private function validaInt($value)
+    {
+        $value = v::intVal()->validate($value);
+        if (!$value) {
+            msg::showMsg('Não foi possível registrar a solicitação', 'danger');
+        }
+        return $value;
     }
 
     // Validação
@@ -265,5 +372,22 @@ class LicitacaoModel extends CRUD
         }
         $this->setValidate($validate);
         return $this;
+    }
+
+    private function buildOmsId(): array
+    {
+        $result = [];
+        $requestPost = filter_input_array(INPUT_POST);
+        $items = is_array($requestPost['oms'] ?? null) ? $requestPost['oms'] : [];
+
+        foreach ($items as $omId) {
+            $value = v::intVal()->validate($omId);
+            if (!$value) {
+                msg::showMsg('O campo ID deve ser um número inteiro válido.', 'danger');
+            }
+            $result[] = $omId;
+        }
+
+        return $result;
     }
 }
