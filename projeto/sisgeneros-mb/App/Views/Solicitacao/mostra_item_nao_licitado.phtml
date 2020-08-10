@@ -1,9 +1,17 @@
+<?php
+
+use App\Config\Configurations as cfg;
+
+?>
 <div id="page-wrapper">
     <div class="container-fluid">
         <form action="<?= $this->view->controller; ?>registranaolicitado" method="post" id="form" enctype="multipart/form-data">
             <div class="row">
                 <input type="hidden" name="biddings_id" value="S/N">
                 <input type="hidden" name="invoice" value="S/N">
+                <input type="hidden" name="modality" value="Dispensa de Licitação Valor">
+                <input type="hidden" name="purposes" id="purposes" value="">
+                <input type="hidden" name="omName" id="omName" value="<?= $this->view->resultOm['name'] ?>">
                 <input type="hidden" name="observation">
                 <div class="col-md-12">
                     <div id="resultado"></div>
@@ -22,20 +30,18 @@
                     </a>
                 </div>
             </div>
-            <div class="row" style="margin-top: 10px; margin-bottom: 20px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
-                    <label>Data estipulada para entrega:</label>
+                    <label>Modalidade:</label>
                     <input type="text"
-                           name="delivery_date"
-                           id="delivery_date"
+                           name="modality"
+                           id="modality"
                            class="form-control"
-                           data-mask="00-00-0000"
-                           data-mask-reverse="true"
-                           placeholder="Data no formato DD-MM-AAAA"
+                           value="Dispensa de Licitação Valor"
                            required
-                           maxlength="10">
+                           disabled>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <label>Fornecedor:</label>
                     <select name="suppliers_id" class="form-control" required>
                         <option value="">---</option>
@@ -43,6 +49,54 @@
                             <option value="<?= $value['id']; ?>"><?= $value['cnpj']; ?> - <?= $value['name']; ?></option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="col-md-1" style="padding-top: 30px;">
+                    <a href="<?= cfg::DEFAULT_URI ?>fornecedor/novo/" class="btn btn-success"><i class="fa fa-plus"></i></a>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label>Tipo de Empenho</label>
+                    <select name="types_invoices"
+                            id="types_invoices"
+                            class="form-control"
+                            required>
+                            <option>Selecione uma opção</option>
+                            <option value="ESTIMATIVO">Estimativo</option>
+                            <option value="GLOBAL">Global</option>
+                            <option value="ORDINARIO">Ordinário</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Plano de Contas</label>
+                    <select name="account_plan"
+                            id="account_plan"
+                            class="form-control"
+                            onchange="changePurposes()"
+                            required>
+                            <option>Selecione uma opção</option>
+                            <option value="339030.07">339030.07</option>
+                            <option value="339030.21">339030.21</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px; margin-bottom: 20px;">
+                <div class="col-md-6">
+                    <label>Observações:</label>
+                    <textarea
+                        name="complement"
+                        id="complement"
+                        class="form-control"
+                        placeholder="Observações no pedido"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label>Finalidade:</label>
+                    <textarea
+                        name="purposesView"
+                        id="purposesView"
+                        class="form-control"
+                        placeholder="Finalidade"
+                        disabled></textarea>
                 </div>
             </div>
             <div class="row">
@@ -156,6 +210,17 @@
     </table>
 </div>
 <script>
+    function changePurposes() {
+        if ($('#account_plan').val() === '339030.07') {
+            let generoAli = `Aquisição de gêneros alimentícios para confecção do rancho do ${$('#omName').val()}`;
+            $('#purposes').val(generoAli);
+            $('#purposesView').val(generoAli);
+        } else {
+            let materialDesc = `Aquisição de material descartável para utilização no rancho do ${$('#omName').val()}`;
+            $('#purposes').val(materialDesc);
+            $('#purposesView').val(materialDesc);
+        }
+    }
     $(document).ready(function () {
         var xRow = 1;
         var xFile = 1;

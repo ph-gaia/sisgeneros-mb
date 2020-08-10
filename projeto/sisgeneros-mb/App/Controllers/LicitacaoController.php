@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Controllers;
 
 use HTR\System\ControllerAbstract as Controller;
 use HTR\Interfaces\ControllerInterface as CtrlInterface;
 use HTR\Helpers\Access\Access;
 use App\Models\LicitacaoModel;
+use App\Models\OmModel;
 use App\Config\Configurations as cfg;
 
 class LicitacaoController extends Controller implements CtrlInterface
@@ -28,6 +30,7 @@ class LicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
         $this->view->title = 'Novo Registro';
+        $this->view->resultOms = (new OmModel())->findAll();
         $this->render('form_novo');
     }
 
@@ -36,7 +39,9 @@ class LicitacaoController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
         $model = new LicitacaoModel();
         $this->view->title = 'Editando Registro';
-        $this->view->result = $model->findById($this->getParametro('id'));
+        $result = $model->fetchDataToEdit((int) $this->getParametro('id'));
+        $this->view->resultOms = $result['oms'];
+        $this->view->result = $result['result'];
         $this->render('form_editar');
     }
 
@@ -76,5 +81,39 @@ class LicitacaoController extends Controller implements CtrlInterface
     {
         $result = (new LicitacaoModel())->findAllByIngredientsId(intval($this->getParametro('id')));
         echo json_encode($result);
+    }
+
+    public function eliminaromAction()
+    {
+        $id = $this->getParametro('id');
+        $avisoId = $this->getParametro('avisoid');
+        if ($id && $avisoId) {
+            (new LicitacaoModel())->eliminarOm((int) $id, (int) $avisoId);
+        } else {
+            header('Location: ' . $this->view->controller);
+        }
+    }
+
+    public function adicionaromAction()
+    {
+        $id = $this->getParametro('id');
+        if ($id) {
+            $result = (new LicitacaoModel())->fetchOmOut((int) $id);
+            if (count($result)) {
+                $this->view->title = 'Adicionar nova OM';
+                $this->view->result = $result;
+
+                $this->render('form_adicionar_om');
+            } else {
+                header('Location: ' . $this->view->controller . 'editar/id/' . $id);
+            }
+        } else {
+            header('Location: ' . $this->view->controller);
+        }
+    }
+
+    public function registrarnovaomAction()
+    {
+        (new LicitacaoModel())->adicionarNovaOM();
     }
 }

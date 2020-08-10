@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -44,12 +45,18 @@ class SolicitacaoItemModel extends CRUD
 
     public function paginator($pagina, $idlista)
     {
+        $inner = " as items " .
+            " INNER JOIN requests as req ON req.id = items.requests_id " .
+            " LEFT JOIN biddings_items as bidding ON bidding.biddings_id = req.biddings_id 
+          and bidding.name LIKE items.name ";
+
         $dados = [
-            'entidade' => $this->entidade,
+            'select' => 'items.*, bidding.quantity_available',
+            'entidade' => $this->entidade . $inner,
             'pagina' => $pagina,
             'maxResult' => 50,
             'orderBy' => 'number ASC',
-            'where' => 'requests_id = ?',
+            'where' => 'items.requests_id = ?',
             'bindValue' => [$idlista]
         ];
 
@@ -81,6 +88,7 @@ class SolicitacaoItemModel extends CRUD
                 'value' => $value['value']
             ];
             parent::novo($dados);
+            $item->atualizarQtdComprometida($idItem, $quantity);
         }
     }
 
@@ -199,16 +207,29 @@ class SolicitacaoItemModel extends CRUD
     public function findAllItemsByRequestId($requestId)
     {
         $query = ""
-            . " SELECT items.number as item_number, "
+            . " SELECT items.number as item_number, lic_items.id as item_id, "
             . " items.quantity as quantidade_solicitada, "
-            . " lic_items.*, lic.number as licitacao "
+            . " lic_items.*, lic.number as licitacao, sol.suppliers_id "
             . " FROM requests_items as items "
             . " INNER JOIN biddings_items as lic_items ON lic_items.number = items.number "
             . " INNER JOIN biddings	as lic ON lic.id = lic_items.biddings_id "
+            . " INNER JOIN requests as sol ON sol.id = items.requests_id "
             . " WHERE items.requests_id = ? ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$requestId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findTotalValueByRequestId($requestId)
+    {
+        $query = ""
+            . " SELECT SUM(items.value * items.quantity) as total "
+            . " FROM requests "
+            . " INNER JOIN requests_items as items ON items.requests_id = requests.id "
+            . " WHERE items.requests_id = ? ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$requestId]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     private function setAll($dados)

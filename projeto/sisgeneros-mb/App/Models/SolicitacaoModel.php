@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -11,9 +12,11 @@ use App\Models\AvaliacaoFornecedorModel;
 use App\Config\Configurations as cfg;
 use HTR\System\ControllerAbstract;
 use App\Helpers\Utils;
+use App\Helpers\View;
 use App\Models\CardapioModel;
 use App\Models\EmpenhoModel;
 use App\Models\HistoricoAcaoModel;
+use App\Models\HistoricoCreditoProvisionadoModel;
 
 class SolicitacaoModel extends CRUD
 {
@@ -406,6 +409,7 @@ class SolicitacaoModel extends CRUD
         $this->validaAll($oms);
 
         $this->validaFiles();
+        $this->validaValorPedidoNaoLicitado();
         $dados = [
             'biddings_id' => $this->getBiddingsId(),
             'oms_id' => $this->getOmsId(),
@@ -415,7 +419,7 @@ class SolicitacaoModel extends CRUD
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d H:i:s'),
             'biddings_id' => 0,
-            'modality' => $this->getModality(), 
+            'modality' => $this->getModality(),
             'types_invoices' => $this->getTypesInvoices(),
             'account_plan' => $this->getAccountPlan(),
             'purposes' => $this->getPurposes()
@@ -452,7 +456,7 @@ class SolicitacaoModel extends CRUD
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d H:i:s'),
             'biddings_id' => $this->getBiddingsId(),
-            'modality' => $this->getModality(), 
+            'modality' => $this->getModality(),
             'types_invoices' => $this->getTypesInvoices(),
             'account_plan' => $this->getAccountPlan(),
             'purposes' => $this->getPurposes()
@@ -493,7 +497,7 @@ class SolicitacaoModel extends CRUD
     {
         $query = "
             SELECT SUM(quantity * value) as total 
-            FROM requests_items items 
+            FROM requests_items as items 
             WHERE items.requests_id = ?;";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id]);
@@ -505,6 +509,20 @@ class SolicitacaoModel extends CRUD
         $id = filter_input(INPUT_POST, 'request_id');
         $reason = filter_input(INPUT_POST, 'reason');
         $action = filter_input(INPUT_POST, 'action');
+
+        $pedido = $this->findById($id);
+
+        if (in_array($pedido['status'], ['AUTORIZADO', 'CONFERIDO', 'EMPENHADO'])) {
+            $total = $this->totalByPedido($id);
+            $credito = (new CreditoProvisionadoModel())->findByOmId($pedido['oms_id']);
+
+            (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+                $credito['id'],
+                $total['total'],
+                'CREDITO',
+                "CRÉDITO DE " . View::floatToMoney($total['total']) . "; REFERENTE A SOLICITAÇÃO " . $pedido['number'] . ", QUE FOI " . $action
+            );
+        }
 
         $dados = [
             'status' => $action,
@@ -519,26 +537,35 @@ class SolicitacaoModel extends CRUD
     }
 
     /**
-     * aprova o pedido e abate o valor do pedido no crédito provisionado para OM
+     * autoriza o pedido e abate o valor do pedido no crédito provisionado para OM
      */
-    public function aprovar($id)
+    public function autorizar($id)
     {
-        $empenhoModel = new CreditoProvisionadoModel();
+        $creditoModel = new CreditoProvisionadoModel();
         $total = $this->totalByPedido($id);
         $pedido = $this->findById($id);
-        $creditoProvisionado = $empenhoModel->creditProvisionedByOmId($pedido['oms_id']);
+        $creditoProvisionado = $creditoModel->findByOmId($pedido['oms_id']);
+
+        if ($pedido['status'] != 'VERIFICADO') {
+            msg::showMsg("A solicitação não está apta para ser autorizada!", "danger");
+        }
 
         if ($total['total'] > $creditoProvisionado['value']) {
             msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
         }
 
         $dados = [
-            'status' => 'APROVADO',
+            'status' => 'AUTORIZADO',
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
         if (parent::editar($dados, $id)) {
-            $empenhoModel->abaterValor($creditoProvisionado['id'], $total['total']);
+            (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+                $creditoProvisionado['id'],
+                $total['total'],
+                'DEBITO',
+                "DÉBITO DE " . View::floatToMoney($total['total']) . "; REFERENTE A SOLICITAÇÃO " . $pedido['number']
+            );
 
             header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
         }
@@ -632,9 +659,9 @@ class SolicitacaoModel extends CRUD
         $request = $this->requestByMenu($menuId);
         $menus = (new CardapioModel)->findById($menuId);
 
-        if (count($request) && $menus['status'] == 'APROVADO') {
+        if (count($request) && $menus['status'] == 'AUTORIZADO') {
             (new CardapioModel)->changeStatus('GERADO', intval($menuId));
-            foreach($request as $values) {
+            foreach ($request as $values) {
                 # ITENS LICITADOS
                 if ($values['biddingsId']) {
                     $dados = [
@@ -647,15 +674,15 @@ class SolicitacaoModel extends CRUD
                         'updated_at' => date('Y-m-d H:i:s')
                     ];
                     $numbers[] = $dados['number'];
-    
+
                     if (parent::novo($dados)) {
                         $lastId = $this->pdo->lastInsertId();
-    
+
                         $itemsList = $this->requestItemsByMenuAndSuppliers($menuId, $values['suppliersId']);
-    
+
                         (new Itens())->novoRegistroByMenu($itemsList, $lastId);
                     }
-                } 
+                }
                 # ITENS NÃO LICITADOS
             }
         }
@@ -665,7 +692,7 @@ class SolicitacaoModel extends CRUD
 
     public function requestByMenu($menuId)
     {
-        $query = "".
+        $query = "" .
             " SELECT " .
             " D.biddings_id AS biddingsId, A.oms_id AS omsId, E.id AS suppliersId, A.beginning_date AS date " .
             " FROM menus A " .
@@ -674,7 +701,7 @@ class SolicitacaoModel extends CRUD
             " LEFT JOIN biddings_items D ON D.id = C.biddings_items_id " .
             " LEFT JOIN suppliers E ON E.id = D.suppliers_id " .
             " WHERE A.id = :menuId " .
-            " GROUP BY D.biddings_id, E.id ".
+            " GROUP BY D.biddings_id, E.id " .
             " ORDER BY D.biddings_id, E.id ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':menuId' => $menuId]);
@@ -836,8 +863,8 @@ class SolicitacaoModel extends CRUD
         }
 
         return $this->pdo
-                ->query($query)
-                ->fetch((\PDO::FETCH_ASSOC));
+            ->query($query)
+            ->fetch((\PDO::FETCH_ASSOC));
     }
 
     /**
@@ -986,12 +1013,25 @@ class SolicitacaoModel extends CRUD
         return $this;
     }
 
+    public function validaValorPedidoNaoLicitado()
+    {
+        $total = 0;
+        foreach ($this->getItemsList() as $value) {
+            $total += $value['quantity'] * floatval($value['value']);
+        }
+
+        if ($total > 17.600) {
+            msg::showMsg('Solicitação da modalidade Não Licitado, tem a restrição de valor até R$ 17.600,00', 'danger');
+        }
+        return $this;
+    }
+
     private function validaQuantity($value)
     {
         $value = str_replace(",", ".", $value);
         $value = intval($value);
         $validate = v::intVal()->validate($value);
-        if ((!$validate) || ( $value <= 0)) {
+        if ((!$validate) || ($value <= 0)) {
             msg::showMsg('O(s) valor(es)  do(s) campo(s) QUANTIDADE deve(m) ser'
                 . ' número INTEIRO não negativo e maior que zero', 'danger');
         }

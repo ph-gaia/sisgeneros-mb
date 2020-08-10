@@ -80,6 +80,20 @@ class CreditoProvisionadoModel extends CRUD
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    public function saldoComprometido($omId)
+    {
+        $stmt = $this->pdo->prepare(""
+            . " SELECT SUM(`requests_items`.`value`) as sum_value "
+            . " FROM `requests_items` "
+            . " INNER JOIN `requests` "
+            . "     ON `requests_items`.`requests_id` = `requests`.`id` "
+            . " WHERE "
+            . "     `requests`.`status` IN ('ELABORADO', 'ENCAMINHADO', 'PROVISIONADO', 'VERIFICADO') "
+            . "     AND `requests`.`oms_id` = ?;");
+        $stmt->execute([$omId]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
     public function findByOmId($omId)
     {
         $query = "" .

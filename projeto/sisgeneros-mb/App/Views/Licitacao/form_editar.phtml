@@ -102,5 +102,47 @@ use App\Helpers\View;
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-table fa-fw"></i> OMs Registradas para esta Licitação
+                        <a href="<?= $this->view->controller; ?>adicionarom/id/<?= $this->view->result['id']; ?>"
+                           class="btn btn-info pull-right"
+                           style="margin-top: -7px;">
+                            <i class="fa fa-plus-circle"></i> Adicionar OM
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" style="margin-top: 10px;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Indicativo Naval</th>
+                                        <th>Nome</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($this->view->resultOms as $value): ?>
+                                        <tr>
+                                            <td><?= $value['naval_indicative'] ?? ''; ?></td>
+                                            <td><?= $value['name'] ?? ''; ?></td>
+                                            <td>
+                                                <a
+                                                    onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminarom/id/<?= $value['id']; ?>/avisoid/<?= $this->view->result['id']; ?>')"
+                                                    class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

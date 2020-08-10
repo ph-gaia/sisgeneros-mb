@@ -1,45 +1,19 @@
 <?php
 
-use App\Helpers\View;
+use App\Helpers\Pagination;
+use App\Helpers\Utils;
 
 $idlista = $this->view->idlista;
 
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+    return [
+        'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
+        'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
+
 ?>
-<!-- Modal Empenho -->
-<div class="modal fade" id="modalEmpenho">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Abater valor do Empenho</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="<?= $this->view->controller; ?>abaterValorEmpenho" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="id" value="<?= $this->view->resultEmpenho['id']; ?>" />
-                    <div class="form-group">
-                        <label>Valor que deseja cancelar:</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="value"
-                            name="value"
-                            placeholder="Valor para ser abatido do Empenho">
-                    </div>
-                    <div class="form-group">
-                        <label>Observação:</label>
-                        <textarea class="form-control" name="observation" placeholder="Adicione uma nota informando mais detalhes..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Registrar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <div id="page-wrapper">
     <div class="container-fluid">
         <div class="row">
@@ -49,203 +23,193 @@ $idlista = $this->view->idlista;
                     <div class="alert alert-info" role="alert">
                         Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><br>
                         OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
-                        Total: <strong><?= $this->view->resultEmpenho['total']; ?></strong><br>
                         Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
                     </div>
                 <?php endif; ?>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEmpenho">
-                    <i class="fa fa-edit"></i> Altenar Saldo do Empenho
-                </button>
-                <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
-                    <i class="fa fa-arrow-left"></i> Voltar
-                </a>
-                <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
-                    <div class="col-md-12">
-                        <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                <div id="resultado"></div>
+                <form action="<?= $this->view->controller ?>registraItensEmpenho" method="post" id="form">
+                    <button class="btn btn-primary">
+                        <i class="fa fa-check"></i> Gerar solicitação
+                    </button>
+                    <p class="help-block" style="color: #130f0f; font-weight: bold;">* Informe a quantidade para gerar a solicitação.</p>
+                    <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
+                        <i class="fa fa-arrow-left"></i> Voltar
+                    </a>
+                    <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
+                        <div class="col-md-12">
+                            <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                        </div>
                     </div>
-                </div>
-                <?= $pagination; ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Nº</th>
-                            <th>OM</th>
-                            <th>Fornecedor</th>
-                            <th>NF</th>
-                            <th>Tipo</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Alteração</th>
-                            <th>Entrega</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($this->view->resultPedidos as $value) : ?>
+                    <?= $pagination; ?>
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td><?= $value['number']; ?></td>
-                                <td><?= $value['naval_indicative']; ?></td>
-                                <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
-                                <td><?= $value['invoice'] ?: ''; ?></td>
-                                <td>
-                                    <?php if ($value['biddings_id']) : ?>
-                                        <i class="fa fa-group"></i> LIC
-                                    <?php else : ?>
-                                        <i class="fa fa-shopping-cart"></i> NL
-                                    <?php endif; ?>
-                                </td>
-                                <td><?= View::floatToMoney($value['total']) ?></td>
-                                <td>
-                                    <?= $value['status'] ?>
-                                </td>
-                                <td>
+                                <th width="8%">Quantidade</th>
+                                <th>Item</th>
+                                <th>Empenhado</th>
+                                <th>Entregue</th>
+                                <th>Disponível</th>
+                                <th>UF</th>
+                                <th>Nome</th>
+                                <th>Valor (R$)</th>
+                                <th>Subtotal</th>
+                                <th>Subtotal Disponível</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $total = 0;
+                            foreach ($this->view->result as $value) :
+                                $subTotal = $value['value'] * $value['quantity'];
+                                $total += $subTotal;
+                                $totalDisponivel += ($value['value'] * $value['quantity']) - ($value['value'] * $value['delivered']);
+                            ?>
+                                <tr>
+                                    <td>
+                                        <input type="hidden" name="ids[]" value="<?= $value['id']; ?>">
+                                        <input type="hidden" name="requested[]" id="requested[]" value="0">
+                                        <input type="text" name="quantity[]" id="quantity" class="form-control">
+                                    </td>
+                                    <td><?= $value['number'] ?: ''; ?></td>
+                                    <td><?= floatval($value['quantity']); ?></td>
+                                    <td><?= intval($value['delivered']); ?></td>
+                                    <td>
+                                        <span class="badge badge-primary">
+                                            <?= floatval($value['quantity'] - $value['delivered']); ?>
+                                        </span>
+                                    </td>
+                                    <td><?= $value['uf']; ?></td>
+                                    <td><?= $value['name']; ?></td>
+                                    <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal - ($value['value'] * $value['delivered'])); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-right" colspan="8">Total (R$)</th>
+                                <td class="text-left">
                                     <span class="badge badge-danger">
-                                        <?= View::humanDate($value['updated_at']); ?>
+                                        <?= Utils::floatToMoney($total); ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td class="text-left">
                                     <span class="badge badge-danger">
-                                        <?= View::humanDate($value['delivery_date']); ?>
+                                        <?= Utils::floatToMoney($totalDisponivel); ?>
                                     </span>
-                                </td>
-                                <td>
-                                    <a href="solicitacao/detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-share"></i>
-                                    </a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </tfoot>
+                    </table>
+                </form>
                 <?= $pagination; ?>
 
-                <div class="accordion" id="accordionExample">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Enviar mensagem para OM <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong>
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseOne" class="collapse">
-                            <div class="card-body">
-                                <div id="resultado"></div>
-                                <form action="<?= $this->view->controller; ?>registra/" method="post" id="form">
-                                    <input type="hidden" name="oms[]" value="<?= $this->view->resultEmpenho['oms_id']; ?>" />
-                                    <div class="row" style="margin-top: 10px;">
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label>Título</label>
-                                                <input type="text"
-                                                    id="title"
-                                                    name="title"
-                                                    placeholder="Título do aviso"
-                                                    class="form-control"
-                                                    required>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label>Data de Início</label>
-                                                <input type="text"
-                                                    id="beginning_date"
-                                                    name="beginning_date"
-                                                    placeholder="Data no formato DD-MM-YYYY"
-                                                    class="form-control"
-                                                    data-mask="00-00-0000"
-                                                    required>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label>Data de Final</label>
-                                                <input type="text"
-                                                    id="ending_date"
-                                                    name="ending_date"
-                                                    placeholder="Data no formato DD-MM-YYYY"
-                                                    class="form-control"
-                                                    data-mask="00-00-0000"
-                                                    required>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label>Mensagem</label>
-                                                <textarea
-                                                    maxlength="256"
-                                                    name="content"
-                                                    id="content"
-                                                    class="form-control"
-                                                    required></textarea>
-                                                <p class="help-block">
-                                                    <i class="fa fa-info-circle"></i> Mensagem com
-                                                    <span class="text-danger">
-                                                        256 caracteres
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <button class="btn btn-primary"><i class="fa fa-check"></i> Enviar mensagem</button>
-                                                <a href="<?= $this->view->controller; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                <?php
+                $request = 0;
+                foreach ($this->view->resultItems as $result) :
+                    if ($request == $result['code']) {
+                        continue;
+                    }
+                ?>
+                    <div class="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
+                                        Solicitação <?= $result['code'] ?> do Empenho
+                                    </button>
+                                </h5>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <?php if (isset($this->view->historico[0])): ?>
-                <div class="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button
-                                    class="btn btn-link"
-                                    type="button"
-                                    data-toggle="collapse"
-                                    data-target="#collapseHistorico"
-                                    aria-expanded="true"
-                                    aria-controls="collapseHistorico">
-                                    Histórico
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseHistorico" class="collapse">
-                            <div class="card-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Valor retirado</th>
-                                            <th>Usuário responsável</th>
-                                            <th>Observação</th>
-                                            <th>Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($this->view->historico as $value) : ?>
+                            <div id="collapseOne<?= $result['code'] ?>" class="collapse">
+                                <div class="card-body">
+                                    <?php
+                                    if ($result['code']) {
+                                        $code = $result['code'];
+                                    }
+                                    ?>
+                                    <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>" class="btn btn-secondary btn-sm">
+                                        <i class="fa fa-file-pdf-o"></i> PDF
+                                    </a>
+                                    <?php if (isset($code) && in_array($result['status'], ['ABERTO'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>receber/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Receber
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'ABERTO') : ?>
+                                        <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>')" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-ban"></i> Cancelar
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check"></i> Entregar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'NF-ENTREGUE') : ?>
+                                        <a href="<?= $this->view->controller; ?>liquidarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-check-square-o"></i> Liquidar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (isset($code) && $result['status'] == 'NF-LIQUIDADA') : ?>
+                                        <a href="<?= $this->view->controller; ?>pagarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-dollar"></i> Pagar NF
+                                        </a>
+                                    <?php endif; ?>
+                                    <table class="table">
+                                        <thead>
                                             <tr>
-                                                <td><?= View::floatToMoney($value['value']) ?></td>
-                                                <td><?= $value['name']; ?></td>
-                                                <td><?= $value['observation']; ?></td>
-                                                <td>
+                                                <th>Nº</th>
+                                                <th>Solicitado</th>
+                                                <th>Entregue</th>
+                                                <th>Disponível</th>
+                                                <th>Status</th>
+                                                <th>UF</th>
+                                                <th>Nome</th>
+                                                <th>Valor (R$)</th>
+                                                <th>Subtotal (R$)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $total = 0;
+                                            foreach ($this->view->resultItems as $value) :
+                                                if ($value['code'] != $result['code']) {
+                                                    continue;
+                                                }
+                                                $total += $value['value'] * $value['quantity'];
+                                            ?>
+                                                <tr>
+                                                    <td><?= $value['code'] ?: ''; ?></td>
+                                                    <td><?= floatval($value['quantity']); ?></td>
+                                                    <td><?= intval($value['delivered']); ?></td>
+                                                    <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
+                                                    <td><?= $value['status']; ?></td>
+                                                    <td><?= $value['uf']; ?></td>
+                                                    <td><?= $value['name']; ?></td>
+                                                    <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                                    <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th class="text-right" colspan="8">Total (R$)</th>
+                                                <td class="text-left">
                                                     <span class="badge badge-danger">
-                                                        <?= View::humanDate($value['created_at']); ?>
-                                                    </span>    
+                                                        <?= Utils::floatToMoney($total); ?>
+                                                    </span>
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <?php endif; ?>
+                <?php
+                    $request = $result['code'];
+                endforeach; ?>
             </div>
         </div>
     </div>

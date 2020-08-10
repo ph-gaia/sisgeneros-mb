@@ -40,8 +40,7 @@ use App\Helpers\View;
                             <?= $this->view->resultSolicitacao['number']; ?>
                             - <?= $this->view->resultSolicitacao['status']; ?>
                         </strong>
-                        <br>
-                        Data para entrega: <strong><?= View::humanDate($this->view->resultSolicitacao['delivery_date']); ?></strong>
+                        <br>                        
                         <?php if ($this->view->resultSolicitacao['complement']): ?>
                             <br>
                             Observações do pedido:
@@ -62,7 +61,6 @@ use App\Helpers\View;
                     <form action="<?= $this->view->controller; ?>registrarrecebimento/id/<?= $this->view->result[0]['requests_id']; ?>" method="post" id="form">
                         <input type="hidden" name="suppliers_id" value="<?= $this->view->result[0]['suppliers_id'] ?>">
                         <input type="hidden" name="biddings_id" value="<?= $this->view->result[0]['biddings_id'] ?>">
-                        <input type="hidden" name="delivery_date" value="<?= View::humanDate($this->view->result[0]['delivery_date']); ?>">
                         <button class="btn btn-success" id='btn_enviar'>
                             <i class="fa fa-check"></i> Confirmar Recebimento
                         </button>

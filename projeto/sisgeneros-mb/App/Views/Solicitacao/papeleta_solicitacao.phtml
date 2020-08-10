@@ -6,10 +6,6 @@ use App\Config\Configurations as cfg;
 setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 date_default_timezone_set(cfg::TIMEZONE);
 
-$mes = function($data) {
-    return 'aquii';
-};
-
 // valida para que as informações sejam geradas apenas quando o status for igual a APROVADO
 if (!isset($this->view->result[0])) {
     die("<i class='fa fa-info-circle'></i> A papeleta não pode ser gerada..");
@@ -126,7 +122,7 @@ if (!isset($this->view->result[0])) {
     </tr>
     <tr>
         <td class="delivery_date">
-            Data de entrega: <strong><?= View::humanDate($value['delivery_date']); ?></strong>
+            Data de entrega: <strong></strong>
         </td>
         <td class="recebedor">
             RECEBIDO EM ________/________/________<br />
@@ -140,29 +136,6 @@ if (!isset($this->view->result[0])) {
         <td colspan="8" class="obs">
             OBSERVAÇÃO: O material deve ser entregue junto com a NFE, com os dados bancários na mesma.<br>
             Nota Fiscal Nº: <?= $this->view->result[0]['invoice']; ?>
-        </td>
-    </tr>
-    <tr>
-        <td class="assinaturas">
-            <div class="content-assinatura">
-                <?= $this->view->result[0]['munition_manager']; ?><br />
-                <?= $this->view->result[0]['munition_manager_graduation']; ?><br />
-                Gestor(a) de Municiamento
-            </div>
-        </td>
-        <td class="assinaturas">
-            <div class="content-assinatura">
-                <div class="linha-assinatura">
-                    PAIOLEIRO DE SERVIÇO
-                </div>
-            </div>
-        </td>
-        <td class="assinaturas">
-            <div class="content-assinatura">
-                <?= $this->view->result[0]['munition_fiel']; ?><br />
-                <?= $this->view->result[0]['munition_fiel_graduation']; ?><br />
-                Fiel de Municiamento
-            </div>
         </td>
     </tr>
 </table>

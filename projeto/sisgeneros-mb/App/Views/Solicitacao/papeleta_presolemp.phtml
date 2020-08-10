@@ -19,77 +19,109 @@ $total = 0;
         font-size: 12px !important;
         background-color: #fff !important;
     }
-    .table-striped > tbody > tr:nth-of-type(2n+1) {
+
+    .table-striped>tbody>tr:nth-of-type(2n+1) {
         background-color: #ccc !important;
     }
+
     .table-print {
         width: 100%;
         border-collapse: collapse;
         margin: 0px auto;
         text-align: center;
     }
+
     .table-info {
         width: 100%;
         margin-bottom: 20px;
         margin-top: 10px;
     }
-    .table-info > tbody > tr > td {
+
+    .table-info>tbody>tr>td {
         padding: 8px;
         vertical-align: top;
     }
-    .table-condensed > tfoot > tr > td {
+
+    .table-condensed>tfoot>tr>td {
         padding: 2px !important;
     }
+
     .right {
         text-align: right !important;
     }
+
     .left {
         text-align: left !important;
     }
+
     .brasao {
         width: 90px;
     }
+
     .cabecalho {
         font-weight: bold;
     }
+
     .data-impressao {
         padding-top: 20px;
         padding-bottom: 20px;
     }
+
     .informacoes span {
         font-weight: bold;
     }
+
     .finalidade {
         margin-bottom: 10px;
     }
+
     .width-5-percent {
         width: 5%;
     }
+
     .width-8-percent {
         width: 8%;
     }
+
     .width-10-percent {
         width: 10%;
     }
+
     .text-normal {
         text-transform: none !important;
         font-weight: normal !important;
     }
+
     .assinaturas {
         padding-top: 50px;
         width: 33%;
     }
+
     .content-assinatura {
         width: 100%;
         display: block;
         text-align: center;
     }
+
     .linha-assinatura {
         border-top: 2px solid;
         width: 75%;
         margin: 0px auto;
     }
+
+    .watermark {
+        position: absolute;
+        opacity: 0.4;
+        font-size: 90px;
+        color: BLACK;
+        bottom: 25%;
+        right: 25%;
+        transform: rotate(-45deg);
+    }
 </style>
+<?php if ($this->getParametro('watermark')): ?>
+<p class="watermark"><?= $this->view->resultSolicitacao['status']; ?></p>
+<?php endif; ?>
 <table class="table-print">
     <tr>
         <td>
@@ -133,24 +165,24 @@ $total = 0;
                             <?= $this->view->resultSolicitacao['types_invoices'] ?>
                         </span>
                     </td>
-                    <?php if (isset($this->view->resultLicitacao['number'])): ?>
+                    <?php if (isset($this->view->resultLicitacao['number'])) : ?>
                         <td class="informacoes right text-uppercase">
                             <span>UASG Licitação:</span>
                             <?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?>
                         </td>
-                    <?php else: ?>
+                    <?php else : ?>
                         <td class="informacoes right text-uppercase">
                             <span>Licitação: NÃO LICITADO</span>
                         </td>
                     <?php endif; ?>
                 </tr>
                 <tr>
-                    <?php if (isset($this->view->resultLicitacao['number'])): ?>
+                    <?php if (isset($this->view->resultLicitacao['number'])) : ?>
                         <td class="informacoes left">
                             <span>NR Processo:</span>
                             <?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?>
                         </td>
-                    <?php else: ?>
+                    <?php else : ?>
                         <td class="informacoes left text-uppercase">
                             <span>Licitação: NÃO LICITADO</span>
                         </td>
@@ -253,7 +285,7 @@ $total = 0;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($this->view->result as $value): ?>
+                    <?php foreach ($this->view->result as $value) : ?>
                         <?php
                         $totaItem = $value['quantity'] * $value['value'];
                         $total += $totaItem;
@@ -301,7 +333,7 @@ $total = 0;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach($this->view->acoes as $value) : ?>
+                    <?php foreach ($this->view->acoes as $value) : ?>
                         <tr>
                             <td><?= $value['action'] ?: ''; ?></td>
                             <td><?= $value['nip'] ?: ''; ?></td>

@@ -61,6 +61,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
                 ->setaFiltros()
                 ->orderBy('suppliers.name ASC');
         });
+        $this->view->resultOm = (new OmModel())->findById($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item_nao_licitado');
     }
 
@@ -132,7 +133,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
             $licitacao = new Licitacao();
             $this->view->title = 'Forncedores e itens encontrados';
-            $this->view->result = $licitacao->listaItemFornecedor($this->getParametro('busca'));
+            $this->view->result = $licitacao->listaItemFornecedor($this->view->userLoggedIn['oms_id'], $this->getParametro('busca'));
             $this->render('mostra_item_buscado');
         } else {
             $this->licitacaobuscaAction();
@@ -189,6 +190,9 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $solicitacaoItem->paginator($this->getParametro('pagina'), $this->view->idlista);
         $this->view->result = $solicitacaoItem->getResultadoPaginator();
         $this->view->btn = $solicitacaoItem->getNavePaginator();
+        $this->view->totalSolicitacao = $solicitacaoItem->findTotalValueByRequestId($this->view->idlista);
+        $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
+        $this->view->creditoComprometido = (new CreditoProvisionadoModel())->saldoComprometido($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item_solicitacao');
     }
 
@@ -208,7 +212,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
             ->clearAccessList()
             ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
-        (new SolicitacaoModel())->novoNaoLicitado($this->view->userLoggedIn['oms_id'], getcwd());
+        (new SolicitacaoModel())->novoNaoLicitado($this->view->userLoggedIn, getcwd());
     }
 
     public function alteraAction()
@@ -316,7 +320,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
         (new SolicitacaoModel())->processStatus($id, $status, $action, $this->view->userLoggedIn['id']);
 
-        if ($status == 'APROVADO' && $action == 'PROXIMO') {
+        if ($status == 'AUTORIZADO' && $action == 'PROXIMO') {
             $solicitacao = (new SolicitacaoModel())->findById($id);
             header('location: '
                 . $this->view->controller
@@ -324,6 +328,17 @@ class SolicitacaoController extends Controller implements CtrlInterface
         } else {
             header('location: ' . $this->view->controller);
         }
+    }
+
+    public function autorizarAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ORDENADOR']);
+
+        $id = (int) $this->getParametro('id');
+
+        (new SolicitacaoModel())->autorizar($id);
     }
 
     public function presolempAction()
