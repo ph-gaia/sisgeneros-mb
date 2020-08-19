@@ -15,17 +15,10 @@ class Max extends AbstractInterval
 {
     public function validate($input)
     {
-        $filteredInput = $this->filterInterval($input);
-        $filteredInterval = $this->filterInterval($this->interval);
-
-        if (!$this->isAbleToCompareValues($filteredInput, $filteredInterval)) {
-            return false;
-        }
-
         if ($this->inclusive) {
-            return $filteredInput <= $filteredInterval;
+            return $this->filterInterval($input) <= $this->filterInterval($this->interval);
         }
 
-        return $filteredInput < $filteredInterval;
+        return $this->filterInterval($input) < $this->filterInterval($this->interval);
     }
 }

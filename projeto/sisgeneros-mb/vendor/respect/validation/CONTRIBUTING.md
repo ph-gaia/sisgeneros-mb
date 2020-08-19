@@ -179,8 +179,8 @@ As we already said, none of them are required but you will help us a lot.
 ## Documentation
 
 Our docs at http://respect.github.io/Validation are generated from our Markdown
-files using [Read the Docs][]. Add your brand new rule there and everything will
-be updated automatically.
+files using [Couscous][]. Add your brand new rule there and everything will be
+updated as soon as possible.
 
 ## Running Tests
 
@@ -234,13 +234,15 @@ $ vendor/bin/php-cs-fixer fix
 ***
 See also:
 
-- [README](README.md)
+- [Feature Guide](docs/README.md)
+- [Installation](docs/INSTALL.md)
 - [License](LICENSE.md)
+- [Validators](docs/VALIDATORS.md)
 - [Changelog](CHANGELOG.md)
 
 
 [ArrayType]: https://github.com/Respect/Validation/commit/f08a1fa
-[Read the Docs]: https://readthedocs.org/ "Read the Docs"
+[Couscous]: http://couscous.io/ "Couscous"
 [data provider]: https://phpunit.de/manual/current/en/writing-tests-for-phpunit.html#writing-tests-for-phpunit.data-providers "PHPUnit Data Providers"
 [open an issue]: http://github.com/Respect/Validation/issues
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer "PHP Coding Standard Fixer"

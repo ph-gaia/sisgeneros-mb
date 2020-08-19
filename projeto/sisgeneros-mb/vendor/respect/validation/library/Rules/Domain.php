@@ -29,12 +29,16 @@ class Domain extends AbstractComposite
             new Alnum('-'),
             new Not(new StartsWith('-')),
             new OneOf(
-                new Not(new Contains('--')),
-                new Callback(function ($str) {
-                    return substr_count($str, '--') == 1;
-                })
-            ),
-            new Not(new EndsWith('-'))
+                new Not(
+                    new Contains('--')
+                ),
+                new AllOf(
+                    new StartsWith('xn--'),
+                    new Callback(function ($str) {
+                        return substr_count($str, '--') == 1;
+                    })
+                )
+            )
         );
     }
 

@@ -15,31 +15,23 @@ class Cnpj extends AbstractRule
 {
     public function validate($input)
     {
-        if (!is_scalar($input)) {
-            return false;
-        }
-
-        // Code ported from jsfromhell.com
-        $cleanInput = preg_replace('/\D/', '', $input);
+        //Code ported from jsfromhell.com
+        $c = preg_replace('/\D/', '', $input);
         $b = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        if ($cleanInput < 1) {
+        if (strlen($c) != 14) {
             return false;
         }
 
-        if (mb_strlen($cleanInput) != 14) {
+        for ($i = 0, $n = 0; $i < 12; $n += $c[$i] * $b[++$i]);
+
+        if ($c[12] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
             return false;
         }
 
-        for ($i = 0, $n = 0; $i < 12; $n += $cleanInput[$i] * $b[++$i]);
+        for ($i = 0, $n = 0; $i <= 12; $n += $c[$i] * $b[$i++]);
 
-        if ($cleanInput[12] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
-            return false;
-        }
-
-        for ($i = 0, $n = 0; $i <= 12; $n += $cleanInput[$i] * $b[$i++]);
-
-        if ($cleanInput[13] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
+        if ($c[13] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
             return false;
         }
 

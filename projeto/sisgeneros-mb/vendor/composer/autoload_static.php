@@ -6,43 +6,18 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit5470b3d9c1802370f7b5691fc7e170d5
 {
-    public static $files = array (
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'h' => 
-        array (
-            'h4cc\\WKHTMLToPDF\\' => 17,
-        ),
         'S' => 
         array (
-            'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Component\\Process\\' => 26,
         ),
         'R' => 
         array (
             'Respect\\Validation\\' => 19,
         ),
-        'P' => 
-        array (
-            'Psr\\Log\\' => 8,
-        ),
-        'K' => 
-        array (
-            'Knp\\Snappy\\' => 11,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'h4cc\\WKHTMLToPDF\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/h4cc/wkhtmltopdf-amd64',
-        ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
-        ),
         'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
@@ -51,17 +26,30 @@ class ComposerStaticInit5470b3d9c1802370f7b5691fc7e170d5
         array (
             0 => __DIR__ . '/..' . '/respect/validation/library',
         ),
-        'Psr\\Log\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
-        'Knp\\Snappy\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/knplabs/knp-snappy/src/Knp/Snappy',
-        ),
     );
 
     public static $prefixesPsr0 = array (
+        'R' => 
+        array (
+            'Rah\\Danpu\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/rah/danpu/src',
+            ),
+        ),
+        'P' => 
+        array (
+            'PHPassLib' => 
+            array (
+                0 => __DIR__ . '/..' . '/rych/phpass/src',
+            ),
+        ),
+        'K' => 
+        array (
+            'Knp\\Snappy' => 
+            array (
+                0 => __DIR__ . '/..' . '/knplabs/knp-snappy/src',
+            ),
+        ),
         'H' => 
         array (
             'HTR' => 

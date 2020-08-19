@@ -29,7 +29,6 @@ class IpException extends ValidationException
 
     public function configure($name, array $params = [])
     {
-        $params += ['networkRange' => null, 'min' => null];
         if ($params['networkRange']) {
             $range = $params['networkRange'];
             $message = $range['min'];

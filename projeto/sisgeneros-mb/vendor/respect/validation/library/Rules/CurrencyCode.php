@@ -46,7 +46,7 @@ class CurrencyCode extends AbstractRule
         'BSD', // Bahamian Dollar
         'BTN', // Ngultrum
         'BWP', // Pula
-        'BYN', // Belarussian Ruble
+        'BYR', // Belarussian Ruble
         'BZD', // Belize Dollar
         'CAD', // Canadian Dollar
         'CDF', // Congolese Franc

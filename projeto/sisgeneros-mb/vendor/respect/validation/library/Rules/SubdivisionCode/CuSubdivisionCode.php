@@ -36,9 +36,8 @@ class CuSubdivisionCode extends AbstractSearcher
         '12', // Granma
         '13', // Santiago de Cuba
         '14', // Guantanamo
-        '15', // Artemisa
-        '16', // Mayabeque
         '99', // Isla de la Juventud
+        '02', // La Habana
     ];
 
     public $compareIdentical = true;

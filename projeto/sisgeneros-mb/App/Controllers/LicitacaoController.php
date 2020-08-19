@@ -57,7 +57,7 @@ class LicitacaoController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
         $model = new LicitacaoModel();
         $this->view->title = 'Lista de Todas as Licitações';
-        $model->paginator($this->getParametro('pagina'));
+        $model->paginator($this->getParametro('pagina'), null, $this->view->userLoggedIn['oms_id']);
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
         $this->render('index');
