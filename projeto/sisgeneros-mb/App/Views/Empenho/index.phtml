@@ -2,6 +2,7 @@
 
 use App\Helpers\Pagination;
 use App\Helpers\View;
+use App\Helpers\Utils;
 
 $pagination = Pagination::make($this);
 
@@ -42,6 +43,8 @@ $pagination = Pagination::make($this);
                             <th>Nº.</th>
                             <th>OM</th>
                             <th>Complemento</th>
+                            <th>Total Solicitado</th>
+                            <th>Total Recebido</th>
                             <th>Status</th>
                             <th>Data de criação</th>
                             <th class="noExl"></th>
@@ -50,19 +53,23 @@ $pagination = Pagination::make($this);
                     <tbody>
                         <?php foreach ($this->view->result as $value) : ?>
                             <tr>
-                                <td><?= $value['code']; ?></td>
+                                <td><strong><?= $value['code']; ?></strong></td>
                                 <td><?= $value['naval_indicative']; ?></td>
                                 <td><?= $value['complement']; ?></td>
+                                <td><?= Utils::floatToMoney($value['total_requested']); ?></td>
+                                <td><?= Utils::floatToMoney($value['total_delivered']); ?></td>
                                 <td><?= $value['status']; ?></td>
                                 <td>
                                     <span class="badge badge-danger">
-                                        <?= View::humanDate($value['created_at']); ?>
+                                        <?= View::humanDate(($value['created_at']) ? $value['created_at'] : date('Y-m-d', time())); ?>
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-copy"></i> Itens
-                                    </a>
+                                    <?php if($value['id']): ?>
+                                        <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-copy"></i> Itens
+                                        </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

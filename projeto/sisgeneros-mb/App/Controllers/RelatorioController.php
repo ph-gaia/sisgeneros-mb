@@ -13,6 +13,7 @@ use App\Models\FornecedorModel;
 use App\Models\RelatorioModel;
 use App\Models\EmpenhoModel;
 use App\Config\Configurations as cfg;
+use App\Models\SolicitacaoEmpenhoModel;
 
 class RelatorioController extends Controller implements CtrlInterface
 {
@@ -125,16 +126,10 @@ class RelatorioController extends Controller implements CtrlInterface
     {
         $this->view->title = 'Relatório de Empenhos';
 
-        $solicitacao = new Solicitacao();
         $model = new EmpenhoModel();
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, $this->getParametro('busca'));
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
-
-        foreach ($this->view->result as $key => $value) {
-            $pedidos = $solicitacao->findByInvoiceId($value['id']);
-            $this->view->result[$key]['items'] = $pedidos;
-        }
 
         $this->render('mostra_empenho');
     }

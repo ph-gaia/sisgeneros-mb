@@ -19,7 +19,7 @@
             <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                 <?= $this->view->userLoggedIn['name'] ?? ''; ?>
                 </br>
-                <?= ucfirst(mb_strtolower($this->view->userLoggedIn['level'])); ?>
+                <?= ucfirst(strtolower($this->view->userLoggedIn['level'])); ?>
             </span>
             </a>
             <!-- Dropdown - User Information -->

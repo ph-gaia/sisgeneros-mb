@@ -29,9 +29,12 @@ class EmpenhoModel extends CRUD
     public function paginator($pagina, $user, $busca = null)
     {
         $innerJoin = " INNER JOIN oms ON oms.id = invoices.oms_id ";
+        $innerJoin .= " INNER JOIN invoices_items as invItems ON invItems.invoices_id = invoices.id ";
 
         $dados = [
-            'select' => 'invoices.*, oms.naval_indicative',
+            'select' => 'invoices.*, oms.naval_indicative, 
+            SUM(invItems.quantity * invItems.value) as total_requested,
+            SUM(invItems.delivered * invItems.value) as total_delivered',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 100,
@@ -196,14 +199,17 @@ class EmpenhoModel extends CRUD
             ->setComplement(filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS));
 
         $result = [];
-        foreach ($value['requests'] as $value) {
-            $id = filter_var($value, FILTER_VALIDATE_INT);
-            $result[] = $id;
+        if (!empty($value['requests'])) {
+            foreach ($value['requests'] as $value) {
+                $id = filter_var($value, FILTER_VALIDATE_INT);
+                $result[] = $id;
+            } 
         }
         $this->setRequests($result);
 
         // Inicia a Validação dos dados
         $this->validaId();
+        $this->validaRequestsList();
     }
 
     // Validação
@@ -212,6 +218,15 @@ class EmpenhoModel extends CRUD
         $value = v::intVal()->validate($this->getId());
         if (!$value) {
             msg::showMsg('O campo ID deve ser um número inteiro válido.', 'danger');
+        }
+        return $this;
+    }
+
+    private function validaRequestsList()
+    {
+        if (empty($this->getRequests())) {
+            msg::showMsg('Para realizar registrar um empenho, é imprescindível'
+                . ' selecionar no mínimo uma solicitação.', 'danger');
         }
         return $this;
     }

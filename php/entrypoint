@@ -1,1 +1,2 @@
 #!/bin/sh
+cd /var/www/html/sisgeneros-mb && php setup.php && php fix_database_schema.php

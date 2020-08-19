@@ -23,3 +23,8 @@ RUN docker-php-ext-install pdo_mysql mysqli mbstring zip exif pcntl
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+
+#COPY entrypoint /entrypoint
+#RUN chmod +x /entrypoint
+
+#CMD /entrypoint

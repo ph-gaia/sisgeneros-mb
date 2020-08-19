@@ -48,7 +48,7 @@ class SolicitacaoEmpenhoModel extends CRUD
                 'name' => $result['name'],
                 'uf' => $result['uf'],
                 'quantity' => $value['quantidade'],
-                'status' => 'ABERTO',
+                'status' => 'SOLICITADO',
                 'delivered' => 0,
                 'value' => $result['value'],
                 'created_at' => date('Y-m-d'),
@@ -59,7 +59,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         msg::showMsg('Solicitação Registrada com Sucesso!<br>'
             . "<strong>Solicitação Nº {$this->getCode()} <br>"
-            . "Status: ABERTO.</strong><br>"
+            . "Status: SOLICITADO.</strong><br>"
             . '<meta http-equiv="refresh" content="3;URL=' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $invoicesId . '" />'
             . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $invoicesId . '"; }, 3000); </script>', 'success');
     }
@@ -195,6 +195,25 @@ class SolicitacaoEmpenhoModel extends CRUD
                 . 'ocultar("legenda");'
                 . '</script>', 'success');
         }
+    }
+
+    public function findQtdSolicitAtrasadas($user, $status = 'SOLICITADO')
+    {
+        $query = ""
+            . " SELECT "
+            . " COUNT(*) AS quantity "
+            . " FROM invoices as req "
+            . " INNER JOIN requests_invoices as items "
+            . "  ON req.id = items.invoices_id "
+            . " WHERE items.status LIKE :status";
+
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+            $where = " AND req.oms_id = {$user['oms_id']} ";
+            $query . $where;
+        }
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':status' => $status]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     private function validaAll()

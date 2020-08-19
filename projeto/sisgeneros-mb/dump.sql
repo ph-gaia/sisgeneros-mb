@@ -31,6 +31,14 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`oms` (
   `munition_manager_graduation` VARCHAR(50) NOT NULL,
   `munition_fiel` VARCHAR(100) NOT NULL COMMENT 'Nome do Fiel de Municiamento',
   `munition_fiel_graduation` VARCHAR(50) NOT NULL,
+  `ug` varchar(30) DEFAULT NULL,
+  `ptres` varchar(30) DEFAULT NULL,
+  `ai` varchar(30) DEFAULT NULL,
+  `do` varchar(30) DEFAULT NULL,
+  `bi` varchar(30) DEFAULT NULL,
+  `fr` varchar(30) DEFAULT NULL,
+  `nd` varchar(30) DEFAULT NULL,
+  `cost_center` varchar(30) DEFAULT NULL,
   `created_at` DATE NOT NULL,
   `updated_at` DATE NOT NULL,
   PRIMARY KEY (`id`),
@@ -46,17 +54,18 @@ COMMENT = 'Organizações Militares';
 DROP TABLE IF EXISTS `sisgeneros`.`users` ;
 
 CREATE TABLE IF NOT EXISTS `sisgeneros`.`users` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `oms_id` INT NOT NULL,
-  `name` VARCHAR(50) NOT NULL,
-  `email` VARCHAR(100) NOT NULL,
-  `level` VARCHAR(15) NOT NULL DEFAULT 'NORMAL',
-  `username` VARCHAR(20) NOT NULL,
-  `password` VARCHAR(60) NOT NULL,
-  `change_password` VARCHAR(3) NOT NULL DEFAULT 'yes',
-  `active` VARCHAR(3) NOT NULL DEFAULT 'yes',
-  `created_at` DATE NOT NULL,
-  `updated_at` DATE NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `oms_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `level` varchar(20) NOT NULL DEFAULT 'NORMAL',
+  `username` varchar(20) NOT NULL,
+  `password` varchar(60) NOT NULL,
+  `change_password` varchar(3) NOT NULL DEFAULT 'yes',
+  `nip` varchar(9) NOT NULL DEFAULT '0',
+  `active` varchar(3) NOT NULL DEFAULT 'yes',
+  `created_at` date NOT NULL,
+  `updated_at` date NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC),
   INDEX `fk_users_oms_idx` (`oms_id` ASC),
@@ -131,7 +140,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_items` (
   `number` INT(5) NOT NULL,
   `name` VARCHAR(256) NOT NULL,
   `uf` VARCHAR(4) NOT NULL,
-  `quantity` FLOAT(9,3) NOT NULL,
+  `quantity` float(9,3) NOT NULL,
+  `quantity_compromised` float(9,3) DEFAULT NULL,
+  `quantity_committed` float(9,3) DEFAULT NULL,
+  `quantity_available` float(9,3) DEFAULT NULL,
   `value` FLOAT(9,2) NOT NULL,
   `active` VARCHAR(3) NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`id`),
@@ -155,6 +167,30 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_items` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'Itens das Licitações Registradas no Sistema';
+
+--
+-- Table structure for table `biddings_oms_lists`
+--
+
+DROP TABLE IF EXISTS `sisgeneros`.`biddings_oms_lists`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_oms_lists` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `biddings_id` int(11) NOT NULL,
+  `oms_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`,`biddings_id`,`oms_id`),
+    KEY `fk_biddings_has_oms_oms1_idx` (`oms_id`),
+    KEY `fk_biddings_has_oms_biddings1_idx` (`biddings_id`),
+  CONSTRAINT `fk_biddings_has_oms_biddings1`
+    FOREIGN KEY (`biddings_id`)
+    REFERENCES `biddings` (`id`)
+    ON DELETE NO ACTION 
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_biddings_has_oms_oms1` FOREIGN KEY (`oms_id`) REFERENCES `oms` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 
 -- -----------------------------------------------------
@@ -198,6 +234,143 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`billboards_oms_lists` (
 ENGINE = InnoDB
 COMMENT = 'Organizações Militares permitidas';
 
+--
+-- Table structure for table `historic_action_requests`
+--
+
+DROP TABLE IF EXISTS `historic_action_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `historic_action_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `requests_id` int(11) NOT NULL,
+  `users_id` int(11) NOT NULL,
+  `action` varchar(15) NOT NULL,
+  `nip` varchar(8) NOT NULL,
+  `user_name` varchar(50) NOT NULL,
+  `user_profile` varchar(20) NOT NULL,
+  `date_action` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_historic_action_requests_1_idx` (`requests_id`),
+  KEY `fk_historic_action_requests_2_idx` (`users_id`),
+  CONSTRAINT `fk_historic_action_requests_1`
+    FOREIGN KEY (`requests_id`)
+    REFERENCES `requests` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_historic_action_requests_2`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `historic_provisioned_credits`
+--
+
+DROP TABLE IF EXISTS `historic_provisioned_credits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `historic_provisioned_credits` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `operation_type` varchar(7) NOT NULL DEFAULT 'CREDITO',
+  `value` float(9,2) NOT NULL,
+  `observation` varchar(100) DEFAULT NULL,
+  `provisioned_credits_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_historic_provisioned_credits_1_idx` (`provisioned_credits_id`),
+  CONSTRAINT `fk_historic_provisioned_credits_1`
+    FOREIGN KEY (`provisioned_credits_id`)
+    REFERENCES `provisioned_credits` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `invoices`
+--
+
+DROP TABLE IF EXISTS `invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `oms_id` int(11) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'ABERTO',
+  `complement` varchar(250) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_invoice_oms_id` (`oms_id`),
+  CONSTRAINT `fk_invoice_oms`
+    FOREIGN KEY (`oms_id`)
+    REFERENCES `oms` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `invoices_items`
+--
+
+DROP TABLE IF EXISTS `sisgeneros`.`invoices_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `requests_id` int(11) NOT NULL,
+  `invoices_id` int(11) NOT NULL,
+  `suppliers_id` int(11) NOT NULL,
+  `number` int(8) DEFAULT NULL,
+  `name` varchar(256) NOT NULL,
+  `uf` varchar(4) NOT NULL,
+  `quantity` float(9,3) NOT NULL,
+  `delivered` float(9,3) NOT NULL,
+  `value` float(9,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_invoices_items_invoices_1_idx` (`invoices_id`),
+  KEY `fk_invoices_items_invoices_2_idx` (`requests_id`),
+  KEY `fk_invoices_items_invoices_3_idx` (`suppliers_id`),
+  CONSTRAINT `fk_invoices_items_invoices_1`
+    FOREIGN KEY (`invoices_id`)
+    REFERENCES `invoices` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_invoices_items_invoices_2`
+    FOREIGN KEY (`requests_id`)
+    REFERENCES `requests` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `provisioned_credits`
+--
+
+DROP TABLE IF EXISTS `sisgeneros`.`provisioned_credits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`provisioned_credits` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `oms_id` int(11) NOT NULL,
+  `credit_note` varchar(30) NOT NULL,
+  `value` float(9,2) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `active` varchar(3) DEFAULT 'yes',
+  PRIMARY KEY (`id`),
+  KEY `fk_provisioned_credits_oms_id` (`oms_id`),
+  CONSTRAINT `fk_provisioned_credits_oms` FOREIGN KEY (`oms_id`) REFERENCES `oms` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 -- -----------------------------------------------------
 -- Table `sisgeneros`.`requests`
@@ -212,8 +385,13 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests` (
   `number` INT(8) NOT NULL,
   `status` VARCHAR(20) NOT NULL DEFAULT 'ABERTO',
   `invoice` VARCHAR(20) NOT NULL DEFAULT 'S/N',
-  `delivery_date` DATE NOT NULL,
-  `observation` VARCHAR(512) NULL,
+  `observation` varchar(512) DEFAULT NULL,
+  `complement` varchar(250) DEFAULT NULL,
+  `modality` varchar(30) DEFAULT NULL,
+  `types_invoices` varchar(10) DEFAULT NULL,
+  `account_plan` varchar(10) DEFAULT NULL,
+  `purposes` varchar(200) DEFAULT NULL,
+  `reason_action` varchar(250) DEFAULT NULL,
   `created_at` DATE NOT NULL,
   `updated_at` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
@@ -258,6 +436,40 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_items` (
 ENGINE = InnoDB
 COMMENT = 'Items das solicitações';
 
+--
+-- Table structure for table `requests_invoices`
+--
+
+DROP TABLE IF EXISTS `sisgeneros`.`requests_invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoices_id` int(11) NOT NULL,
+  `suppliers_id` int(11) DEFAULT NULL,
+  `code` int(11) NOT NULL,
+  `number` int(8) DEFAULT NULL,
+  `invoice` varchar(20) DEFAULT NULL,
+  `name` varchar(256) NOT NULL,
+  `uf` varchar(4) NOT NULL,
+  `quantity` float(9,3) NOT NULL,
+  `delivered` float(9,3) NOT NULL,
+  `value` float(9,2) NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `observation` varchar(100) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_invoices_items_invoices_1_idx` (`invoices_id`),
+  KEY `fk_requests_invoices_code` (`code`),
+  CONSTRAINT `fk_invoices_items_invoices_10`
+    FOREIGN KEY (`invoices_id`)
+    REFERENCES `invoices` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 -- -----------------------------------------------------
 -- Table `sisgeneros`.`suppliers_evaluations`
@@ -272,9 +484,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`suppliers_evaluations` (
   INDEX `fk_suppliers_evaluations_requests1_idx` (`requests_id` ASC),
   CONSTRAINT `fk_suppliers_evaluations_requests1`
     FOREIGN KEY (`requests_id`)
-    REFERENCES `sisgeneros`.`requests` (`id`)
+    REFERENCES `requests_invoices` (`code`)
     ON DELETE CASCADE
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION
+)
 ENGINE = InnoDB
 COMMENT = 'Avaliação de entrega dos fornecedores';
 
