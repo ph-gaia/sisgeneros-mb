@@ -256,7 +256,7 @@ class SolicitacaoModel extends CRUD
         /**
          * caso não seja ADM busca os pedidos apenas da OM do usuário
          */
-        if (!in_array($user['level'], ['ADMINISTRADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $dados['where'] = 'oms_id = :omsId ';
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
