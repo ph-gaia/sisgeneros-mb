@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`oms` (
   `munition_manager_graduation` VARCHAR(50) NOT NULL,
   `munition_fiel` VARCHAR(100) NOT NULL COMMENT 'Nome do Fiel de Municiamento',
   `munition_fiel_graduation` VARCHAR(50) NOT NULL,
+  `expense_originator` VARCHAR(100) NULL,
+  `expense_originator_graduation` VARCHAR(50) NULL,
   `ug` varchar(30) DEFAULT NULL,
   `ptres` varchar(30) DEFAULT NULL,
   `ai` varchar(30) DEFAULT NULL,
@@ -39,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`oms` (
   `fr` varchar(30) DEFAULT NULL,
   `nd` varchar(30) DEFAULT NULL,
   `cost_center` varchar(30) DEFAULT NULL,
+  `classification_items` VARCHAR(30) NULL,
   `created_at` DATE NOT NULL,
   `updated_at` DATE NOT NULL,
   PRIMARY KEY (`id`),
@@ -238,10 +241,10 @@ COMMENT = 'Organizações Militares permitidas';
 -- Table structure for table `historic_action_requests`
 --
 
-DROP TABLE IF EXISTS `historic_action_requests`;
+DROP TABLE IF EXISTS `sisgeneros`.`historic_action_requests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `historic_action_requests` (
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_action_requests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `requests_id` int(11) NOT NULL,
   `users_id` int(11) NOT NULL,
@@ -270,10 +273,10 @@ CREATE TABLE IF NOT EXISTS `historic_action_requests` (
 -- Table structure for table `historic_provisioned_credits`
 --
 
-DROP TABLE IF EXISTS `historic_provisioned_credits`;
+DROP TABLE IF EXISTS `sisgeneros`.`historic_provisioned_credits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `historic_provisioned_credits` (
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_provisioned_credits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `operation_type` varchar(7) NOT NULL DEFAULT 'CREDITO',
   `value` float(9,2) NOT NULL,
@@ -294,10 +297,10 @@ CREATE TABLE IF NOT EXISTS `historic_provisioned_credits` (
 -- Table structure for table `invoices`
 --
 
-DROP TABLE IF EXISTS `invoices`;
+DROP TABLE IF EXISTS `sisgeneros`.`invoices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `invoices` (
+CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `oms_id` int(11) NOT NULL,
   `code` varchar(50) DEFAULT NULL,
