@@ -151,6 +151,9 @@ class SolicitacaoModel extends CRUD
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @deprecated
+     */
     public function findByInvoiceId($invoiceId)
     {
         $query = "
@@ -160,14 +163,8 @@ class SolicitacaoModel extends CRUD
                 (SELECT SUM(quantity * value) FROM requests_items items WHERE items.requests_id = sol.id) as total,
                 oms.naval_indicative
             FROM requests AS sol
-                    INNER JOIN
-                oms ON oms.id = sol.oms_id
-                    INNER JOIN
-                suppliers ON suppliers.id = sol.suppliers_id
-                    INNER JOIN
-                invoices_has_requests ON invoices_has_requests.requests_id = sol.id
-            WHERE
-                invoices_has_requests.invoices_id = ?
+            INNER JOIN oms ON oms.id = sol.oms_id
+            INNER JOIN suppliers ON suppliers.id = sol.suppliers_id
             ORDER BY sol.updated_at DESC;";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$invoiceId]);
@@ -430,6 +427,8 @@ class SolicitacaoModel extends CRUD
 
             (new Itens())->novoNaoLicitado($this->getItemsList(), $lastId);
 
+            (new HistoricoAcaoModel())->novoRegistro($lastId, $this->getUserId(), 'ELABORADO');
+
             $this->saveFiles($directoryReference, $dados['number']);
 
             msg::showMsg('Solicitação Registrada com Sucesso!<br>'
@@ -504,6 +503,18 @@ class SolicitacaoModel extends CRUD
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    public function totalByPlanoConta($id)
+    {
+        $date = date('Y-01-01', time());
+        $query = "
+        SELECT SUM(items.quantity * items.value) as total FROM requests as sol
+        INNER JOIN requests_items as items ON items.requests_id = sol.id
+        WHERE account_plan = ? and sol.created_at >= ?";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$id, $date]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
     public function rejeitarCancelar($userId)
     {
         $id = filter_input(INPUT_POST, 'request_id');
@@ -539,7 +550,7 @@ class SolicitacaoModel extends CRUD
     /**
      * autoriza o pedido e abate o valor do pedido no crédito provisionado para OM
      */
-    public function autorizar($id)
+    public function autorizar($id, $user)
     {
         $creditoModel = new CreditoProvisionadoModel();
         $total = $this->totalByPedido($id);
@@ -560,6 +571,7 @@ class SolicitacaoModel extends CRUD
         ];
 
         if (parent::editar($dados, $id)) {
+            (new HistoricoAcaoModel())->novoRegistro($id, $user['id'], 'AUTORIZADO');
             (new HistoricoCreditoProvisionadoModel())->novaTransacao(
                 $creditoProvisionado['id'],
                 $total['total'],
@@ -816,7 +828,7 @@ class SolicitacaoModel extends CRUD
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function findQtdSolicitByStatus($user, $status = 'ABERTO')
+    public function findQtdSolicitByStatus($user, $status = 'ELABORADO')
     {
         $query = ""
             . "SELECT "
@@ -1016,12 +1028,15 @@ class SolicitacaoModel extends CRUD
     public function validaValorPedidoNaoLicitado()
     {
         $total = 0;
+        $result = (new OmModel())->findById($this->getOmsId());
+        $total = $this->totalByPlanoConta($this->getAccountPlan())['total'];
+
         foreach ($this->getItemsList() as $value) {
             $total += $value['quantity'] * floatval($value['value']);
         }
 
-        if ($total > 17.600) {
-            msg::showMsg('Solicitação da modalidade Não Licitado, tem a restrição de valor até R$ 17.600,00', 'danger');
+        if ($total > $result['limit_request_nl']) {
+            msg::showMsg('Solicitação da modalidade Não Licitado, tem a restrição de valor até ' . View::floatToMoney($result['limit_request_nl']), 'danger');
         }
         return $this;
     }

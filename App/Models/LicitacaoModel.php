@@ -23,18 +23,19 @@ class LicitacaoModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina, $dateLimit = null)
+    public function paginator($pagina, $dateLimit = null, $omId = null)
     {
+        $innerJoin = " INNER JOIN biddings_oms_lists ON biddings.id = biddings_oms_lists.biddings_id ";
         $dados = [
-            'entidade' => $this->entidade,
+            'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 20,
             'orderBy' => 'created_at DESC'
         ];
 
         if ($dateLimit) {
-            $dados['where'] = 'validate >= ?';
-            $dados['bindValue'] = [0 => $dateLimit];
+            $dados['where'] = 'validate >= ? && biddings_oms_lists.oms_id = ?';
+            $dados['bindValue'] = [0 => $dateLimit, 1 => $omId];
         }
 
         $paginator = new Paginator($dados);

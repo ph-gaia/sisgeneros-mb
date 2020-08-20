@@ -94,7 +94,7 @@ class EmpenhoController extends Controller implements CtrlInterface
             ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $solicitacao = new SolicitacaoEmpenhoModel();
-        $solicitacao->recebimento($this->getParametro('id'));
+        $solicitacao->recebimento($this->view->userLoggedIn);
     }
 
     public function pdfAction()

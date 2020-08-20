@@ -83,6 +83,7 @@ class OmModel extends CRUD
             'fr' => $this->getFr(),
             'nd' => $this->getNd(),
             'cost_center' => $this->getCostCenter(),
+            'limit_request_nl' => $this->getLimitRequest(),
             'classification_items' => $this->getClassificationItems(),
             'created_at' => date('Y-m-d'),
             'updated_at' => date('Y-m-d')
@@ -119,6 +120,7 @@ class OmModel extends CRUD
             'fr' => $this->getFr(),
             'nd' => $this->getNd(),
             'cost_center' => $this->getCostCenter(),
+            'limit_request_nl' => $this->getLimitRequest(),
             'classification_items' => $this->getClassificationItems(),
             'updated_at' => date('Y-m-d')
         ];
@@ -186,6 +188,7 @@ class OmModel extends CRUD
             ->setBi(filter_input(INPUT_POST, 'bi'))
             ->setFr(filter_input(INPUT_POST, 'fr'))
             ->setNd(filter_input(INPUT_POST, 'nd'))
+            ->setLimitRequest(filter_input(INPUT_POST, 'limit_request_nl'))
             ->setClassificationItems(filter_input(INPUT_POST, 'classification_items'))
             ->setCostCenter(filter_input(INPUT_POST, 'cost_center'));
 

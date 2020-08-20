@@ -11,12 +11,12 @@ $fullPathUploadFiles = getcwd() . cfg::DS . $relativePathUploadFiles;
 $pathSolemp = getcwd() . cfg::DS . 'arquivos' . cfg::DS . 'solemps' . cfg::DS;
 
 $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
-        return [
-            'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
-            'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
-            'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
-        ];
-    });
+    return [
+        'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
+        'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
 
 ?>
 <div class="modal fade" id="modalSuppliersDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -56,7 +56,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         <div class="row">
             <div class="col-lg-12">
                 <h5>Itens da Solicitação</h5>
-                <?php if (isset($this->view->resultLicitacao['number'])): ?>
+                <?php if (isset($this->view->resultLicitacao['number'])) : ?>
                     <div class="alert alert-info" role="alert">
                         Licitação: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
                         Órgão: <strong><?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
@@ -65,10 +65,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
                             - <?= $this->view->resultSolicitacao['suppliers_name']; ?>
                         </strong>
-                        (<a href="#"
-                            class="text-danger"
-                            data-toggle="modal"
-                            data-target="#modalSuppliersDetails">
+                        (<a href="#" class="text-danger" data-toggle="modal" data-target="#modalSuppliersDetails">
                             mais detalhes
                         </a>)
                         <br>
@@ -87,21 +84,21 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?= $this->view->resultSolicitacao['number']; ?>
                             - <?= $this->view->resultSolicitacao['status']; ?>
                         </strong>
-                        <?php if ($this->view->resultSolicitacao['reason_action'] && in_array($this->view->resultSolicitacao['status'], ['REJEITADO', 'CANCELADO'])): ?>
+                        <?php if ($this->view->resultSolicitacao['reason_action'] && in_array($this->view->resultSolicitacao['status'], ['REJEITADO', 'CANCELADO'])) : ?>
                             <br>
                             Motivo:
                             <strong>
                                 <?= $this->view->resultSolicitacao['reason_action']; ?>
                             </strong>
                         <?php endif; ?>
-                        <?php if ($this->view->resultSolicitacao['complement']): ?>
+                        <?php if ($this->view->resultSolicitacao['complement']) : ?>
                             <br>
                             Observações do pedido:
                             <strong>
                                 <?= $this->view->resultSolicitacao['complement']; ?>
                             </strong>
                         <?php endif; ?>
-                        <?php if ($this->view->resultSolicitacao['observation']): ?>
+                        <?php if ($this->view->resultSolicitacao['observation']) : ?>
                             <br>
                             Observações do recebimento:
                             <strong>
@@ -124,7 +121,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?= $this->view->resultSolicitacao['types_invoices']; ?>
                         </strong>
                     </div>
-                <?php else: ?>
+                <?php else : ?>
                     <div class="alert alert-info" role="alert">
                         <h4>NÃO LICITADO</h4>
                         Fornecedor:
@@ -132,10 +129,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
                             - <?= $this->view->resultSolicitacao['suppliers_name']; ?>
                         </strong>
-                        (<a href="#"
-                            class="text-danger"
-                            data-toggle="modal"
-                            data-target="#modalSuppliersDetails">
+                        (<a href="#" class="text-danger" data-toggle="modal" data-target="#modalSuppliersDetails">
                             mais detalhes
                         </a>)
                         <br>
@@ -148,65 +142,79 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <?php endif; ?>
                 <?php
                 $ruleCredit = ($this->view->totalSolicitacao['total'] > $this->view->credito['value']);
-                if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO' && isset($this->view->resultLicitacao['number'])): ?>
-                <div class="alerta-credito">
-                    <div class="alert alert-warning" role="alert">
-                        O saldo do crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
-                        O crédito está <strong>comprometido</strong> com o valor de <strong><?= View::floatToMoney($this->view->creditoComprometido['sum_value']) ?></strong>.<br>
-                        O valor total da sua <strong>solicitação</strong> é de <strong><?= View::floatToMoney($this->view->totalSolicitacao['total']) ?></strong><br><br>
-                        <?php if ($ruleCredit): ?>
-                        <strong>O Crédito disponível é INSUFICIENTE para essa solicitação de Gêneros</strong><br>
-                        <?php else: ?>
-                        <strong>O Crédito disponível é SUFICIENTE para essa solicitação de Gêneros</strong><br>
-                        <?php endif; ?>
+                if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO' && isset($this->view->resultLicitacao['number'])) : ?>
+                    <div class="alerta-credito">
+                        <div class="alert alert-warning" role="alert">
+                            O saldo do crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
+                            O crédito está <strong>comprometido</strong> com o valor de <strong><?= View::floatToMoney($this->view->creditoComprometido['sum_value']) ?></strong>.<br>
+                            O valor total da sua <strong>solicitação</strong> é de <strong><?= View::floatToMoney($this->view->totalSolicitacao['total']) ?></strong><br><br>
+                            <?php if ($ruleCredit) : ?>
+                                <strong>O Crédito disponível é INSUFICIENTE para essa solicitação de Gêneros</strong><br>
+                            <?php else : ?>
+                                <strong>O Crédito disponível é SUFICIENTE para essa solicitação de Gêneros</strong><br>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                    <div class="alerta-item">
+                        <div class="alert alert-danger" role="alert">
+                            <?php
+                            $ruleQuantity = true;
+                            foreach ($this->view->result as $value) :
+                                if ($value['quantity'] <= $value['quantity_available']) {
+                                    continue;
+                                }
+                                $ruleQuantity = false;
+                            ?>
+                                A quantidade de <?= $value['name'] ?> <strong>disponível</strong> atualmente é de <strong><?= floatval($value['quantity_available']); ?></strong>.<br>
+                                A quantidade <strong>solicitada</strong> é de <strong><?= floatval($value['quantity']); ?></strong>.<br><br>
+                            <?php endforeach; ?>
+                            <?php if ($ruleCredit || !$ruleQuantity) : ?>
+                                <strong>Você não pode PROVISIONAR essa solicitação!</strong><br>
+                            <?php else : ?>
+                                <strong>Você deseja PROVISIONAR essa solicitação?</strong><br>
+                                <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/ENCAMINHADO/id/<?= $this->view->idlista; ?>" class="btn btn-success">
+                                    <i class="fa fa-check"></i> Sim
+                                </a>
+                                <a href="<?= $this->view->controller; ?>" class="btn btn-danger">
+                                    <i class="fa fa-ban"></i> Não
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO' && !isset($this->view->resultLicitacao['number'])) : ?>
                 <div class="alerta-item">
                     <div class="alert alert-danger" role="alert">
-                        <?php
-                        $ruleQuantity = true;
-                        foreach ($this->view->result as $value):
-                        if ($value['quantity'] <= $value['quantity_available']) {
-                            continue;
-                        }
-                        $ruleQuantity = false;
-                        ?>
-                            A quantidade de <?= $value['name'] ?> <strong>disponível</strong> atualmente é de <strong><?= floatval($value['quantity_available']); ?></strong>.<br>
-                            A quantidade <strong>solicitada</strong> é de <strong><?= floatval($value['quantity']); ?></strong>.<br><br>
-                        <?php endforeach; ?>
-                        <?php if ($ruleCredit || !$ruleQuantity): ?>
-                            <strong>Você não pode PROVISIONAR essa solicitação!</strong><br>
-                        <?php else: ?>
-                            <strong>Você deseja PROVISIONAR essa solicitação?</strong><br>
-                            <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/ENCAMINHADO/id/<?= $this->view->idlista; ?>" class="btn btn-success">
-                                <i class="fa fa-check"></i> Sim
-                            </a>
-                            <a href="<?= $this->view->controller; ?>" class="btn btn-danger">
-                                <i class="fa fa-ban"></i> Não
-                            </a>
-                        <?php endif; ?>
+                        <strong>Você deseja PROVISIONAR essa solicitação?</strong><br>
+                        <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/ENCAMINHADO/id/<?= $this->view->idlista; ?>" class="btn btn-success">
+                            <i class="fa fa-check"></i> Sim
+                        </a>
+                        <a href="<?= $this->view->controller; ?>" class="btn btn-danger">
+                            <i class="fa fa-ban"></i> Não
+                        </a>
                     </div>
                 </div>
                 <?php endif; ?>
+
                 <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
                     <i class="fa fa-arrow-left"></i> Voltar
                 </a>
-                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && in_array($this->view->resultSolicitacao['status'], ['ELABORADO', 'REJEITADO'])): ?>
-                    <a href="<?= $this->view->controller; ?>encaminhar/id/<?= $this->view->idlista; ?>" class="btn btn-success pull-right"  style="margin-right: 10px;">
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && in_array($this->view->resultSolicitacao['status'], ['ELABORADO', 'REJEITADO'])) : ?>
+                    <a href="<?= $this->view->controller; ?>encaminhar/id/<?= $this->view->idlista; ?>" class="btn btn-success pull-right" style="margin-right: 10px;">
                         <i class="fa fa-forward"></i> Encaminhar
                     </a>
                 <?php endif; ?>
-                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $this->view->resultSolicitacao['status'] == 'ABERTO' && !isset($this->view->resultLicitacao['number'])): ?>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $this->view->resultSolicitacao['status'] == 'ABERTO' && !isset($this->view->resultLicitacao['number'])) : ?>
                     <a href="<?= $this->view->controller; ?>adicionararquivo/idlista/<?= $this->view->idlista; ?>" class="btn btn-info pull-right" style="margin-right: 10px;">
                         <i class="fa fa-file"></i> Adicionar arquivo
                     </a>
                 <?php endif; ?>
-                <?php if (!in_array($this->view->resultSolicitacao['status'], ['ELABORADO', 'REJEITADO', 'CANCELADO'])): ?>
+                <?php if (!in_array($this->view->resultSolicitacao['status'], ['ELABORADO', 'REJEITADO', 'CANCELADO'])) : ?>
                     <a href="<?= $this->view->controller; ?>presolemp/id/<?= $this->view->resultSolicitacao['id'] ?>" class="btn btn-secondary" target="__blank">
                         <i class="fa fa-file-pdf-o"></i> Documento SOLEMP DE GÊNEROS
                     </a>
                 <?php endif; ?>
-                <?php if (!isset($this->view->resultLicitacao['number'])): ?>
+                <?php if (!isset($this->view->resultLicitacao['number'])) : ?>
                     <table class="table table-hover table-bordered" style="margin-top: 10px;">
                         <thead>
                             <tr>
@@ -216,7 +224,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach (View::listFilesPdf($fullPathUploadFiles) as $file): ?>
+                            <?php foreach (View::listFilesPdf($fullPathUploadFiles) as $file) : ?>
                                 <tr>
                                     <td>
                                         <a href="<?= $relativePathUploadFiles . $file ?>" target="_blank">
@@ -224,10 +232,8 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         </a>
                                     </td>
                                     <td width="8%">
-                                        <?php if ($this->view->resultSolicitacao['status'] == 'ABERTO'): ?>
-                                            <a
-                                                onclick="confirmar('Deseja REMOVER este arquivo?', '<?= $this->view->controller; ?>eliminararquivo/file/<?= $file; ?>/idlista/<?= $this->view->idlista; ?>')"
-                                                class="btn btn-danger btn-sm">
+                                        <?php if ($this->view->resultSolicitacao['status'] == 'ABERTO') : ?>
+                                            <a onclick="confirmar('Deseja REMOVER este arquivo?', '<?= $this->view->controller; ?>eliminararquivo/file/<?= $file; ?>/idlista/<?= $this->view->idlista; ?>')" class="btn btn-danger btn-sm">
                                                 <i class="fa fa-trash"></i>
                                             </a>
                                         <?php endif; ?>
@@ -261,7 +267,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <?php
                         $total = 0;
                         $btnDelete = (count($this->view->result) > 1 ? true : false);
-                        foreach ($this->view->result as $value):
+                        foreach ($this->view->result as $value) :
                             $total += $value['value'] * $value['quantity'];
                         ?>
                             <tr>
@@ -272,18 +278,16 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <td><?= $value['uf']; ?></td>
                                 <td><?= $value['name']; ?></td>
                                 <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                <td><?= Utils::floatToMoney( ($value['value'] * $value['quantity']) ); ?></td>
+                                <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
                                 <td>
                                     <?php if ($this->view->userLoggedIn['level'] != 'CONTROLADOR' && in_array($this->view->resultSolicitacao['status'], ['REJEITADO', 'ELABORADO'])) : ?>
                                         <a href="<?= $this->view->controller; ?>editar/id/<?= $value['id']; ?>/idlista/<?= $this->view->idlista; ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <?php if($btnDelete): ?>
-                                        <a
-                                            onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminaritem/id/<?= $value['id']; ?>/idlista/<?= $this->view->idlista; ?>')"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
+                                        <?php if ($btnDelete) : ?>
+                                            <a onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminaritem/id/<?= $value['id']; ?>/idlista/<?= $this->view->idlista; ?>')" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </td>

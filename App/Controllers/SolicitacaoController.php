@@ -43,7 +43,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
         $licitacao = new Licitacao();
         $this->view->title = 'Licitações Disponíveis';
-        $licitacao->paginator($this->getParametro('pagina'), date("Y-m-d", time()));
+        $licitacao->paginator($this->getParametro('pagina'), date("Y-m-d", time()), $this->view->userLoggedIn['oms_id']);
         $this->view->result = $licitacao->getResultadoPaginator();
         $this->view->btn = $licitacao->getNavePaginator();
         $this->render('mostra_licitacao_disponivel');
@@ -338,7 +338,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
         $id = (int) $this->getParametro('id');
 
-        (new SolicitacaoModel())->autorizar($id);
+        (new SolicitacaoModel())->autorizar($id, $this->view->userLoggedIn);
     }
 
     public function presolempAction()
@@ -379,7 +379,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
                 . 'modalidade/' . filter_input(INPUT_POST, 'modalidade') . '/'
                 . 'finalidade/' . filter_input(INPUT_POST, 'finalidade') . '/'
                 . 'usuario/' . $this->view->userLoggedIn['name'];
-            $pdf->salvar();
+            //$pdf->salvar();
         }
 
         msg::showMsg('SOLEMP DE GÊNEROS gerada(s) com sucesso!', 'success');

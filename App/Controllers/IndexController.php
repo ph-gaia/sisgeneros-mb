@@ -7,6 +7,7 @@ use HTR\Helpers\Access\Access;
 use App\Models\SolicitacaoModel as Solicitacao;
 use App\Models\AvaliacaoFornecedorModel as Avaliacao;
 use App\Models\AvisosModel;
+use App\Models\SolicitacaoEmpenhoModel;
 
 class IndexController extends Controller implements CtrlInterface
 {
@@ -23,13 +24,14 @@ class IndexController extends Controller implements CtrlInterface
     public function indexAction()
     {
         $solicitacao = new Solicitacao();
+        $solEmpenho = new SolicitacaoEmpenhoModel();
         $avaliacao = new Avaliacao();
         $arrEvaluation = $avaliacao->findBestBadSuppliers();
         $this->view->melhoresAvaliacoes = $arrEvaluation;
         $this->view->pioresAvaliacoes = array_reverse($arrEvaluation);
-        $this->view->pendAprov = $solicitacao->findQtdSolicitByStatus($this->view->userLoggedIn, 'ABERTO');
+        $this->view->pendAprov = $solicitacao->findQtdSolicitByStatus($this->view->userLoggedIn, 'ELABORADO');
         $this->view->solicitacoesMensal = $solicitacao->findSolitacoesMensal($this->view->userLoggedIn);
-        $this->view->solicitacoesAtrasadas = $solicitacao->findQtdSolicitAtrasadas($this->view->userLoggedIn);
+        $this->view->solicitacoesAtrasadas = $solEmpenho->findQtdSolicitAtrasadas($this->view->userLoggedIn);
         $this->view->resultAvisos = (new AvisosModel())->fetchAllAvisosByOmId($this->view->userLoggedIn['oms_id']);
         $this->view->lastUpdated = $solicitacao->lastUpdated($this->view->userLoggedIn);
         $this->render('index');

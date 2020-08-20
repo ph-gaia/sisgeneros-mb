@@ -90,7 +90,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                             <th>Tipo</th>
                             <th>Status</th>
                             <th>Observações do Recebimento</th>
-                            <th>Entrega</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -114,11 +113,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                 </td>
                                 <td>
                                     <?= $value['observation'] ?>
-                                </td>
-                                <td>
-                                    <span class="badge badge-danger">
-                                        <?= View::humanDate($value['delivery_date']); ?>
-                                    </span>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
