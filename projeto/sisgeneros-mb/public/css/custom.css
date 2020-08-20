@@ -58,8 +58,8 @@ table.table th {
 
 .bg-gradient-primary {
     background-color: #4e73df;
-    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(10%,#336a7b),to(#277344));
-    background-image: linear-gradient(180deg,#336a7b 10%,#277344 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(15%,#336a7b),to(#277344));
+    background-image: linear-gradient(180deg,#2f5e6c 15%,#277344 100%);
     background-size: cover;
 }
 .highlight {

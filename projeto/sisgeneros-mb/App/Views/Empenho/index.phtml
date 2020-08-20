@@ -56,8 +56,8 @@ $pagination = Pagination::make($this);
                                 <td><strong><?= $value['code']; ?></strong></td>
                                 <td><?= $value['naval_indicative']; ?></td>
                                 <td><?= $value['complement']; ?></td>
-                                <td><?= Utils::floatToMoney($value['total_requested']); ?></td>
-                                <td><?= Utils::floatToMoney($value['total_delivered']); ?></td>
+                                <td><?= Utils::floatToMoney($value['quantity'] * $value['value']); ?></td>
+                                <td><?= Utils::floatToMoney($value['delivered'] * $value['value']); ?></td>
                                 <td><?= $value['status']; ?></td>
                                 <td>
                                     <span class="badge badge-danger">

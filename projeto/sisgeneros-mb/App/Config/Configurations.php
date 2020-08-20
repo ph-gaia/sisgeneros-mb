@@ -7,7 +7,7 @@ class Configurations extends InternalConfigurations
 {
 
     const DS = DIRECTORY_SEPARATOR;
-    const STR_SALT = 'H352b7b8ce1db145eaceb957a549eaabf4b7ced8d';
+    const STR_SALT = 'Hb2e07278eb7661d316d5f997e4330201d6a3a54d';
     const DOMAIN = 'www.ceimbe.mb';
     const ADMIN_CONTACT = 'E-mail: bruno.monteirodg@gmail.com';
     const PATH_CORE = '/var/www/html/sisgeneros-mb/';
