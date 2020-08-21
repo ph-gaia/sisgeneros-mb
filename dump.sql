@@ -5,22 +5,22 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema sisgeneros
+-- Schema sisgeneros_mb
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `sisgeneros` ;
+DROP SCHEMA IF EXISTS `sisgeneros_mb` ;
 
 -- -----------------------------------------------------
--- Schema sisgeneros
+-- Schema sisgeneros_mb
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `sisgeneros` DEFAULT CHARACTER SET utf8 ;
-USE `sisgeneros` ;
+CREATE SCHEMA IF NOT EXISTS `sisgeneros_mb` DEFAULT CHARACTER SET utf8 ;
+USE `sisgeneros_mb` ;
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`oms`
+-- Table `sisgeneros_mb`.`oms`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`oms` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`oms` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`oms` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`oms` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
   `naval_indicative` VARCHAR(6) NOT NULL,
@@ -52,11 +52,11 @@ COMMENT = 'Organizações Militares';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`users`
+-- Table `sisgeneros_mb`.`users`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`users` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`users` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`users` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `oms_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`users` (
   INDEX `fk_users_oms_idx` (`oms_id` ASC),
   CONSTRAINT `fk_users_oms`
     FOREIGN KEY (`oms_id`)
-    REFERENCES `sisgeneros`.`oms` (`id`)
+    REFERENCES `sisgeneros_mb`.`oms` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -82,11 +82,11 @@ COMMENT = 'tabela de usuário, contendo os dados do usuário e as credenciais de
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`suppliers`
+-- Table `sisgeneros_mb`.`suppliers`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`suppliers` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`suppliers` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`suppliers` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`suppliers` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
   `cnpj` VARCHAR(18) NOT NULL,
@@ -99,11 +99,11 @@ COMMENT = 'Fornecedores';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`biddings`
+-- Table `sisgeneros_mb`.`biddings`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`biddings` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`biddings` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`biddings` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `number` VARCHAR(10) NOT NULL,
   `uasg` INT(6) NOT NULL,
@@ -118,11 +118,11 @@ COMMENT = 'Licitações do sistema';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`ingredients`
+-- Table `sisgeneros_mb`.`ingredients`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`ingredients` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`ingredients` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`ingredients` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`ingredients` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`))
@@ -131,11 +131,11 @@ COMMENT = 'Igredientes usados na confecção de receitas';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`biddings_items`
+-- Table `sisgeneros_mb`.`biddings_items`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`biddings_items` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`biddings_items` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_items` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`biddings_items` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `biddings_id` INT NOT NULL,
   `suppliers_id` INT NOT NULL,
@@ -155,17 +155,17 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_items` (
   INDEX `fk_biddings_items_ingredients1_idx` (`ingredients_id` ASC),
   CONSTRAINT `fk_biddings_items_biddings1`
     FOREIGN KEY (`biddings_id`)
-    REFERENCES `sisgeneros`.`biddings` (`id`)
+    REFERENCES `sisgeneros_mb`.`biddings` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_biddings_items_suppliers1`
     FOREIGN KEY (`suppliers_id`)
-    REFERENCES `sisgeneros`.`suppliers` (`id`)
+    REFERENCES `sisgeneros_mb`.`suppliers` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_biddings_items_ingredients1`
     FOREIGN KEY (`ingredients_id`)
-    REFERENCES `sisgeneros`.`ingredients` (`id`)
+    REFERENCES `sisgeneros_mb`.`ingredients` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -175,10 +175,10 @@ COMMENT = 'Itens das Licitações Registradas no Sistema';
 -- Table structure for table `biddings_oms_lists`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`biddings_oms_lists`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`biddings_oms_lists`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_oms_lists` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`biddings_oms_lists` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `biddings_id` int(11) NOT NULL,
   `oms_id` int(11) NOT NULL,
@@ -197,11 +197,11 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`biddings_oms_lists` (
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`billboards`
+-- Table `sisgeneros_mb`.`billboards`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`billboards` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`billboards` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`billboards` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`billboards` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(100) NOT NULL,
   `content` VARCHAR(256) NOT NULL,
@@ -213,11 +213,11 @@ COMMENT = 'Quadro de avisos';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`billboards_oms_lists`
+-- Table `sisgeneros_mb`.`billboards_oms_lists`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`billboards_oms_lists` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`billboards_oms_lists` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`billboards_oms_lists` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`billboards_oms_lists` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `billboards_id` INT NOT NULL,
   `oms_id` INT NOT NULL,
@@ -226,12 +226,12 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`billboards_oms_lists` (
   INDEX `fk_billboards_oms_lists_oms1_idx` (`oms_id` ASC),
   CONSTRAINT `fk_billboards_oms_lists_billboards1`
     FOREIGN KEY (`billboards_id`)
-    REFERENCES `sisgeneros`.`billboards` (`id`)
+    REFERENCES `sisgeneros_mb`.`billboards` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_billboards_oms_lists_oms1`
     FOREIGN KEY (`oms_id`)
-    REFERENCES `sisgeneros`.`oms` (`id`)
+    REFERENCES `sisgeneros_mb`.`oms` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -241,10 +241,10 @@ COMMENT = 'Organizações Militares permitidas';
 -- Table structure for table `historic_action_requests`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`historic_action_requests`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`historic_action_requests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_action_requests` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`historic_action_requests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `requests_id` int(11) NOT NULL,
   `users_id` int(11) NOT NULL,
@@ -273,10 +273,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_action_requests` (
 -- Table structure for table `historic_provisioned_credits`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`historic_provisioned_credits`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`historic_provisioned_credits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_provisioned_credits` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`historic_provisioned_credits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `operation_type` varchar(7) NOT NULL DEFAULT 'CREDITO',
   `value` float(9,2) NOT NULL,
@@ -297,10 +297,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`historic_provisioned_credits` (
 -- Table structure for table `invoices`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`invoices`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`invoices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`invoices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `oms_id` int(11) NOT NULL,
   `code` varchar(50) DEFAULT NULL,
@@ -322,10 +322,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices` (
 -- Table structure for table `invoices_items`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`invoices_items`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`invoices_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices_items` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`invoices_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `requests_id` int(11) NOT NULL,
   `invoices_id` int(11) NOT NULL,
@@ -357,10 +357,10 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`invoices_items` (
 -- Table structure for table `provisioned_credits`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`provisioned_credits`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`provisioned_credits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`provisioned_credits` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`provisioned_credits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `oms_id` int(11) NOT NULL,
   `credit_note` varchar(30) NOT NULL,
@@ -376,11 +376,11 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`provisioned_credits` (
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`requests`
+-- Table `sisgeneros_mb`.`requests`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`requests` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`requests` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`requests` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `oms_id` INT NOT NULL,
   `suppliers_id` INT NOT NULL,
@@ -403,12 +403,12 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests` (
   INDEX `fk_requests_suppliers1_idx` (`suppliers_id` ASC),
   CONSTRAINT `fk_requests_oms1`
     FOREIGN KEY (`oms_id`)
-    REFERENCES `sisgeneros`.`oms` (`id`)
+    REFERENCES `sisgeneros_mb`.`oms` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_requests_suppliers1`
     FOREIGN KEY (`suppliers_id`)
-    REFERENCES `sisgeneros`.`suppliers` (`id`)
+    REFERENCES `sisgeneros_mb`.`suppliers` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -416,11 +416,11 @@ COMMENT = 'Solicitações de itens Licitados e Não Licitados';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`requests_items`
+-- Table `sisgeneros_mb`.`requests_items`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`requests_items` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`requests_items` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_items` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`requests_items` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `requests_id` INT NOT NULL,
   `number` INT(8) NULL,
@@ -433,7 +433,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_items` (
   INDEX `fk_requests_items_requests1_idx` (`requests_id` ASC),
   CONSTRAINT `fk_requests_items_requests1`
     FOREIGN KEY (`requests_id`)
-    REFERENCES `sisgeneros`.`requests` (`id`)
+    REFERENCES `sisgeneros_mb`.`requests` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -443,10 +443,10 @@ COMMENT = 'Items das solicitações';
 -- Table structure for table `requests_invoices`
 --
 
-DROP TABLE IF EXISTS `sisgeneros`.`requests_invoices`;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`requests_invoices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_invoices` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`requests_invoices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `invoices_id` int(11) NOT NULL,
   `suppliers_id` int(11) DEFAULT NULL,
@@ -475,11 +475,11 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`requests_invoices` (
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`suppliers_evaluations`
+-- Table `sisgeneros_mb`.`suppliers_evaluations`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`suppliers_evaluations` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`suppliers_evaluations` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`suppliers_evaluations` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`suppliers_evaluations` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `requests_id` INT NOT NULL,
   `evaluation` INT(1) NOT NULL DEFAULT 3,
@@ -496,11 +496,11 @@ COMMENT = 'Avaliação de entrega dos fornecedores';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`recipes_patterns`
+-- Table `sisgeneros_mb`.`recipes_patterns`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`recipes_patterns` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`recipes_patterns` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes_patterns` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`recipes_patterns` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`))
@@ -509,11 +509,11 @@ COMMENT = 'Receitas padrões registradas no sistema';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`recipes_patterns_items`
+-- Table `sisgeneros_mb`.`recipes_patterns_items`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`recipes_patterns_items` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`recipes_patterns_items` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes_patterns_items` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`recipes_patterns_items` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ingredients_id` INT NOT NULL,
   `recipes_patterns_id` INT NOT NULL,
@@ -523,12 +523,12 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes_patterns_items` (
   INDEX `fk_recipes_patterns_items_ingredients1_idx` (`ingredients_id` ASC),
   CONSTRAINT `fk_recipes_patterns_items_recipes_patterns1`
     FOREIGN KEY (`recipes_patterns_id`)
-    REFERENCES `sisgeneros`.`recipes_patterns` (`id`)
+    REFERENCES `sisgeneros_mb`.`recipes_patterns` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_recipes_patterns_items_ingredients1`
     FOREIGN KEY (`ingredients_id`)
-    REFERENCES `sisgeneros`.`ingredients` (`id`)
+    REFERENCES `sisgeneros_mb`.`ingredients` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -536,11 +536,11 @@ COMMENT = 'Itens das receitas';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`menus`
+-- Table `sisgeneros_mb`.`menus`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`menus` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`menus` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`menus` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`menus` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `oms_id` INT NOT NULL,
   `users_id_requesters` INT NOT NULL,
@@ -555,17 +555,17 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`menus` (
   INDEX `fk_menus_users2_idx` (`users_id_authorizers` ASC),
   CONSTRAINT `fk_menus_oms1`
     FOREIGN KEY (`oms_id`)
-    REFERENCES `sisgeneros`.`oms` (`id`)
+    REFERENCES `sisgeneros_mb`.`oms` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_menus_users1`
     FOREIGN KEY (`users_id_requesters`)
-    REFERENCES `sisgeneros`.`users` (`id`)
+    REFERENCES `sisgeneros_mb`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_menus_users2`
     FOREIGN KEY (`users_id_authorizers`)
-    REFERENCES `sisgeneros`.`users` (`id`)
+    REFERENCES `sisgeneros_mb`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -573,11 +573,11 @@ COMMENT = 'Cardápios registrados pela Organizações Militares';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`meals`
+-- Table `sisgeneros_mb`.`meals`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`meals` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`meals` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`meals` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`meals` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `sort` VARCHAR(15) NOT NULL DEFAULT 1,
   `name` VARCHAR(50) NOT NULL,
@@ -587,11 +587,11 @@ COMMENT = 'Refeições diárias';
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`recipes`
+-- Table `sisgeneros_mb`.`recipes`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`recipes` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`recipes` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`recipes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `meals_id` INT NOT NULL,
   `menus_id` INT NOT NULL,
@@ -606,28 +606,28 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes` (
   INDEX `fk_recipes_menus1_idx` (`menus_id` ASC),
   CONSTRAINT `fk_recipes_recipes_patterns1`
     FOREIGN KEY (`recipes_patterns_id`)
-    REFERENCES `sisgeneros`.`recipes_patterns` (`id`)
+    REFERENCES `sisgeneros_mb`.`recipes_patterns` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_recipes_meals1`
     FOREIGN KEY (`meals_id`)
-    REFERENCES `sisgeneros`.`meals` (`id`)
+    REFERENCES `sisgeneros_mb`.`meals` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_recipes_menus1`
     FOREIGN KEY (`menus_id`)
-    REFERENCES `sisgeneros`.`menus` (`id`)
+    REFERENCES `sisgeneros_mb`.`menus` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `sisgeneros`.`recipes_items`
+-- Table `sisgeneros_mb`.`recipes_items`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `sisgeneros`.`recipes_items` ;
+DROP TABLE IF EXISTS `sisgeneros_mb`.`recipes_items` ;
 
-CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes_items` (
+CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`recipes_items` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `recipes_id` INT NOT NULL,
   `biddings_items_id` INT NULL COMMENT 'Item da licitação quando houver',
@@ -638,7 +638,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros`.`recipes_items` (
   INDEX `fk_recispes_items_recipes1_idx` (`recipes_id` ASC),
   CONSTRAINT `fk_recispes_items_recipes1`
     FOREIGN KEY (`recipes_id`)
-    REFERENCES `sisgeneros`.`recipes` (`id`)
+    REFERENCES `sisgeneros_mb`.`recipes` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
