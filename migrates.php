@@ -19,22 +19,6 @@ try {
             const RUN_COMMAND = '--executar';
 
             /**
-             * This array is filled with INDEX as Sqlite tables name, and VALUE is the MySQL table name
-             */
-            const TABLE_MAP = [
-                'om' => 'oms',
-                'users' => 'users',
-                'fornecedor' => 'suppliers',
-                'licitacao' => 'biddings',
-                'licitacao_item' => 'biddings_items',
-                'solicitacao' => 'requests',
-                'solicitacao_item' => 'requests_items',
-                'avaliacao_fornecedor' => 'suppliers_evaluations',
-                'quadro_avisos' => 'billboards',
-                'quadro_avisos_lista_oms' => 'billboards_oms_lists'
-            ];
-
-            /**
              * @var \PDO The PDO instance
              */
             private $connectionMySQL;
@@ -42,8 +26,8 @@ try {
             /**
              * @var \PDO The PDO instance
              */
-            private $connectionSqlite;
-            
+            private $connectionMySQLOld;
+
             /**
              * @var App\Config\DatabaseConfig
              */
@@ -68,7 +52,7 @@ try {
                 $this->migrateTableBiddingsItems();
                 $this->migrateTableRequests();
                 $this->migrateTableRequestsItems();
-                $this->migrateTableSuppliersEvaluantions();
+                //$this->migrateTableSuppliersEvaluantions();
                 $this->migrateTableBillboards();
                 $this->migrateTableBillboardsOmsLists();
             }
@@ -148,20 +132,23 @@ try {
              * @return \PDO
              * @throws \Exception
              */
-            private function connectSqlite(): \PDO
+            private function connectMySQLOldDatabase(): \PDO
             {
                 try {
-                    if (!$this->connectionSqlite) {
-                        $this->connectionSqlite = new \PDO('sqlite:' . cfg::DIR_DATABASE . 'sisgeneros.db');
-                        $this->connectionSqlite->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                        $this->connectionSqlite->exec('PRAGMA encoding = "UTF-8";');
+                    if (!$this->connectionMySQLOld) {
+                        $config = $this->databaseConfig->db;
+                        $dns = 'mysql:host=' . $config['servidor'] . ';dbname=sisgeneros';
+                        $this->connectionMySQLOld = new \PDO(
+                            $dns, $config['usuario'], $config['senha'], $config['opcoes']
+                        );
+                        $this->connectionMySQLOld->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                     }
-                    return $this->connectionSqlite;
+                    return $this->connectionMySQLOld;
                 } catch (\PDOException $ex) {
                     throw new \Exception(""
                     . "ERRO!"
                     . PHP_EOL
-                    . "Não foi possível connectar ao banco de dados Sqlite"
+                    . "Não foi possível connectar ao banco de dados MySQL"
                     . PHP_EOL
                     . $ex->getMessage()
                     . "" . PHP_EOL);
@@ -482,13 +469,13 @@ try {
              * @return array
              * @throws \Exception
              */
-            private function fetchData(string $entity, string $where = '', string $use = 'sqlite'): array
+            private function fetchData(string $entity, string $where = '', string $use = 'old'): array
             {
                 try {
                     /**
                      * @var \PDO
                      */
-                    $connection = $use === 'sqlite' ? $this->connectSqlite() : $this->connectMySQL();
+                    $connection = $use === 'old' ? $this->connectMySQLOldDatabase() : $this->connectMySQL();
                     $where = $where !== '' ? " WHERE {$where} " : '';
                     $sql = "SELECT * FROM {$entity} {$where};";
                     return $connection->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -509,25 +496,34 @@ try {
              */
             private function migrateTableOms()
             {
-                $sqliteTable = 'om';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
+                $table = 'oms';
+                $this->showMessageBeginningAndEndExecution($table);
                 $this->clearTable($table);
-                $oldDate = $this->fetchData($sqliteTable);
+                $oldData = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
-                foreach ($oldDate as $value) {
+                foreach ($oldData as $value) {
                     $data = [
                         'id' => null,
-                        'name' => $value['nome'],
-                        'naval_indicative' => $value['indicativo_naval'],
+                        'name' => $value['name'],
+                        'naval_indicative' => $value['naval_indicative'],
                         'uasg' => $value['uasg'],
-                        'fiscal_agent' => $value['agente_fiscal'] ?? 'FISCAL',
-                        'fiscal_agent_graduation' => $value['agente_fiscal_posto'] ?? 'FISCAL',
-                        'munition_manager' => $value['gestor_municiamento'] ?? 'GERENTE',
-                        'munition_manager_graduation' => $value['gestor_municiamento_posto'] ?? 'GERENTE',
-                        'munition_fiel' => $value['fiel_municiamento'] ?? 'FIEL',
-                        'munition_fiel_graduation' => $value['fiel_municiamento_posto'] ?? 'FIEL',
+                        'fiscal_agent' => $value['fiscal_agent'] ?? 'FISCAL',
+                        'fiscal_agent_graduation' => $value['fiscal_agent_graduation'] ?? 'FISCAL',
+                        'munition_manager' => $value['munition_manager'] ?? 'GERENTE',
+                        'munition_manager_graduation' => $value['munition_manager_graduation'] ?? 'GERENTE',
+                        'munition_fiel' => $value['munition_fiel'] ?? 'FIEL',
+                        'munition_fiel_graduation' => $value['munition_fiel_graduation'] ?? 'FIEL',
+                        'expense_originator' => 'ORDENADOR',
+                        'expense_originator_graduation' => 'ORDENADOR',
+                        'ug' => 'UG',
+                        'ptres' => 'PTRES',
+                        'ai' => 'AI',
+                        'do' => 'DO',
+                        'bi' => 'BI',
+                        'fr' => 'FR',
+                        'nd' => 'ND',
+                        'cost_center' => 'COST_CENTER',
                         'created_at' => date('Y-m-d', $value['created_at']),
                         'updated_at' => date('Y-m-d', $value['updated_at'])
                     ];
@@ -539,7 +535,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -548,11 +544,10 @@ try {
              */
             private function migrateTableUsers()
             {
-                $sqliteTable = 'users';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
+                $table = 'users';
+                $this->showMessageBeginningAndEndExecution($table);
                 $this->clearTable($table);
-                $oldDate = $this->fetchData($sqliteTable);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
@@ -562,10 +557,10 @@ try {
                         'oms_id' => $omData['id'],
                         'name' => $value['name'],
                         'email' => $value['email'],
-                        'level' => $value['nivel'],
+                        'level' => $value['level'],
                         'username' => $value['username'],
                         'password' => $value['password'],
-                        'change_password' => $this->translateYesNo($value['trocar_senha']),
+                        'change_password' => $this->translateYesNo($value['change_password']),
                         'active' => $this->translateYesNo($value['active']),
                         'created_at' => date('Y-m-d', $value['created_at']),
                         'updated_at' => date('Y-m-d', $value['updated_at'])
@@ -578,7 +573,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -587,18 +582,17 @@ try {
              */
             private function migrateTableSuppliers()
             {
-                $sqliteTable = 'fornecedor';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'suppliers';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
                     $data = [
                         'id' => null,
-                        'name' => $value['nome'],
+                        'name' => $value['name'],
                         'cnpj' => $value['cnpj'],
-                        'details' => $value['dados'],
+                        'details' => $value['details'],
                     ];
 
                     if (!$this->create($data, $table)) {
@@ -608,7 +602,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -617,21 +611,20 @@ try {
              */
             private function migrateTableBiddings()
             {
-                $sqliteTable = 'licitacao';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'biddings';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
                     $data = [
                         'id' => null,
-                        'number' => $value['numero'],
+                        'number' => $value['number'],
                         'uasg' => $value['uasg'],
-                        'uasg_name' => $value['nome_uasg'],
-                        'description' => $value['descricao'],
-                        'validate' => date('Y-m-d', $value['validade']),
-                        'created_at' => date('Y-m-d', $value['criacao'])
+                        'uasg_name' => $value['uasg_name'],
+                        'description' => $value['description'],
+                        'validate' => date('Y-m-d', $value['validate']),
+                        'created_at' => date('Y-m-d', $value['created_at'])
                     ];
 
                     if (!$this->create($data, $table)) {
@@ -641,7 +634,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -650,37 +643,39 @@ try {
              */
             private function migrateTableBiddingsItems()
             {
-                $sqliteTable = 'licitacao_item';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'biddings_items';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
-                    $biddingsData = $this->fetchNewBiddingsData($value['id_lista']);
-                    $suppliersData = $this->fetchNewSuppliersData($value['id_fornecedor']);
+                    $biddingsData = $this->fetchNewBiddingsData($value['biddings_id']);
+                    $suppliersData = $this->fetchNewSuppliersData($value['suppliers_id']);
 
                     $data = [
                         'id' => null,
                         'biddings_id' => $biddingsData['id'],
                         'suppliers_id' => $suppliersData['id'],
                         'ingredients_id' => 1,
-                        'number' => $value['numero'],
-                        'name' => $value['nome'],
+                        'number' => $value['number'],
+                        'name' => $value['name'],
                         'uf' => $value['uf'],
-                        'quantity' => $value['quantidade'],
-                        'value' => $value['valor'],
+                        'quantity' => $value['quantity'],
+                        'quantity_compromised' => 0,
+                        'quantity_committed' => 0,
+                        'quantity_available' => $value['quantity'],
+                        'value' => $value['value'],
                         'active' => $this->translateYesNo($value['active'])
                     ];
 
                     if (!$this->create($data, $table)) {
                         $this->connectMySQL()->rollBack();
-                        throw new \Exception("Erro ao inserir " . $value['numero']);
+                        throw new \Exception("Erro ao inserir " . $value['number']);
                     }
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -689,28 +684,30 @@ try {
              */
             private function migrateTableRequests()
             {
-                $sqliteTable = 'solicitacao';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'requests';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
 
-                    $omsData = $this->fetchNewOmsData($value['om_id']);
-                    $suppliersData = $this->fetchNewSuppliersData($value['fornecedor_id']);
+                    $omsData = $this->fetchNewOmsData($value['oms_id']);
+                    $suppliersData = $this->fetchNewSuppliersData($value['suppliers_id']);
 
                     if (isset($omsData['id'], $suppliersData['id'])) {
                         $data = [
                             'id' => null,
                             'oms_id' => $omsData['id'],
                             'suppliers_id' => $suppliersData['id'],
-                            'biddings_id' => $value['id_licitacao'],
-                            'number' => $value['numero'],
+                            'biddings_id' => $value['biddings_id'],
+                            'number' => $value['number'],
                             'status' => $value['status'],
-                            'invoice' => $value['numero_nota_fiscal'] ?? 'S/N',
-                            'delivery_date' => $value['data_entrega'],
-                            'observation' => $value['observacao'],
+                            'invoice' => $value['invoice'] ?? 'S/N',
+                            'observation' => $value['observation'],
+                            'modality' => 'Pregão Eletrônico',
+                            'types_invoices' => 'ESTIMATIVO',
+                            'account_plan' => '339030.07',
+                            'purposes' => 'Aquisição de gêneros alimentícios para confecção do rancho do ' . $omsData['naval_indicative'],
                             'created_at' => date('Y-m-d', $value['created_at']),
                             'updated_at' => date('Y-m-d H:i:s', $value['updated_at'])
                         ];
@@ -723,7 +720,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -732,26 +729,25 @@ try {
              */
             private function migrateTableRequestsItems()
             {
-                $sqliteTable = 'solicitacao_item';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'requests_items';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
 
-                    $requestsData = $this->fetchNewRequestsData($value['id_lista']);
+                    $requestsData = $this->fetchNewRequestsData($value['requests_id']);
                     if (isset($requestsData['id'])) {
 
                         $data = [
                             'id' => null,
                             'requests_id' => $requestsData['id'],
-                            'number' => $value['item_numero'],
-                            'name' => $value['item_nome'],
-                            'uf' => $value['item_uf'],
-                            'quantity' => $value['item_quantidade'],
-                            'delivered' => $value['item_quatidade_atendida'] ?? '0',
-                            'value' => $value['item_valor']
+                            'number' => $value['number'],
+                            'name' => $value['name'],
+                            'uf' => $value['uf'],
+                            'quantity' => $value['quantity'],
+                            'delivered' => $value['delivered'] ?? '0',
+                            'value' => $value['value']
                         ];
 
                         if (!$this->create($data, $table)) {
@@ -762,7 +758,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -771,10 +767,9 @@ try {
              */
             private function migrateTableSuppliersEvaluantions()
             {
-                $sqliteTable = 'avaliacao_fornecedor';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'suppliers_evaluations';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
@@ -795,7 +790,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -804,20 +799,19 @@ try {
              */
             private function migrateTableBillboards()
             {
-                $sqliteTable = 'quadro_avisos';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'billboards';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
 
                     $data = [
                         'id' => null,
-                        'title' => $value['titulo'],
-                        'content' => $value['corpo'],
-                        'beginning_date' => $value['data_inicio'],
-                        'ending_date' => $value['data_fim'],
+                        'title' => $value['title'],
+                        'content' => $value['content'],
+                        'beginning_date' => $value['beginning_date'],
+                        'ending_date' => $value['ending_date'],
                     ];
 
                     if (!$this->create($data, $table)) {
@@ -827,7 +821,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
 
             /**
@@ -836,15 +830,14 @@ try {
              */
             private function migrateTableBillboardsOmsLists()
             {
-                $sqliteTable = 'quadro_avisos_lista_oms';
-                $table = self::TABLE_MAP[$sqliteTable];
-                $this->showMessageBeginningAndEndExecution($sqliteTable);
-                $oldDate = $this->fetchData($sqliteTable);
+                $table = 'billboards_oms_lists';
+                $this->showMessageBeginningAndEndExecution($table);
+                $oldDate = $this->fetchData($table);
                 $this->connectMySQL()->beginTransaction();
 
                 foreach ($oldDate as $value) {
 
-                    $omsData = $this->fetchNewOmsData($value['om_id']);
+                    $omsData = $this->fetchNewOmsData($value['oms_id']);
                     $billboardsData = $this->fetchNewBillboardsData($value['id']);
 
                     if (isset($billboardsData['id'], $omsData['id'])) {
@@ -862,7 +855,7 @@ try {
                 }
 
                 $this->connectMySQL()->commit();
-                $this->showMessageBeginningAndEndExecution($sqliteTable, true);
+                $this->showMessageBeginningAndEndExecution($table, true);
             }
         };
 } catch (\Exception $ex) {
