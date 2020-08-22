@@ -15,7 +15,7 @@ class DatabaseConfig
 
     public $db = [
         'servidor' => 'mariadb',
-        'banco' => 'sisgeneros',
+        'banco' => 'sisgeneros_mb',
         'usuario' => 'root',
         'senha' => 'root',
         'opcoes' => [\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"],
