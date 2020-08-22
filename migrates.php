@@ -568,7 +568,7 @@ try {
 
                     if (!$this->create($data, $table)) {
                         $this->connectMySQL()->rollBack();
-                        throw new \Exception("Erro ao inserir " . $value['nome']);
+                        throw new \Exception("Erro ao inserir " . $value['name']);
                     }
                 }
 

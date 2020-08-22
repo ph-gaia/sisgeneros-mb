@@ -221,7 +221,7 @@ new class($argv) {
             try {
                 $currentDate = date('Y-m-d');
                 $sql = ""
-                    . " INSERT INTO `sisgeneros`.`oms` ( "
+                    . " INSERT INTO `sisgeneros_mb`.`oms` ( "
                     . "    `id`, `name`, "
                     . "    `naval_indicative`, `uasg`, "
                     . "    `fiscal_agent`, `fiscal_agent_graduation`, "
@@ -238,7 +238,7 @@ new class($argv) {
                     . "    '{$currentDate}', '{$currentDate}' "
                     . " ); "
                     . ""
-                    . " INSERT INTO `sisgeneros`.`users` ( "
+                    . " INSERT INTO `sisgeneros_mb`.`users` ( "
                     . "    `id`, `oms_id`, "
                     . "    `name`, `email`, "
                     . "    `level`, `username`, "
@@ -255,14 +255,14 @@ new class($argv) {
                     . "    '{$currentDate}' "
                     . " ); "
                     . ""
-                    . " INSERT INTO `sisgeneros`.`ingredients` ( "
+                    . " INSERT INTO `sisgeneros_mb`.`ingredients` ( "
                     . "    `id`, `name` "
                     . " ) "
                     . " VALUES ( "
                     . "    1, 'DESCONHECIDO' "
                     . " ); "
                     . ""
-                    . " INSERT INTO `sisgeneros`.`meals` ( "
+                    . " INSERT INTO `sisgeneros_mb`.`meals` ( "
                     . "    `id`, `sort`, `name` "
                     . " ) "
                     . " VALUES "
@@ -303,7 +303,7 @@ new class($argv) {
                 $username = 'administrador';
                 $password = (new \HTR\Helpers\Criptografia\Criptografia())->passHash($username . cfg::STR_SALT);
                 $sql = ""
-                    . " UPDATE `sisgeneros`.`users` SET "
+                    . " UPDATE `sisgeneros_mb`.`users` SET "
                     . " username='{$username}', password='{$password}', change_password='yes' "
                     . " WHERE id = 1; ";
                 $this->connectDatabase()->exec($sql);
