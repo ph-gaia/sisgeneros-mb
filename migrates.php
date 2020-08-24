@@ -446,7 +446,7 @@ try {
          */
         private function translateYesNo(string $value): string
         {
-            return $value === '1' ? 'yes' : 'no';
+            return $value == '1' ? 'yes' : 'no';
         }
 
         /**
@@ -564,8 +564,8 @@ try {
                     'password' => $value['password'],
                     'change_password' => $this->translateYesNo($value['change_password']),
                     'active' => $this->translateYesNo($value['active']),
-                    'created_at' => date('Y-m-d', $value['created_at']),
-                    'updated_at' => date('Y-m-d', $value['updated_at'])
+                    'created_at' => date('Y-m-d', strtotime($value['created_at'])),
+                    'updated_at' => date('Y-m-d', strtotime($value['updated_at']))
                 ];
 
                 if (!$this->create($data, $table)) {
@@ -710,8 +710,8 @@ try {
                         'types_invoices' => 'ESTIMATIVO',
                         'account_plan' => '339030.07',
                         'purposes' => 'Aquisição de gêneros alimentícios para confecção do rancho do ' . $omsData['naval_indicative'],
-                        'created_at' => date('Y-m-d', $value['created_at']),
-                        'updated_at' => date('Y-m-d H:i:s', $value['updated_at'])
+                        'created_at' => date('Y-m-d', strtotime($value['created_at'])),
+                        'updated_at' => date('Y-m-d H:i:s', strtotime($value['updated_at']))
                     ];
 
                     if (!$this->create($data, $table)) {

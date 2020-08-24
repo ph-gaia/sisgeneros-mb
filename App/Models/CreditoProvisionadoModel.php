@@ -157,7 +157,11 @@ class CreditoProvisionadoModel extends CRUD
         $this->setTime(time())
             ->setId(filter_input(INPUT_POST, 'id') ?? time())
             ->setCreditNote(filter_input(INPUT_POST, 'credit_note', FILTER_SANITIZE_SPECIAL_CHARS))
-            ->setValue(filter_input(INPUT_POST, 'value'));
+            ->setValue(filter_input(INPUT_POST, 'value', FILTER_SANITIZE_SPECIAL_CHARS));
+
+        $value = str_replace(".", "", $this->getValue());
+        $value = str_replace(",", ".", $value);
+        $this->setValue($value);
 
         $omId = ($user['level'] != 'ADMINISTRADOR') ? $user['oms_id'] : filter_input(INPUT_POST, 'oms_id');
         $this->setOmsId($omId);

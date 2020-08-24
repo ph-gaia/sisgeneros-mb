@@ -82,7 +82,7 @@ class FornecedorModel extends CRUD
     public function removerRegistro($id)
     {
         if (parent::remover($id)) {
-            header('Location: ' . cfg::DEFAULT_URI . 'suppliers/ver/');
+            header('Location: ' . cfg::DEFAULT_URI . 'fornecedor/ver/');
         }
     }
 

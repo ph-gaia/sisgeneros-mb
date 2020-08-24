@@ -220,6 +220,7 @@ use App\Helpers\View;
         $('input[name="quantity[]"]').each(function() {
             $(this).prop("disabled", false);
         });
+        $('.alerta-item').hide()
     });
     function addItemList(name, available, requested) {
         var html = `A quantidade de ${name} <strong>disponível</strong> atualmente é de <strong>${available}</strong>.<br>A quantidade <strong>solicitada</strong> é de <strong>${requested}</strong>.<br><br>`;

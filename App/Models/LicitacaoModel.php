@@ -27,15 +27,18 @@ class LicitacaoModel extends CRUD
     {
         $innerJoin = " INNER JOIN biddings_oms_lists ON biddings.id = biddings_oms_lists.biddings_id ";
         $dados = [
+            'select' => 'biddings.*',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 20,
-            'orderBy' => 'created_at DESC'
+            'orderBy' => 'created_at DESC',
+            'where' => ' biddings_oms_lists.oms_id = :omId ',
+            'bindValue' => [':omId' => $omId]
         ];
 
         if ($dateLimit) {
-            $dados['where'] = 'validate >= ? && biddings_oms_lists.oms_id = ?';
-            $dados['bindValue'] = [0 => $dateLimit, 1 => $omId];
+            $dados['where'] = ' biddings.validate >= :date and biddings_oms_lists.oms_id = :omId ';
+            $dados['bindValue'] = [':date' => $dateLimit, ':omId' => $omId];
         }
 
         $paginator = new Paginator($dados);
@@ -156,8 +159,10 @@ class LicitacaoModel extends CRUD
 
     public function removerRegistro($id)
     {
-        if (parent::remover($id)) {
-            header('Location: ' . cfg::DEFAULT_URI . 'biddings/ver/');
+        $stmt = $this->pdo->prepare("DELETE FROM biddings_oms_lists WHERE biddings_id = ?");
+        if ($stmt->execute([$id])) {
+            parent::remover($id);
+            header('Location: ' . cfg::DEFAULT_URI . 'licitacao/ver/');
         }
     }
 

@@ -136,7 +136,7 @@ $cfg = cfg::htrFileConfigs();
                 } catch (e) {}
                 var tamanho = $("#cpfcnpj").val().length;
 
-                if(tamanho < 11) {
+                if(tamanho <= 11) {
                     $("#cpfcnpj").mask("000.000.000-00");
                 } else {
                     $("#cpfcnpj").mask("00.000.000/0000-00");

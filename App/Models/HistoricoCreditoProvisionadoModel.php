@@ -117,7 +117,9 @@ class HistoricoCreditoProvisionadoModel extends CRUD
             ->setProvisionedCredits(filter_input(INPUT_POST, 'provisioned_credits_id'))
             ->setValue(filter_input(INPUT_POST, 'value', FILTER_SANITIZE_SPECIAL_CHARS));
 
-        $this->setValue(Utils::moneyToFloat($this->getValue()));
+        $value = str_replace(".", "", $this->getValue());
+        $value = str_replace(",", ".", $value);
+        $this->setValue($value);
         // Inicia a Validação dos dados
         $this->validaId()
             ->validaObservation()

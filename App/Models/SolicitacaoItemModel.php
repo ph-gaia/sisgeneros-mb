@@ -139,7 +139,7 @@ class SolicitacaoItemModel extends CRUD
         $solicitacaoModel = new Solicitacao();
         $solicitacao = $solicitacaoModel->findById($item['requests_id']);
 
-        if ($solicitacao['status'] !== 'ABERTO') {
+        if ($solicitacao['status'] !== 'ELABORADO') {
             // redireciona para solicitacao/ se a Solicitação ja estiver aprovada
             header("Location:" . cfg::DEFAULT_URI . 'solicitacao/');
             return true;
