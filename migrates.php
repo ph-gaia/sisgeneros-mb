@@ -52,6 +52,7 @@ try {
             $this->migrateTableSuppliers();
             $this->migrateTableBiddings();
             $this->migrateTableBiddingsItems();
+            $this->migrateTableBiddingsOmsLists();
             $this->migrateTableRequests();
             $this->migrateTableRequestsItems();
             // $this->migrateTableSuppliersEvaluantions();
@@ -673,6 +674,34 @@ try {
                 if (!$this->create($data, $table)) {
                     $this->connectMySQL()->rollBack();
                     throw new \Exception("Erro ao inserir " . $value['number']);
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'licitacao'
+         * @throws \Exception
+         */
+        private function migrateTableBiddingsOmsLists()
+        {
+            $table = 'biddings_oms_lists';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData('biddings', '', 'mysql');
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+                $data = [
+                    'id' => null,
+                    'biddings_id' => $value['id'],
+                    'oms_id' => 1,
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
                 }
             }
 
