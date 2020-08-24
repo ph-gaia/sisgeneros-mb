@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`oms` (
   `nd` varchar(30) DEFAULT NULL,
   `cost_center` varchar(30) DEFAULT NULL,
   `classification_items` VARCHAR(30) NULL,
+  `limit_request_nl` float DEFAULT NULL,
   `created_at` DATE NOT NULL,
   `updated_at` DATE NOT NULL,
   PRIMARY KEY (`id`),
