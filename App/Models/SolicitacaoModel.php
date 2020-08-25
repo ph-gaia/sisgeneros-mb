@@ -477,6 +477,8 @@ class SolicitacaoModel extends CRUD
 
     public function removerRegistro($id)
     {
+        $stmt1 = $this->pdo->prepare("DELETE FROM historic_action_requests WHERE requests_id = ?");
+        $stmt1->execute([$id]);
         $stmt = $this->pdo->prepare("DELETE FROM {$this->entidade} WHERE id = ?");
         if ($stmt->execute([$id])) {
             header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
