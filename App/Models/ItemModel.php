@@ -94,6 +94,7 @@ class ItemModel extends CRUD
             'name' => $this->getName(),
             'uf' => $this->getUf(),
             'quantity' => $this->getQuantity(),
+            'quantity_available' => $this->getQuantity(),
             'value' => $this->getValue(),
             'active' => $this->getActive()
         ];
