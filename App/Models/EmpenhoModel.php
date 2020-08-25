@@ -32,7 +32,7 @@ class EmpenhoModel extends CRUD
         $innerJoin .= " INNER JOIN invoices_items as invItems ON invItems.invoices_id = invoices.id ";
 
         $dados = [
-            'select' => 'invoices.*, oms.naval_indicative, invItems.quantity, invItems.delivered, invItems.value',
+            'select' => 'invoices.*, oms.naval_indicative, SUM(invItems.quantity * invItems.value) as total_requested, SUM(invItems.delivered * invItems.value) as total_delivered',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 100,
