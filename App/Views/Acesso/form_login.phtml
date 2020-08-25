@@ -5,8 +5,8 @@ use App\Config\Configurations as cfg;
 ?>
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
-            <div class="login-panel text-application">
+        <div class="col-md-12">
+            <div class="text-application" style="margin-top: 5%;">
                 <h1>MARINHA DO BRASIL</h1>
                 <h3><?= cfg::htrFileConfigs()->application->om ?></h3>
                 <h4>
@@ -15,45 +15,34 @@ use App\Config\Configurations as cfg;
                 </h4>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="login-panel panel login-container">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <i class="fa fa-lock"></i>
-                        <?= $this->view->title ?>
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    <div id="resultado"></div>
-                    <form role="form" id="form" action="<?= $this->view->controller; ?>autentica" method="post">
-                        <div class="form-group input-group">
-                            <span class="input-group-addon">
-                                <i class="fa fa-user"></i>
-                            </span>
-                            <input type="text"
-                                   name="username"
-                                   id="username"
-                                   class="form-control"
-                                   placeholder="Login"
-                                   autofocus
-                                   required>
-                        </div>
-                        <div class="form-group input-group">
-                            <span class="input-group-addon">
-                                <i class="fa fa-key"></i>
-                            </span>
-                            <input type="password"
-                                   name="password"
-                                   id="password"
-                                   class="form-control"
-                                   placeholder="Senha"
-                                   required>
-                        </div>
-                        <button class="btn btn-lg btn-block btn-entrar">
-                            <i class="fa fa-sign-in"></i> Entrar
-                        </button>
-                    </form>
-                </div>
+    </div>
+    <div class="row">
+        <div class="panel login-container" style="margin-top: 5%;">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-lock"></i>
+                    <?= $this->view->title ?>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div id="resultado"></div>
+                <form role="form" id="form" action="<?= $this->view->controller; ?>autentica" method="post">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-user"></i>
+                        </span>
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Login" autofocus required>
+                    </div>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon">
+                            <i class="fa fa-key"></i>
+                        </span>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Senha" required>
+                    </div>
+                    <button class="btn btn-lg btn-block btn-entrar">
+                        <i class="fa fa-sign-in"></i> Entrar
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -61,15 +50,17 @@ use App\Config\Configurations as cfg;
 <style>
     body {
         background-color: #333;
-        background-image: url('images/background.png');
+        background-image: url('images/background.jpg');
         background-attachment: fixed;
         background-repeat: no-repeat;
         background-size: 100% 100%;
     }
+
     .btn-entrar {
         background-color: #1c294e;
         color: #fff;
     }
+
     .btn-entrar:hover {
         color: #b7b9cc;
     }
@@ -79,12 +70,16 @@ use App\Config\Configurations as cfg;
         background-position-x: 200px;
         background-repeat: no-repeat;
         padding: 20px;
-        box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3); 
+        box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
+        max-width: 430px;
+        margin: 0 auto;
     }
+
     .text-application {
         color: #fff;
         text-transform: uppercase;
         font-weight: bold;
         text-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
+        text-align: center;
     }
 </style>
