@@ -195,7 +195,7 @@ class SolicitacaoItemModel extends CRUD
             . " INNER JOIN `requests` "
             . "     ON `requests_items`.`requests_id` = `requests`.`id` "
             . " WHERE "
-            . "     `requests`.`status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA') "
+            . "     `requests`.`status` NOT IN ('REJEITADO', 'ELABORADO', 'ENCAMINHADO', 'PROVISIONADO', 'VERIFICADO', 'AUTORIZADO') "
             . "     AND `requests_items`.`number` = ? "
             . "     AND `requests`.`biddings_id` = ?;");
         $stmt->execute([$itemnumber, $idLicitacao]);
