@@ -81,7 +81,7 @@ class RelatorioController extends Controller implements CtrlInterface
     {
         $licitacao = new Licitacao();
         $this->view->title = 'Licitações Registradas';
-        $licitacao->paginator($this->getParametro('pagina'));
+        $licitacao->paginator($this->getParametro('pagina'), null, $this->view->userLoggedIn['oms_id']);
         $this->view->result = $licitacao->getResultadoPaginator();
         $this->view->btn = $licitacao->getNavePaginator();
         $this->render('mostra_licitacao_disponivel');
