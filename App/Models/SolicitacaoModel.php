@@ -264,17 +264,17 @@ class SolicitacaoModel extends CRUD
         /**
          * perfil NORMAL visualiza apenas pedidos 'ELABORADO', 'REJEITADO', 'CANCELADO'
          */
-        if ($user['level'] === 'NORMAL') {
-            $dados['where'] = "status IN ('ELABORADO', 'REJEITADO', 'CANCELADO')";
-        }
+        // if ($user['level'] === 'NORMAL') {
+        //     $dados['where'] = "status IN ('ELABORADO', 'REJEITADO', 'CANCELADO')";
+        // }
 
         /**
          * perfil ENCARREGADO visualiza apenas pedidos 'ENCAMINHADO'
          */
-        if ($user['level'] === 'ENCARREGADO') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'ENCAMINHADO'];
-        }
+        // if ($user['level'] === 'ENCARREGADO') {
+        //     $dados['where'] = 'status = :status';
+        //     $dados['bindValue'] = [':status' => 'ENCAMINHADO'];
+        // }
 
         /**
          * perfil FISCAL visualiza apenas pedidos 'PROVISIONADO'
@@ -870,7 +870,7 @@ class SolicitacaoModel extends CRUD
             . " FROM {$this->entidade} "
             . " WHERE created_at BETWEEN '" . date('Y-m') . "-01' AND '" . date('Y-m-d') . "' ";
 
-        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $query .= " AND oms_id = {$user['oms_id']} ";
         }
 
@@ -887,7 +887,7 @@ class SolicitacaoModel extends CRUD
     public function lastUpdated(array $user): array
     {
         $where = '';
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $where = " WHERE sol.oms_id = " . $user['oms_id'];
         }
         $query = ""

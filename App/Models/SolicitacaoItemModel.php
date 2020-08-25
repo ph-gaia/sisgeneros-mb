@@ -127,7 +127,6 @@ class SolicitacaoItemModel extends CRUD
     public function editarRegistro($idlista, $user)
     {
         $quantity = filter_input(INPUT_POST, 'quantity');
-        $quantity = Utils::moneyToFloat($quantity);
 
         $this->setQuantity($quantity)
             ->setId(filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT))

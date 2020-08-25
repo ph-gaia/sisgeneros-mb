@@ -63,8 +63,8 @@ class ItemModel extends CRUD
             'name' => $this->getName(),
             'uf' => $this->getUf(),
             'quantity' => $this->getQuantity(),
-            'quantity_compromised' => $this->getQuantity(),
-            'quantity_committed' => $this->getQuantity(),
+            'quantity_compromised' => 0,
+            'quantity_committed' => 0,
             'quantity_available' => $this->getQuantity(),
             'value' => $this->getValue(),
             'active' => $this->getActive()
