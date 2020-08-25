@@ -285,7 +285,7 @@ class AcessoModel extends CRUD
             ->setName(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS))
             ->setEmail(filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL))
             ->setLevel(filter_input(INPUT_POST, 'level', FILTER_SANITIZE_SPECIAL_CHARS))
-            ->setActive(filter_input(INPUT_POST, 'active', FILTER_SANITIZE_NUMBER_INT)?? 'yes');
+            ->setActive(filter_input(INPUT_POST, 'active', FILTER_SANITIZE_SPECIAL_CHARS)?? 'yes');
 
         return $this;
     }
