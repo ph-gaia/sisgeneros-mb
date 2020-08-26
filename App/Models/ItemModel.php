@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -110,13 +111,19 @@ class ItemModel extends CRUD
      * @param $id identificador do item
      * @param $quantity quantidade solicitada
      */
-    public function atualizarQtdComprometida($id, $quantity)
+    public function atualizarQtdComprometida($id, $quantity, $operation = 'soma')
     {
         $result = $this->findById($id);
 
-        $dados = [
-            'quantity_compromised' => $result['quantity_compromised'] + $quantity
-        ];
+        if ($operation == 'soma') {
+            $dados = [
+                'quantity_compromised' => $result['quantity_compromised'] + $quantity
+            ];
+        } else {
+            $dados = [
+                'quantity_compromised' => $result['quantity_compromised'] - $quantity
+            ];
+        }
 
         if (parent::editar($dados, $id)) {
             $this->atualizarQtdDisponivel();
@@ -191,7 +198,8 @@ class ItemModel extends CRUD
             FROM `biddings_items` 
             INNER JOIN `suppliers` ON `biddings_items`.`suppliers_id` = `suppliers`.`id` 
             WHERE `biddings_items`.`biddings_id` = ? AND suppliers.id = ? AND `biddings_items`.`active` = 'yes'
-            ORDER BY `biddings_items`.`number` ASC");
+            ORDER BY `biddings_items`.`number` ASC"
+        );
         $stmt->execute([$idlista, $idFornecedor]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

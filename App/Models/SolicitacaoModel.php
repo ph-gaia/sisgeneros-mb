@@ -537,6 +537,23 @@ class SolicitacaoModel extends CRUD
             );
         }
 
+        if ($action == 'CANCELADO') {
+            $query = "" .
+                " SELECT C.id, B.quantity as requested FROM requests as A " .
+                " INNER JOIN requests_items as B ON B.requests_id = A.id " .
+                " INNER JOIN biddings_items as C ON C.number = B.number and C.biddings_id = A.biddings_id " .
+                " WHERE A.id = :id ";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute([':id' => $id]);
+            $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            var_dump($items);exit;
+            $itemModel = new ItemModel();
+            foreach ($items as $item) {
+                $itemModel->atualizarQtdComprometida($item['id'], $item['requested'], 'subtrair');
+            }
+        }
+
         $dados = [
             'status' => $action,
             'reason_action' => $reason,
