@@ -3,6 +3,7 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET GLOBAL SQL_MODE=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
 
 -- -----------------------------------------------------
 -- Schema sisgeneros_mb
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `sisgeneros_mb`.`oms` (
   `nd` varchar(30) DEFAULT NULL,
   `cost_center` varchar(30) DEFAULT NULL,
   `classification_items` VARCHAR(30) NULL,
-  `limit_request_nl` float DEFAULT NULL,
+  `limit_request_nl` float(9,2) DEFAULT NULL,
   `created_at` DATE NOT NULL,
   `updated_at` DATE NOT NULL,
   PRIMARY KEY (`id`),

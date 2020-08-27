@@ -477,6 +477,20 @@ class SolicitacaoModel extends CRUD
 
     public function removerRegistro($id)
     {
+        $query = "" .
+            " SELECT C.id, B.quantity as requested FROM requests as A " .
+            " INNER JOIN requests_items as B ON B.requests_id = A.id " .
+            " INNER JOIN biddings_items as C ON C.number = B.number and C.biddings_id = A.biddings_id " .
+            " WHERE A.id = :id ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':id' => $id]);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $itemModel = new ItemModel();
+        foreach ($items as $item) {
+            $itemModel->atualizarQtdComprometida($item['id'], $item['requested'], 'subtrair');
+        }
+
         $stmt1 = $this->pdo->prepare("DELETE FROM historic_action_requests WHERE requests_id = ?");
         $stmt1->execute([$id]);
         $stmt = $this->pdo->prepare("DELETE FROM {$this->entidade} WHERE id = ?");

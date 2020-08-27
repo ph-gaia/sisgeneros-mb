@@ -46,22 +46,27 @@ $pagination = Pagination::make($this);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($this->view->result as $value) : ?>
-                            <tr>
-                                <td><strong><?= $value['code']; ?></strong></td>
-                                <td><?= $value['naval_indicative']; ?></td>
-                                <td><?= $value['complement']; ?></td>
-                                <td><?= Utils::floatToMoney($value['total_requested']); ?></td>
-                                <td><?= Utils::floatToMoney($value['total_delivered']); ?></td>
-                                <td><?= Utils::floatToMoney($value['total_requested'] - $value['total_delivered']); ?></td>
-                                <td><?= $value['status']; ?></td>
-                                <td>
-                                    <span class="badge badge-danger">
-                                        <?= View::humanDate(($value['created_at']) ? $value['created_at'] : date('Y-m-d', time())); ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                        <?php
+                        if (empty($this->view->result)) :
+                            foreach ($this->view->result as $value) : ?>
+                                <tr>
+                                    <td><strong><?= $value['code']; ?></strong></td>
+                                    <td><?= $value['naval_indicative']; ?></td>
+                                    <td><?= $value['complement']; ?></td>
+                                    <td><?= Utils::floatToMoney($value['total_requested']); ?></td>
+                                    <td><?= Utils::floatToMoney($value['total_delivered']); ?></td>
+                                    <td><?= Utils::floatToMoney($value['total_requested'] - $value['total_delivered']); ?></td>
+                                    <td><?= $value['status']; ?></td>
+                                    <td>
+                                        <span class="badge badge-danger">
+                                            <?= View::humanDate(($value['created_at']) ? $value['created_at'] : date('Y-m-d', time())); ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                        <?php
+                            endforeach;
+                        endif;
+                        ?>
                     </tbody>
                 </table>
                 <?= $pagination; ?>

@@ -8,7 +8,8 @@ use App\Config\Configurations as cfg;
         <div class="col-md-12">
             <div class="text-application" style="margin-top: 5%;">
                 <h1>MARINHA DO BRASIL</h1>
-                <h3><?= cfg::htrFileConfigs()->application->om ?></h3>
+                <h2 style="text-transform: uppercase;"><?= cfg::htrFileConfigs()->application->om ?></h2>
+                <h3>Sistema de Gerenciamento de Gêneros</h3>
                 <h4>
                     <?= cfg::htrFileConfigs()->application->name ?>
                     <?= cfg::htrFileConfigs()->application->version ?>
@@ -77,7 +78,6 @@ use App\Config\Configurations as cfg;
 
     .text-application {
         color: #fff;
-        text-transform: uppercase;
         font-weight: bold;
         text-shadow: 0 5px 5px rgba(0, 0, 0, 0.3);
         text-align: center;

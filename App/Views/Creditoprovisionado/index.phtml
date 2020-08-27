@@ -26,7 +26,6 @@ $pagination = Pagination::make($this);
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nota de crédito</th>
                             <th>OM</th>
                             <th>Valor</th>
                             <th></th>
@@ -35,7 +34,6 @@ $pagination = Pagination::make($this);
                     <tbody>
                         <?php foreach ($this->view->result as $value) : ?>
                             <tr>
-                                <td><?= $value['credit_note']; ?></td>
                                 <td><?= $value['naval_indicative']; ?></td>
                                 <td><?= Utils::floatToMoney($value['value']); ?></td>
                                 <td>

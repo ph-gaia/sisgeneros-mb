@@ -527,8 +527,8 @@ try {
                     'fr' => 'FR',
                     'nd' => 'ND',
                     'cost_center' => 'COST_CENTER',
-                    'created_at' => date('Y-m-d', $value['created_at']),
-                    'updated_at' => date('Y-m-d', $value['updated_at'])
+                    'created_at' => date('Y-m-d', strtotime($value['created_at'])),
+                    'updated_at' => date('Y-m-d', strtotime($value['updated_at']))
                 ];
 
                 if (!$this->create($data, $table)) {

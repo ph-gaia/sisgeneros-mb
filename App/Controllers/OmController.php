@@ -48,7 +48,7 @@ class OmController extends Controller implements CtrlInterface
     public function verAction()
     {
         $model = new OmModel();
-        $this->view->title = 'Lista de Todos as OMs';
+        $this->view->title = 'Lista de Todas as OM';
         $model->paginator($this->getParametro('pagina'));
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();

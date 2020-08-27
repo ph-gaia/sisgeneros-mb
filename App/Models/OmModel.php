@@ -188,10 +188,13 @@ class OmModel extends CRUD
             ->setBi(filter_input(INPUT_POST, 'bi'))
             ->setFr(filter_input(INPUT_POST, 'fr'))
             ->setNd(filter_input(INPUT_POST, 'nd'))
-            ->setLimitRequest(filter_input(INPUT_POST, 'limit_request_nl'))
+            ->setLimitRequest(filter_input(INPUT_POST, 'limit_request_nl', FILTER_SANITIZE_SPECIAL_CHARS))
             ->setClassificationItems(filter_input(INPUT_POST, 'classification_items'))
             ->setCostCenter(filter_input(INPUT_POST, 'cost_center'));
 
+        $value = str_replace(".", "", $this->getLimitRequest());
+        $value = str_replace(",", ".", $value);
+        $this->setLimitRequest($value);
         // Inicia a Validação dos dados
         $this->validaId()
             ->validaUasg()
