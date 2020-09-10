@@ -56,7 +56,7 @@ use App\Helpers\View;
                     <span class="btn btn-success btn-save">
                         <i class="fa fa-check"></i> Salvar Registro
                     </span>
-                    <a href="<?= $this->view->controller; ?>licitacaobusca" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Cancelar</a>
+                    <a href="<?= $this->view->controller; ?>licitacaobusca" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
                     <div class="row">
                         <div class="col-md-4" style="margin-top: 10px;">
                             <label>Tipo de Empenho</label>
@@ -197,7 +197,7 @@ use App\Helpers\View;
             $('.listItem').append("Todos os itens solicitados possuem saldo disponíveis para o pedido.");
         }
         
-        $('#valorTotal').html('R$ ' + total.toFixed(2));
+        $('#valorTotal').html('R$ ' + total.toLocaleString('pt-BR'));
         $(this).hide()
         $('.alerta-credito').show()
     });

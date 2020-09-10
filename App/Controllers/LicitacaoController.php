@@ -28,7 +28,7 @@ class LicitacaoController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $this->view->title = 'Novo Registro';
         $this->view->resultOms = (new OmModel())->findAll();
         $this->render('form_novo');
@@ -36,7 +36,7 @@ class LicitacaoController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new LicitacaoModel();
         $this->view->title = 'Editando Registro';
         $result = $model->fetchDataToEdit((int) $this->getParametro('id'));
@@ -47,14 +47,14 @@ class LicitacaoController extends Controller implements CtrlInterface
 
     public function eliminarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new LicitacaoModel();
         $model->removerRegistro($this->getParametro('id'));
     }
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR']);
         $model = new LicitacaoModel();
         $this->view->title = 'Lista de Todas as Licitações';
         $model->paginator($this->getParametro('pagina'), null, $this->view->userLoggedIn['oms_id']);
@@ -65,14 +65,14 @@ class LicitacaoController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new LicitacaoModel();
         $model->novoRegistro();
     }
 
     public function alteraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new LicitacaoModel();
         $model->editarRegistro();
     }

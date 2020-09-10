@@ -240,7 +240,7 @@ class AcessoModel extends CRUD
                     . '<script>focusOn("username");</script>', 'warning');
             }
 
-            if ($result['active'] === 'no') {
+            if ($result['active'] == 'no') {
                 msg::showMsg('<strong>Usuário Bloqueado!</strong><br>'
                     . ' Consulte o Admistrador do Sistema para mais informações.'
                     . cfg::ADMIN_CONTACT, 'danger');

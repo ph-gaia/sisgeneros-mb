@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -198,8 +197,7 @@ class ItemModel extends CRUD
             FROM `biddings_items` 
             INNER JOIN `suppliers` ON `biddings_items`.`suppliers_id` = `suppliers`.`id` 
             WHERE `biddings_items`.`biddings_id` = ? AND suppliers.id = ? AND `biddings_items`.`active` = 'yes'
-            ORDER BY `biddings_items`.`number` ASC"
-        );
+            ORDER BY `biddings_items`.`number` ASC");
         $stmt->execute([$idlista, $idFornecedor]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

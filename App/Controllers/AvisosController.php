@@ -16,7 +16,7 @@ class AvisosController extends Controller implements CtrlInterface
         parent::__construct($bootstrap);
 
         $this->view->controller = cfg::DEFAULT_URI . 'avisos/';
-        $this->view->userLoggedIn = (new Access())->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR']);
+        $this->view->userLoggedIn = (new Access())->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
     }
 
     public function indexAction()
