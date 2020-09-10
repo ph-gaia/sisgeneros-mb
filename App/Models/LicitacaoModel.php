@@ -245,10 +245,10 @@ class LicitacaoModel extends CRUD
         }
     }
 
-    public function eliminarOm(int $id, $avisoId)
+    public function eliminarOm(int $id, $licitacaoId)
     {
         if ((new LicitacaoListaOmsModel())->remover($id)) {
-            header('Location: ' . cfg::DEFAULT_URI . 'licitacao/editar/id/' . $avisoId);
+            header('Location: ' . cfg::DEFAULT_URI . 'licitacao/editar/id/' . $licitacaoId);
         }
     }
 

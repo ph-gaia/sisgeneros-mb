@@ -264,48 +264,48 @@ class SolicitacaoModel extends CRUD
         /**
          * perfil NORMAL visualiza apenas pedidos 'ELABORADO', 'REJEITADO', 'CANCELADO'
          */
-        // if ($user['level'] === 'NORMAL') {
-        //     $dados['where'] = "status IN ('ELABORADO', 'REJEITADO', 'CANCELADO')";
-        // }
+        if ($user['level'] === 'NORMAL') {
+            $dados['where'] = "status IN ('ELABORADO', 'REJEITADO', 'CANCELADO')";
+        }
 
         /**
          * perfil ENCARREGADO visualiza apenas pedidos 'ENCAMINHADO'
          */
-        // if ($user['level'] === 'ENCARREGADO') {
-        //     $dados['where'] = 'status = :status';
-        //     $dados['bindValue'] = [':status' => 'ENCAMINHADO'];
-        // }
+        if ($user['level'] === 'ENCARREGADO') {
+            $dados['where'] = 'status = :status';
+            $dados['bindValue'] = [':status' => 'ENCAMINHADO'];
+        }
 
         /**
          * perfil FISCAL visualiza apenas pedidos 'PROVISIONADO'
          */
         if ($user['level'] === 'FISCAL') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'PROVISIONADO'];
+            $dados['where'] = 'status = :status and oms_id = :omsId';
+            $dados['bindValue'] = [':status' => 'PROVISIONADO', ':omsId' => $user['oms_id']];
         }
 
         /**
          * perfil ORDENADOR visualiza apenas pedidos 'VERIFICADO'
          */
         if ($user['level'] === 'ORDENADOR') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'VERIFICADO'];
+            $dados['where'] = 'status = :status and oms_id = :omsId';
+            $dados['bindValue'] = [':status' => 'VERIFICADO', ':omsId' => $user['oms_id']];
         }
 
         /**
          * perfil CONTROLADOR_OBTENCAO visualiza apenas pedidos 'AUTORIZADO'
          */
         if ($user['level'] === 'CONTROLADOR_OBTENCAO') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'AUTORIZADO'];
+            $dados['where'] = "status IN ('AUTORIZADO', 'CONFERIDO', 'EMPENHADO')";
+            //$dados['bindValue'] = [':status' => ""];
         }
 
         /**
          * perfil CONTROLADOR_FINANCA visualiza apenas pedidos 'CONFERIDO'
          */
         if ($user['level'] === 'CONTROLADOR_FINANCA') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'CONFERIDO'];
+            $dados['where'] = "status IN ('CONFERIDO', 'EMPENHADO')";
+            //$dados['bindValue'] = [':status' => 'CONFERIDO, EMPENHADO'];
         }
 
         if ($busca) {
@@ -561,7 +561,6 @@ class SolicitacaoModel extends CRUD
             $stmt->execute([':id' => $id]);
             $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            var_dump($items);exit;
             $itemModel = new ItemModel();
             foreach ($items as $item) {
                 $itemModel->atualizarQtdComprometida($item['id'], $item['requested'], 'subtrair');
@@ -594,8 +593,11 @@ class SolicitacaoModel extends CRUD
             msg::showMsg("A solicitação não está apta para ser autorizada!", "danger");
         }
 
-        if ($total['total'] > $creditoProvisionado['value']) {
-            msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
+        if ($total['total'] < $creditoProvisionado['value']) {
+            echo "<script>alert('O valor do pedido é superior ao saldo disponível no crédito');</script>";
+            header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
+            //exit;
+            //msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
         }
 
         $dados = [
@@ -869,7 +871,7 @@ class SolicitacaoModel extends CRUD
             . "FROM {$this->entidade} "
             . "WHERE status LIKE :status";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query . $where;
         }
@@ -886,7 +888,7 @@ class SolicitacaoModel extends CRUD
             . " COUNT(*) AS quantity "
             . " FROM {$this->entidade} "
             . " WHERE status LIKE :status";
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query . $where;
         }
@@ -903,7 +905,7 @@ class SolicitacaoModel extends CRUD
             . " FROM {$this->entidade} "
             . " WHERE created_at BETWEEN '" . date('Y-m') . "-01' AND '" . date('Y-m-d') . "' ";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
+        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $query .= " AND oms_id = {$user['oms_id']} ";
         }
 
@@ -920,7 +922,7 @@ class SolicitacaoModel extends CRUD
     public function lastUpdated(array $user): array
     {
         $where = '';
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $where = " WHERE sol.oms_id = " . $user['oms_id'];
         }
         $query = ""

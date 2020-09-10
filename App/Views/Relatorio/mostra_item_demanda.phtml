@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Pagination;
+use App\Helpers\Utils;
 use App\Helpers\View;
 
 $idlista = $this->view->idlista;
@@ -56,7 +57,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <td style='font-size: 11px'><?= $value['supplier']; ?></td>
                                 <td>
                                     <span class="label label-success">
-                                        <?= View::normalizeFloat($value['quantity'], 3, true); ?>
+                                        <?= Utils::floatToMoney($value['quantity'], ""); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -66,7 +67,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                     ?>
                                     <?php if ($demanda): ?>
                                         <span class="badge badge-dark">
-                                            <?= View::normalizeFloat($demanda, 3, true); ?>
+                                            <?= Utils::floatToMoney($demanda, ""); ?>
                                         </span>
                                     <?php else: ?>
                                         ---
@@ -74,7 +75,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 </td>
                                 <td>
                                     <span class="badge <?= $restante < 0 ? "badge-danger" : "badge-success"; ?>">
-                                        <?= View::normalizeFloat($restante, 3, true); ?>
+                                        <?= Utils::floatToMoney($restante, ""); ?>
                                     </span>
                                 </td>
                             </tr>

@@ -7,7 +7,7 @@ use App\Helpers\Utils;
 setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 date_default_timezone_set(cfg::TIMEZONE);
 
-if (in_array($this->view->resultSolicitacao['status'] ?? false, ['ELABORADO', 'REJEITADO', 'CANCELADO', false])) {
+if (in_array($this->view->resultSolicitacao['status'] ?? false, ['REJEITADO', 'CANCELADO', false])) {
     die("<i class='fa fa-info-circle'></i> A papeleta não pode ser gerada...");
 }
 
@@ -296,7 +296,7 @@ $total = 0;
                             <td><?= $this->view->resultOm['classification_items'] ?: ''; ?></td>
                             <td class="left"><?= $value['name']; ?></td>
                             <td><?= $value['uf']; ?></td>
-                            <td><?= intval($value['quantity']); ?></td>
+                            <td><?= $value['quantity']; ?></td>
                             <td><?= $this->view->resultOm['cost_center']; ?></td>
                             <td><?= View::floatToMoney($value['value'], ''); ?></td>
                             <td><?= View::floatToMoney($totaItem, ''); ?></td>

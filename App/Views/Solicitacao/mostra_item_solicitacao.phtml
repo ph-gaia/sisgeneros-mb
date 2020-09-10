@@ -141,7 +141,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     </div>
                 <?php endif; ?>
                 <?php
-                $ruleCredit = ($this->view->totalSolicitacao['total'] > $this->view->credito['value']);
+                $ruleCredit = ($this->view->totalSolicitacao['total'] > ($this->view->credito['value'] - $this->view->creditoComprometido['sum_value']));
                 if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO']) && $this->view->resultSolicitacao['status'] == 'ENCAMINHADO' && isset($this->view->resultLicitacao['number'])) : ?>
                     <div class="alerta-credito">
                         <div class="alert alert-warning" role="alert">
@@ -165,7 +165,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 }
                                 $ruleQuantity = false;
                             ?>
-                                A quantidade de <?= $value['name'] ?> <strong>disponível</strong> atualmente é de <strong><?= floatval($value['quantity_available']); ?></strong>.<br>
+                                A quantidade de <?= $value['name'] ?> <strong> disponível</strong> atualmente é de <strong><?= floatval($value['quantity_available']); ?></strong>.<br>
                                 A quantidade <strong>solicitada</strong> é de <strong><?= floatval($value['quantity']); ?></strong>.<br><br>
                             <?php endforeach; ?>
                             <?php if ($ruleCredit || !$ruleQuantity) : ?>
@@ -202,6 +202,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && in_array($this->view->resultSolicitacao['status'], ['ELABORADO', 'REJEITADO'])) : ?>
                     <a href="<?= $this->view->controller; ?>encaminhar/id/<?= $this->view->idlista; ?>" class="btn btn-success pull-right" style="margin-right: 10px;">
                         <i class="fa fa-forward"></i> Encaminhar
+                    </a>
+                <?php endif; ?>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ORDENADOR']) && $this->view->resultSolicitacao['status'] == 'VERIFICADO'): ?>
+                    <a href="<?= $this->view->controller; ?>autorizar/id/<?= $value['id']; ?>" class="btn btn-success pull-right" style="margin-right: 10px;">
+                        <i class="fa fa-check"></i> Autorizar
                     </a>
                 <?php endif; ?>
                 <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $this->view->resultSolicitacao['status'] == 'ABERTO' && !isset($this->view->resultLicitacao['number'])) : ?>
@@ -272,9 +277,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         ?>
                             <tr>
                                 <td><?= $value['number'] ?: '-'; ?></td>
-                                <td><?= floatval($value['quantity']); ?></td>
+                                <td><?= Utils::floatToMoney($value['quantity'], ''); ?></td>
                                 <td><?= intval($value['delivered']); ?></td>
-                                <td><?= floatval($value['quantity_available']); ?></td>
+                                <td><?= Utils::floatToMoney($value['quantity_available'], ''); ?></td>
                                 <td><?= $value['uf']; ?></td>
                                 <td><?= $value['name']; ?></td>
                                 <td><?= Utils::floatToMoney($value['value']); ?></td>

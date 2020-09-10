@@ -19,7 +19,6 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
         parent::__construct($bootstrap);
         $this->view->controller = cfg::DEFAULT_URI . 'creditoprovisionado/';
         $this->access = new Access();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
     }
 
     public function indexAction()
@@ -29,6 +28,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $this->view->title = 'Novo Registro';
         $om = new OmModel();
         $this->view->resultOm = $om->findAll();
@@ -37,6 +37,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function detalharAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'ORDENADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $this->view->title = 'Editando Registro';
         $this->view->result = $model->findById($this->getParametro('id'));
@@ -51,12 +52,14 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function eliminarAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $model->removerRegistro($this->getParametro('id'));
     }
 
     public function verAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'ORDENADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $this->view->title = 'Lista de Todos os Créditos provisionados';
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn);
@@ -67,6 +70,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $model->novoRegistro($this->view->userLoggedIn);
     }
@@ -79,6 +83,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function alteraAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $model->editarRegistro();
     }

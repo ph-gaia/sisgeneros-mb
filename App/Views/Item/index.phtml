@@ -33,6 +33,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <a href="<?= $this->view->controller; ?>novo/idlista/<?= $this->view->idlista; ?>" class="btn btn-info">
                     <i class="fa fa-plus-circle"></i> Novo Registro
                 </a>
+                <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
+                    <i class="fa fa-arrow-left"></i> Voltar
+                </a>
                 <div class="row">
                     <div class="col-md-6">
                         <?= $pagination; ?>
@@ -58,10 +61,10 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <?php foreach ($this->view->result as $value): ?>
                             <tr>
                                 <td style='font-size: 11px'><?= $value['number']; ?></td>
-                                <td style='font-size: 11px'><?= intval($value['quantity']); ?></td>
-                                <td style='font-size: 11px'><?= intval($value['quantity_compromised']); ?></td>
-                                <td style='font-size: 11px'><?= intval($value['quantity_committed']); ?></td>
-                                <td style='font-size: 11px'><?= intval($value['quantity_available']); ?></td>
+                                <td style='font-size: 11px'><?= Utils::floatToMoney($value['quantity'], ""); ?></td>
+                                <td style='font-size: 11px'><?= Utils::floatToMoney($value['quantity_compromised'], ""); ?></td>
+                                <td style='font-size: 11px'><?= Utils::floatToMoney($value['quantity_committed'], ""); ?></td>
+                                <td style='font-size: 11px'><?= Utils::floatToMoney($value['quantity_available'], ""); ?></td>
                                 <td style='font-size: 11px'><?= Utils::floatToMoney($value['value']); ?></td>
                                 <td style='font-size: 11px'><?= $value['uf']; ?></td>
                                 <td style='font-size: 11px'>

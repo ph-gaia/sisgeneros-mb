@@ -27,7 +27,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $om = new OmModel();
         $this->view->resultOm = $om->findAll();
         $this->view->title = 'Novo Registro';
@@ -36,7 +36,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA', 'ENCARREGADO', 'NORMAL', 'FISCAL']);
         $om = new OmModel();
         $this->view->resultOm = $om->findAll();
         $model = new AcessoModel();
@@ -76,7 +76,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function alteraAction()
     {
-        $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $model = new AcessoModel();
         $model->editarRegistro();
     }
@@ -104,7 +104,7 @@ class AcessoController extends Controller implements CtrlInterface
     public function mudarSenhaAction()
     {
         $this->access->breakRedirect();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $this->view->title = "Mudando Senha";
         $this->render('form_mudar_senha');
     }
@@ -113,7 +113,7 @@ class AcessoController extends Controller implements CtrlInterface
     {
         $model = new AcessoModel();
         $this->access->breakRedirect();
-        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $model->mudarSenha($user['id']);
     }
 }

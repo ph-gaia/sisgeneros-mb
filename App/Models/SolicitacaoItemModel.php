@@ -127,6 +127,7 @@ class SolicitacaoItemModel extends CRUD
     public function editarRegistro($idlista, $user)
     {
         $quantity = filter_input(INPUT_POST, 'quantity');
+        $currentQtd = filter_input(INPUT_POST, 'currentQtd');
 
         $this->setQuantity($quantity)
             ->setId(filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT))
@@ -160,6 +161,17 @@ class SolicitacaoItemModel extends CRUD
         $dados = [
             'quantity' => Utils::normalizeFloat($this->getQuantity(), 3),
         ];
+
+        $result = 0;
+        $itemModel = new Item();
+        $itemReq = $this->findItemByRequestIdAndNumber($item['requests_id'], $item['number']);
+        if ($quantity > $currentQtd) {
+            $result = $quantity - $currentQtd;
+            $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'soma');
+        } else {
+            $result = $currentQtd - $quantity;
+            $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'subtrai');
+        }
 
         if (parent::editar($dados, $this->getId())) {
             $solicitacaoModel->update($solicitacao['id']);
@@ -195,7 +207,7 @@ class SolicitacaoItemModel extends CRUD
             . " INNER JOIN `requests` "
             . "     ON `requests_items`.`requests_id` = `requests`.`id` "
             . " WHERE "
-            . "     `requests`.`status` NOT IN ('REJEITADO', 'ELABORADO', 'ENCAMINHADO', 'PROVISIONADO', 'VERIFICADO', 'AUTORIZADO') "
+            . "     `requests`.`status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA') "
             . "     AND `requests_items`.`number` = ? "
             . "     AND `requests`.`biddings_id` = ?;");
         $stmt->execute([$itemnumber, $idLicitacao]);
@@ -212,11 +224,24 @@ class SolicitacaoItemModel extends CRUD
             . " FROM requests_items as items "
             . " INNER JOIN biddings_items as lic_items ON lic_items.number = items.number "
             . " INNER JOIN biddings	as lic ON lic.id = lic_items.biddings_id "
-            . " INNER JOIN requests as sol ON sol.id = items.requests_id "
+            . " INNER JOIN requests as sol ON sol.id = items.requests_id and sol.biddings_id = lic.id "
             . " WHERE items.requests_id = ? ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$requestId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findItemByRequestIdAndNumber($requestId, $number)
+    {
+        $query = ""
+            . " SELECT lic_items.id as item_id "
+            . " FROM requests_items as items "
+            . " INNER JOIN requests as sol ON sol.id = items.requests_id "
+            . " INNER JOIN biddings_items as lic_items ON lic_items.number = items.number AND lic_items.biddings_id = sol.biddings_id "
+            . " WHERE items.requests_id = ? and items.number = ? ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$requestId, $number]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function findTotalValueByRequestId($requestId)

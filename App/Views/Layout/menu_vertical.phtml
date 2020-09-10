@@ -50,6 +50,7 @@
                 <a class="collapse-item" href="solicitacao/ver">
                     <i class="fa fa-history"></i> Histórico
                 </a>
+                <?php if (!in_array($this->view->userLoggedIn['level'], ['FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) : ?>
                 <a class="collapse-item" href="solicitacao/licitacao/">
                     <i class="fa fa-group"></i> Licitado - PE/Empresa
                 </a>
@@ -59,10 +60,12 @@
                 <a class="collapse-item" href="solicitacao/formnaolicitado/">
                     <i class="fa fa-shopping-cart"></i> Não Licitado
                 </a>
+                <?php endif; ?>
             </div>
         </div>
     </li>
 
+    <?php if (!in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_OBTENCAO'])) : ?>
     <li class="nav-item">
         <a class="nav-link collapsed"
             href="#"
@@ -81,169 +84,162 @@
                 <a class="collapse-item" href="empenho/ver/">
                     <i class="fa fa-history"></i> Histórico
                 </a>
+                <?php if (!in_array($this->view->userLoggedIn['level'], ['FISCAL', 'ORDENADOR'])) : ?>
                 <a class="collapse-item" href="empenho/novo/">
+                    <i class="fa fa-plus-circle"></i> Novo Registro
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </li>
+    <?php endif; ?>
+
+    <?php if (!in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA'])) : ?>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#menuReport"
+            aria-expanded="false"
+            aria-controls="menuReport">
+            <i class="fa fa-list-ol fa-fw"></i> Relatórios
+            <span class="fa arrow"></span>
+        </a>
+        <div id="menuReport"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+                <a class="collapse-item" href="relatorio/solicitacao/">
+                    <i class="fa fa-list"></i> Rel. de Solicitação
+                </a>
+                <a class="collapse-item" href="relatorio/demanda/">
+                    <i class="fa fa-list"></i> Rel. Demanda de Itens
+                </a>
+                <a class="collapse-item" href="relatorio/entrega/">
+                    <i class="fa fa-list"></i> Rel. Aval. de Entrega
+                </a>
+                <?php endif; ?>
+                <a class="collapse-item" href="relatorio/empenho/">
+                    <i class="fa fa-list"></i> Rel. de Empenhos
+                </a>
+            </div>
+        </div>
+    </li>
+    <?php endif; ?>
+
+    <?php if (!in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA'])) : ?>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#menuCredito"
+            aria-expanded="false"
+            aria-controls="menuCredito">
+            <i class="fa fa-credit-card fa-fw"></i> Crédito Provisionado
+            <span class="fa arrow"></span>
+        </a>
+        <div id="menuCredito"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="creditoprovisionado/ver/">
+                    <i class="fa fa-cog"></i> Gerenciar
+                </a>
+                <?php if ($this->view->userLoggedIn['level'] == ['CONTROLADOR_OBTENCAO']) : ?>
+                <a class="collapse-item" href="creditoprovisionado/novo/">
+                    <i class="fa fa-plus-circle"></i> Novo Registro
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#menuQuadros"
+            aria-expanded="false"
+            aria-controls="menuQuadros">
+            <i class="fa fa-newspaper-o fa-fw"></i> Quadro de Avisos
+            <span class="fa arrow"></span>
+        </a>
+        <div id="menuQuadros"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="avisos/ver/">
+                    <i class="fa fa-cog"></i> Gerenciar
+                </a>
+                <a class="collapse-item" href="avisos/novo/">
                     <i class="fa fa-plus-circle"></i> Novo Registro
                 </a>
             </div>
         </div>
     </li>
 
-    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR']) === false) : ?>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#OrgMilitar"
+            aria-expanded="false"
+            aria-controls="OrgMilitar">
+            <i class="fa fa-university fa-fw"></i> Organização Militar
+            <i class="fa arrow-down"></i>
+        </a>
+        <div id="OrgMilitar"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="om/ver">
+                    <i class="fa fa-cog"></i> Gerenciar
+                </a>
+                <a class="collapse-item" href="om/novo/">
+                    <i class="fa fa-plus-circle"></i> Novo Registro
+                </a>
+            </div>
+        </div>
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'FISCAL', 'ORDENADOR']) === false) : ?>
         <li class="nav-item">
             <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#menuFornecedor"
-               aria-expanded="true"
-               aria-controls="menuFornecedor">
+                href="#"
+                data-toggle="collapse"
+                data-target="#menuFornecedor"
+                aria-expanded="true"
+                aria-controls="menuFornecedor">
                 <i class="fa fa-suitcase fa-fw"></i> Fornecedor
                 <span class="fa arrow"></span>
             </a>
             <div id="menuFornecedor"
-                 class="collapse"
-                 aria-labelledby="headingUtilities"
-                 data-parent="#accordionSidebar">
+                    class="collapse"
+                    aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="fornecedor/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR','CONTROLADOR_OBTENCAO'])) : ?>
                     <a class="collapse-item" href="fornecedor/novo/">
                         <i class="fa fa-plus-circle"></i> Novo Registro
                     </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </li>
     <?php endif; ?>
 
-    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#menuReport"
-               aria-expanded="false"
-               aria-controls="menuReport">
-                <i class="fa fa-list-ol fa-fw"></i> Relatórios
-                <span class="fa arrow"></span>
-            </a>
-            <div id="menuReport"
-                 class="collapse"
-                 aria-labelledby="headingPages"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="relatorio/solicitacao/">
-                        <i class="fa fa-list"></i> Rel. de Solicitação
-                    </a>
-                    <a class="collapse-item" href="relatorio/demanda/">
-                        <i class="fa fa-list"></i> Rel. Demanda de Itens
-                    </a>
-                    <a class="collapse-item" href="relatorio/entrega/">
-                        <i class="fa fa-list"></i> Rel. Aval. de Entrega
-                    </a>
-                    <a class="collapse-item" href="relatorio/empenho/">
-                        <i class="fa fa-list"></i> Rel. de Empenhos
-                    </a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#menuCredito"
-               aria-expanded="false"
-               aria-controls="menuCredito">
-                <i class="fa fa-credit-card fa-fw"></i> Crédito Provisionado
-                <span class="fa arrow"></span>
-            </a>
-            <div id="menuCredito"
-                 class="collapse"
-                 aria-labelledby="headingPages"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="creditoprovisionado/ver/">
-                        <i class="fa fa-cog"></i> Gerenciar
-                    </a>
-                    <a class="collapse-item" href="creditoprovisionado/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#menuQuadros"
-               aria-expanded="false"
-               aria-controls="menuQuadros">
-                <i class="fa fa-newspaper-o fa-fw"></i> Quadro de Avisos
-                <span class="fa arrow"></span>
-            </a>
-            <div id="menuQuadros"
-                 class="collapse"
-                 aria-labelledby="headingPages"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="avisos/ver/">
-                        <i class="fa fa-cog"></i> Gerenciar
-                    </a>
-                    <a class="collapse-item" href="avisos/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#OrgMilitar"
-               aria-expanded="false"
-               aria-controls="OrgMilitar">
-                <i class="fa fa-university fa-fw"></i> Organização Militar
-                <i class="fa arrow-down"></i>
-            </a>
-            <div id="OrgMilitar"
-                 class="collapse"
-                 aria-labelledby="headingPages"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="om/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
-                    </a>
-                    <a class="collapse-item" href="om/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#menuFornecedor"
-               aria-expanded="true"
-               aria-controls="menuFornecedor">
-                <i class="fa fa-suitcase fa-fw"></i> Fornecedor
-                <span class="fa arrow"></span>
-            </a>
-            <div id="menuFornecedor"
-                 class="collapse"
-                 aria-labelledby="headingUtilities"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="fornecedor/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
-                    </a>
-                    <a class="collapse-item" href="fornecedor/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-
+    <?php if (!in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA'])) : ?>
         <li class="nav-item">
             <a class="nav-link collapsed"
                href="#"
@@ -262,13 +258,17 @@
                     <a class="collapse-item" href="licitacao/ver">
                         <i class="fa fa-cog"></i> Gerenciar
                     </a>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR','CONTROLADOR_OBTENCAO'])) : ?>
                     <a class="collapse-item" href="licitacao/novo/">
                         <i class="fa fa-plus-circle"></i> Novo Registro
                     </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </li>
+    <?php endif; ?>
 
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
         <li class="nav-item">
             <a class="nav-link collapsed"
                href="#"
@@ -344,32 +344,37 @@
             </div>
         </li>
     <?php endif; ?>
-    <li class="nav-item">
-        <a class="nav-link collapsed"
-           href="#"
-           data-toggle="collapse"
-           data-target="#cardapio"
-           aria-expanded="false"
-           aria-controls="cardapio">
-            <i class="fa fa-bars fa-fw"></i> Cardápio
-            <span class="fa arrow"></span>
-        </a>
-        <div id="cardapio"
-             class="collapse"
-             aria-labelledby="headingPages"
-             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="cardapio/ver">
-                    <i class="fa fa-cog"></i> Gerenciar
-                </a>
-                <a class="collapse-item" href="cardapio/novo/">
-                    <i class="fa fa-plus-circle"></i> Novo Registro
-                </a>
-            </div>
-        </div>
-    </li>
 
-    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR') : ?>
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR'])) : ?>
+        <li class="nav-item">
+            <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#cardapio"
+            aria-expanded="false"
+            aria-controls="cardapio">
+                <i class="fa fa-bars fa-fw"></i> Cardápio
+                <span class="fa arrow"></span>
+            </a>
+            <div id="cardapio"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="cardapio/ver">
+                        <i class="fa fa-cog"></i> Gerenciar
+                    </a>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO'])) : ?>
+                    <a class="collapse-item" href="cardapio/novo/">
+                        <i class="fa fa-plus-circle"></i> Novo Registro
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
         <li class="nav-item">
             <a class="nav-link collapsed"
                href="#"

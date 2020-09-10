@@ -162,7 +162,6 @@ class CreditoProvisionadoModel extends CRUD
         $value = str_replace(".", "", $this->getValue());
         $value = str_replace(",", ".", $value);
         $this->setValue($value);
-
         $omId = ($user['level'] != 'ADMINISTRADOR') ? $user['oms_id'] : filter_input(INPUT_POST, 'oms_id');
         $this->setOmsId($omId);
 

@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @Model Om
  */
+
 namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
@@ -194,7 +196,9 @@ class OmModel extends CRUD
 
         $value = str_replace(".", "", $this->getLimitRequest());
         $value = str_replace(",", ".", $value);
+
         $this->setLimitRequest($value);
+
         // Inicia a Validação dos dados
         $this->validaId()
             ->validaUasg()

@@ -3,6 +3,26 @@
 use App\Helpers\View;
 $cfg = App\Config\Configurations::htrFileConfigs();
 
+$status = [
+    "ADMINISTRADOR" => "ENCAMINHAR",
+    "NORMAL" => "ENCAMINHAR",
+    "ENCARREGADO" => "PROVISIONAR",
+    "FISCAL" => "VERIFICAR",
+    "ORDENADOR" => "AUTORIZAR",
+    "CONTROLADOR_OBTENCAO" => "CONFERIR",
+    "CONTROLADOR_FINANCA" => "EMPENHAR",
+];
+
+$statusReal = [
+    "ADMINISTRADOR" => "ELABORADO",
+    "NORMAL" => "ELABORADO",
+    "ENCARREGADO" => "ENCAMINHADO",
+    "FISCAL" => "PROVISIONADO",
+    "ORDENADOR" => "VERIFICADO",
+    "CONTROLADOR_OBTENCAO" => "AUTORIZADO",
+    "CONTROLADOR_FINANCA" => "CONFERIDO",
+];
+
 ?>
 <div id="page-wrapper">
     <div class="container-fluid">
@@ -62,7 +82,7 @@ $cfg = App\Config\Configurations::htrFileConfigs();
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Aguard. aprov.</div>
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Aguard. <?= $status[$this->view->userLoggedIn['level']]; ?>.</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $this->view->pendAprov['quantity'] ?></div>
                             </div>
                             <div class="col-auto">
@@ -211,7 +231,7 @@ $cfg = App\Config\Configurations::htrFileConfigs();
     }
     if (gotoBtnAguardando) {
         gotoBtnAguardando.addEventListener('click', function () {
-            window.location = 'relatorio/solicitacao/pagina/1/status/ABERTO/';
+            window.location = 'relatorio/solicitacao/pagina/1/status/<?= $statusReal[$this->view->userLoggedIn['level']]; ?>';
         });
     }
 </script>
