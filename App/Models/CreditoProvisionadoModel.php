@@ -39,7 +39,7 @@ class CreditoProvisionadoModel extends CRUD
     {
         $innerJoin = " AS credits INNER JOIN oms ON oms.id = credits.oms_id";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $dados['where'] = 'oms_id = :omsId ';
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }

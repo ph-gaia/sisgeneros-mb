@@ -30,9 +30,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     </strong>
                 </div>
                 <i class="fa fa-list"></i> <?= $this->view->title; ?><br>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                 <a href="<?= $this->view->controller; ?>novo/idlista/<?= $this->view->idlista; ?>" class="btn btn-info">
                     <i class="fa fa-plus-circle"></i> Novo Registro
                 </a>
+                <?php endif ?>
                 <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
                     <i class="fa fa-arrow-left"></i> Voltar
                 </a>
@@ -77,6 +79,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                     <?= View::limitString($value['supplier'], 25); ?>
                                 </td>
                                 <td>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                                     <a href="<?= $this->view->controller; ?>editar/id/<?= $value['id']; ?>/idlista/<?= $this->view->idlista; ?>" class="btn btn-success btn-sm">
                                         <i class="fa fa-edit"></i>
                                     </a>
@@ -85,6 +88,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         class="btn btn-danger btn-sm">
                                         <i class="fa fa-trash"></i>
                                     </a>
+                                <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -58,7 +58,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new AcessoModel();
         $this->view->title = 'Lista de Todos os Usuários';
         $model->paginator($this->getParametro('pagina'));

@@ -20,7 +20,6 @@ class ItemController extends Controller implements CtrlInterface
         parent::__construct($bootstrap);
         $this->view->controller = cfg::DEFAULT_URI . 'item/';
         $this->access = new Access();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
         $this->view->idlista = $this->getParametro('idlista');
         if (!$this->view->idlista) {
             header("Location:" . cfg::DEFAULT_URI . "licitacao/");
@@ -34,6 +33,7 @@ class ItemController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $this->view->title = 'Novo Registro';
         $fornecedor = new Fornecedor();
         $this->view->resultIngredients = (new IngredientesModel())->findAll(function ($i) {
@@ -46,6 +46,7 @@ class ItemController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new ItemModel();
         $this->view->title = 'Editando Registro';
         $fornecedor = new Fornecedor();
@@ -60,12 +61,14 @@ class ItemController extends Controller implements CtrlInterface
 
     public function eliminarAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new ItemModel();
         $model->removerRegistro($this->getParametro('id'), $this->view->idlista);
     }
 
     public function listarAction()
     {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'FISCAL']);
         $model = new ItemModel();
         $this->view->title = 'Lista de Itens da Licitação';
         $model->paginator($this->getParametro('pagina'), $this->view->idlista);

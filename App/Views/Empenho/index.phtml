@@ -16,9 +16,11 @@ $pagination = Pagination::make($this);
 
                 <div class="row">
                     <div class="col-md-2">
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_FINANCA'])) : ?>
                         <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
                             <i class="fa fa-plus-circle"></i> Novo Registro
                         </a>
+                    <?php endif ?>
                     </div>
                     <div class="col-md-5">
                         <?= $pagination; ?>

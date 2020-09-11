@@ -14,9 +14,11 @@ $pagination = Pagination::make($this);
                 <i class="fa fa-list"></i> <?= $this->view->title; ?>
                 <div class="row">
                     <div class="col-md-12">
+                        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                         <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
                             <i class="fa fa-plus-circle"></i> Novo Registro
                         </a>
+                        <?php endif ?>
                     </div>
                 </div>
                 <?= $pagination; ?>
@@ -32,14 +34,16 @@ $pagination = Pagination::make($this);
                             <tr>
                                 <td><?= View::limitString($value['name'], 35); ?></td>
                                 <td>
-                                    <a href="<?= $this->view->controller; ?>editar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a
-                                        onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>editar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a
+                                            onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -34,6 +34,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
         ];
     });
 
+
+$status = [
+    "NORMAL" => "ELABORADO",
+    "ENCARREGADO" => "ENCAMINHADO",
+    "FISCAL" => "PROVISIONADO",
+    "ORDENADOR" => "VERIFICADO",
+    "CONTROLADOR_OBTENCAO" => "AUTORIZADO",
+    "CONTROLADOR_FINANCA" => "CONFERIDO",
+]
 ?>
 <!-- Modal da cancelamento e rejeição -->
 <div class="modal fade" id="modalAction">
@@ -143,14 +152,12 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                                 <i class="fa fa-file-pdf-o"></i> Visualizar
                                             </a>
                                         </li>
-                                        <?php if (!in_array($userNivel, ['NORMAL']) && !in_array($value['status'], ['REJEITADO', 'ELABORADO', 'CANCELADO'])): ?>
+                                        <?php if (in_array($userNivel, ['ADMINISTRADOR']) || $status[$userNivel] == $value['status']): ?>
                                         <li style="margin-top: 5px">
                                             <button data-id="<?= $value['id']; ?>" class="btn btn-warning btn-sm btn-reject" style="width: 100%;">
                                                 <i class="fa fa-repeat"></i> Rejeitar
                                             </button>
                                         </li>
-                                        <?php endif; ?>
-                                        <?php if (!in_array($userNivel, ['CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])): ?>
                                         <li style="margin-top: 5px">
                                             <button data-id="<?= $value['id']; ?>" class="btn btn-danger btn-sm btn-cancel" style="width: 100%;">
                                                 <i class="fa fa-ban"></i> Cancelar

@@ -107,7 +107,7 @@ class CardapioController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'ORDENADOR',  'NORMAL', 'FISCAL']);
         $model = new CardapioModel();
         $this->view->title = 'Lista de Todos os Cardápios';
         $model->paginator($this->getParametro('pagina'));
