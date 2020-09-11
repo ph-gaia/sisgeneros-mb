@@ -15,7 +15,7 @@ $pagination = Pagination::make($this);
                 <i class="fa fa-list"></i> <?= $this->view->title; ?>
                 <div class="row">
                     <div class="col-md-12">
-                        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+                        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                             <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
                                 <i class="fa fa-plus-circle"></i> Novo Registro
                             </a>
@@ -40,7 +40,7 @@ $pagination = Pagination::make($this);
                                     <a href="<?= $this->view->controller; ?>detalhar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                         <i class="fa fa-list"></i>
                                     </a>
-                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                                         <a onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')" class="btn btn-danger btn-sm">
                                             <i class="fa fa-trash"></i>
                                         </a>

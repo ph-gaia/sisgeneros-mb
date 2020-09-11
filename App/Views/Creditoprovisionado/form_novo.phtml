@@ -39,7 +39,7 @@
                                                maxlength="10"
                                                required>
                                     </div>
-                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                                     <div class="form-group">
                                         <label>OM</label>
                                         <select name="oms_id"

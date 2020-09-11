@@ -61,7 +61,7 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $this->view->title = 'Novo registro de empenho';
 
         $solicitacao = new SolicitacaoModel();

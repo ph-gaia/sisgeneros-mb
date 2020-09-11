@@ -28,7 +28,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $this->view->title = 'Novo Registro';
         $this->view->resultIngredients = (new IngredientesModel())->findAll();
         $this->render('form_novo');
@@ -36,7 +36,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $this->view->title = 'Editando Registro';
         $this->view->result = $model->findById($this->getParametro('id'));
@@ -47,21 +47,21 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function eliminarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $model->removerRegistro($this->getParametro('id'));
     }
     
     public function eliminarIngredienteAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsItemsModel();
         $model->removerRegistro($this->getParametro('id'));
     }
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR']);
         $model = new RecipesPatternsModel();
         $this->view->title = 'Lista de Todas as Receitas Padrões';
         $model->paginator($this->getParametro('pagina'));
@@ -72,14 +72,14 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $model->novoRegistro();
     }
 
     public function alteraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR','FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $model->editarRegistro();
     }

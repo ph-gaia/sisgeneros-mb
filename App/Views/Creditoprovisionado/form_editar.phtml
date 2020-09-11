@@ -27,7 +27,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($id)
                 </div>
             </div>
         </div>
-        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) : ?>
+        <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
         <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
             <div class="col-md-12">
                 <i class="fa fa-plus-circle"></i> Novo Registro

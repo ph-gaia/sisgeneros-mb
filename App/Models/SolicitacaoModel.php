@@ -871,7 +871,7 @@ class SolicitacaoModel extends CRUD
             . "FROM {$this->entidade} "
             . "WHERE status LIKE :status";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query . $where;
         }
@@ -888,7 +888,7 @@ class SolicitacaoModel extends CRUD
             . " COUNT(*) AS quantity "
             . " FROM {$this->entidade} "
             . " WHERE status LIKE :status";
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query . $where;
         }
@@ -905,7 +905,7 @@ class SolicitacaoModel extends CRUD
             . " FROM {$this->entidade} "
             . " WHERE created_at BETWEEN '" . date('Y-m') . "-01' AND '" . date('Y-m-d') . "' ";
 
-        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $query .= " AND oms_id = {$user['oms_id']} ";
         }
 
@@ -922,7 +922,7 @@ class SolicitacaoModel extends CRUD
     public function lastUpdated(array $user): array
     {
         $where = '';
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $where = " WHERE sol.oms_id = " . $user['oms_id'];
         }
         $query = ""
