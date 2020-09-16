@@ -65,6 +65,11 @@ class Utils
         return $value;
     }
 
+    public static function roundFloat($value, int $precision = 2)
+    {
+        return round($value, $precision);
+    }
+
     /**
      * Check the length of string
      * @param string $str The string to be verified

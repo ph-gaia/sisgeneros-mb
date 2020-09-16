@@ -132,7 +132,7 @@ $total = 0;
         <td class="cabecalho text-uppercase">
             MARINHA DO BRASIL
             <br>
-            <?= cfg::htrFileConfigs()->application->om ?? ''; ?>
+            <?= $this->view->resultOm['name']; ?>
             <br>
             <br>
             Solicitação de Empenho (SOLEMP) -
@@ -154,7 +154,7 @@ $total = 0;
                         <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
                     </td>
                     <td class="informacoes right">
-                        <span>Detalhes:</span>
+                        <span>Detalhes da empresa:</span>
                         <?= $this->view->resultSolicitacao['suppliers_details']; ?>
                     </td>
                 </tr>
@@ -198,12 +198,6 @@ $total = 0;
                         <span class="modalidade text-normal">
                             <?= $this->view->resultSolicitacao['modality'] ?>
                         </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="informacoes left">
-                        <span>SOLEMP gerada por:</span>
-                        HENRIQUE
                     </td>
                 </tr>
             </table>
@@ -274,8 +268,8 @@ $total = 0;
             <table class="table table-striped table-hover table-condensed" border="1">
                 <thead>
                     <tr>
-                        <th class="text-center width-8-percent">Cód. PAR</th>
                         <th class="text-center width-10-percent">Clasificação Item</th>
+                        <th class="text-center width-8-percent">Nº item</th>
                         <th>Descrição</th>
                         <th class="text-center width-8-percent">UF</th>
                         <th class="text-center width-8-percent">Qtd</th>
@@ -292,11 +286,11 @@ $total = 0;
 
                         ?>
                         <tr>
-                            <td><?= $value['number'] ?: ''; ?></td>
                             <td><?= $this->view->resultOm['classification_items'] ?: ''; ?></td>
+                            <td><?= $value['number'] ?: ''; ?></td>
                             <td class="left"><?= $value['name']; ?></td>
                             <td><?= $value['uf']; ?></td>
-                            <td><?= $value['quantity']; ?></td>
+                            <td><?= View::floatToMoney($value['quantity'], ''); ?></td>
                             <td><?= $this->view->resultOm['cost_center']; ?></td>
                             <td><?= View::floatToMoney($value['value'], ''); ?></td>
                             <td><?= View::floatToMoney($totaItem, ''); ?></td>

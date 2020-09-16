@@ -254,26 +254,19 @@ class SolicitacaoModel extends CRUD
         ];
 
         /**
-         * caso não seja ADM busca os pedidos apenas da OM do usuário
-         */
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
-            $dados['where'] = 'oms_id = :omsId ';
-            $dados['bindValue'] = [':omsId' => $user['oms_id']];
-        }
-
-        /**
          * perfil NORMAL visualiza apenas pedidos 'ELABORADO', 'REJEITADO', 'CANCELADO'
          */
         if ($user['level'] === 'NORMAL') {
-            $dados['where'] = "status IN ('ELABORADO', 'REJEITADO', 'CANCELADO')";
+            $dados['where'] = " status IN ('ELABORADO', 'REJEITADO', 'CANCELADO') and oms_id = :omsId ";
+            $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 
         /**
          * perfil ENCARREGADO visualiza apenas pedidos 'ENCAMINHADO'
          */
         if ($user['level'] === 'ENCARREGADO') {
-            $dados['where'] = 'status = :status';
-            $dados['bindValue'] = [':status' => 'ENCAMINHADO'];
+            $dados['where'] = 'status = :status and oms_id = :omsId ';
+            $dados['bindValue'] = [':status' => 'ENCAMINHADO', ':omsId' => $user['oms_id']];
         }
 
         /**
@@ -408,7 +401,7 @@ class SolicitacaoModel extends CRUD
         $this->validaFiles();
         $this->validaValorPedidoNaoLicitado();
         $dados = [
-            'biddings_id' => $this->getBiddingsId(),
+            //'biddings_id' => $this->getBiddingsId(),
             'oms_id' => $this->getOmsId(),
             'suppliers_id' => $this->getSuppliersId(),
             'number' => $this->getNumber(),
@@ -521,14 +514,41 @@ class SolicitacaoModel extends CRUD
 
     public function totalByPlanoConta($id)
     {
-        $date = date('Y-01-01', time());
+        $currentYear = date('Y');
         $query = "
         SELECT SUM(items.quantity * items.value) as total FROM requests as sol
         INNER JOIN requests_items as items ON items.requests_id = sol.id
-        WHERE account_plan = ? and sol.created_at >= ?";
+        WHERE account_plan = ? and YEAR(sol.created_at) = ?";
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id, $date]);
+        $stmt->execute([$id, $currentYear]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function provisionar($requestId, $userId)
+    {
+        $query = "" .
+            " SELECT C.id, B.quantity as requested FROM requests as A " .
+            " INNER JOIN requests_items as B ON B.requests_id = A.id " .
+            " INNER JOIN biddings_items as C ON C.number = B.number and C.biddings_id = A.biddings_id " .
+            " WHERE A.id = :id ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':id' => $requestId]);
+        $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $itemModel = new ItemModel();
+        foreach ($items as $item) {
+            $itemModel->atualizarQtdComprometida($item['id'], $item['requested']);
+        }
+
+        $dados = [
+            'status' => 'PROVISIONADO',
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if (parent::editar($dados, $requestId)) {
+            (new HistoricoAcaoModel())->novoRegistro($requestId, $userId, 'PROVISIONADO');
+            header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
+        }
     }
 
     public function rejeitarCancelar($userId)
@@ -871,9 +891,9 @@ class SolicitacaoModel extends CRUD
             . "FROM {$this->entidade} "
             . "WHERE status LIKE :status";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
-            $query . $where;
+            $query .= $where;
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -890,7 +910,7 @@ class SolicitacaoModel extends CRUD
             . " WHERE status LIKE :status";
         if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
-            $query . $where;
+            $query .= $where;
         }
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':status' => $status]);

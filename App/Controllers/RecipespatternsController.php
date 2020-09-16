@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use HTR\System\ControllerAbstract as Controller;
@@ -36,7 +37,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR', 'ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $this->view->title = 'Editando Registro';
         $this->view->result = $model->findById($this->getParametro('id'));
@@ -51,7 +52,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
         $model = new RecipesPatternsModel();
         $model->removerRegistro($this->getParametro('id'));
     }
-    
+
     public function eliminarIngredienteAction()
     {
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);

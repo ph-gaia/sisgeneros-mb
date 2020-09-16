@@ -209,7 +209,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
             $where = " AND req.oms_id = {$user['oms_id']} ";
-            $query . $where;
+            $query .= $where;
         }
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':status' => $status]);

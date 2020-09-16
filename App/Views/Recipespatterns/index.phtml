@@ -34,10 +34,12 @@ $pagination = Pagination::make($this);
                             <tr>
                                 <td><?= View::limitString($value['name'], 35); ?></td>
                                 <td>
-                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                                         <a href="<?= $this->view->controller; ?>editar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
+                                    <?php endif; ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
                                         <a
                                             onclick="confirmar('Deseja REMOVER este registro?', '<?= $this->view->controller; ?>eliminar/id/<?= $value['id']; ?>')"
                                             class="btn btn-danger btn-sm">

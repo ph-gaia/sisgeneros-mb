@@ -172,7 +172,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <strong>Você não pode PROVISIONAR essa solicitação!</strong><br>
                             <?php else : ?>
                                 <strong>Você deseja PROVISIONAR essa solicitação?</strong><br>
-                                <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/ENCAMINHADO/id/<?= $this->view->idlista; ?>" class="btn btn-success">
+                                <a href="<?= $this->view->controller; ?>provisionar/id/<?= $this->view->idlista; ?>" class="btn btn-success">
                                     <i class="fa fa-check"></i> Sim
                                 </a>
                                 <a href="<?= $this->view->controller; ?>" class="btn btn-danger">
@@ -186,7 +186,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div class="alerta-item">
                     <div class="alert alert-danger" role="alert">
                         <strong>Você deseja PROVISIONAR essa solicitação?</strong><br>
-                        <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/ENCAMINHADO/id/<?= $this->view->idlista; ?>" class="btn btn-success">
+                        <a href="<?= $this->view->controller; ?>provisionar/id/<?= $this->view->idlista; ?>" class="btn btn-success">
                             <i class="fa fa-check"></i> Sim
                         </a>
                         <a href="<?= $this->view->controller; ?>" class="btn btn-danger">

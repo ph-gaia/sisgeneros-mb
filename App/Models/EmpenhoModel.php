@@ -39,7 +39,7 @@ class EmpenhoModel extends CRUD
             'orderBy' => ''
         ];
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $dados['where'] = 'invoices.oms_id = :omsId ';
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }

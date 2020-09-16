@@ -113,7 +113,7 @@ class HistoricoCreditoProvisionadoModel extends CRUD
         $this->setTime(time())
             ->setId(filter_input(INPUT_POST, 'id') ?? time())
             ->setOperationType(filter_input(INPUT_POST, 'operation_type', FILTER_SANITIZE_SPECIAL_CHARS))
-            ->setObservation(mb_strtoupper(filter_input(INPUT_POST, 'observation', FILTER_SANITIZE_SPECIAL_CHARS)))
+            ->setObservation(strtoupper(filter_input(INPUT_POST, 'observation', FILTER_SANITIZE_SPECIAL_CHARS)))
             ->setProvisionedCredits(filter_input(INPUT_POST, 'provisioned_credits_id'))
             ->setValue(filter_input(INPUT_POST, 'value', FILTER_SANITIZE_SPECIAL_CHARS));
 

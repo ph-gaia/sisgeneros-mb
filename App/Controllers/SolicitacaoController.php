@@ -106,7 +106,9 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $solicitacaoItem = new SolicitacaoItem();
         $model->avaliaAcesso($this->view->idlista, $this->view->userLoggedIn);
         $this->view->title = 'Editando Registro';
+        $this->view->solicitacao = $model->findById($this->getParametro('idlista'));
         $this->view->result = $solicitacaoItem->findById($this->getParametro('id'));
+        $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
         $this->render('form_editar');
     }
 
@@ -233,6 +235,16 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
         $model = new SolicitacaoModel();
         $model->rejeitarCancelar($this->view->userLoggedIn['id']);
+    }
+
+    public function provisionarAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO']);
+
+        $model = new SolicitacaoModel();
+        $model->provisionar($this->getParametro('id'), $this->view->userLoggedIn['id']);
     }
 
     public function encaminharAction()

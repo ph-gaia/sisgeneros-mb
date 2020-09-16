@@ -84,7 +84,7 @@
                 <a class="collapse-item" href="empenho/ver/">
                     <i class="fa fa-history"></i> Histórico
                 </a>
-                <?php if (!in_array($this->view->userLoggedIn['level'], ['FISCAL', 'ORDENADOR'])) : ?>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_FINANCA'])) : ?>
                 <a class="collapse-item" href="empenho/novo/">
                     <i class="fa fa-plus-circle"></i> Novo Registro
                 </a>

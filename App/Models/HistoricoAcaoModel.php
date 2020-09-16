@@ -4,6 +4,7 @@ namespace App\Models;
 
 use HTR\System\ModelCRUD as CRUD;
 use App\Models\AcessoModel;
+use DateTimeZone;
 
 class HistoricoAcaoModel extends CRUD
 {
@@ -18,6 +19,7 @@ class HistoricoAcaoModel extends CRUD
      */
     public function novoRegistro(int $requestId, int $userId, string $action)
     {
+        $date = new \DateTime('now', new DateTimeZone('America/Sao_Paulo'));
         $result = (new AcessoModel())->findById($userId);
 
         $dados = [
@@ -27,7 +29,7 @@ class HistoricoAcaoModel extends CRUD
             'nip' => $result['nip'],
             'user_name' => $result['name'],
             'user_profile' => $result['level'],
-            'date_action' => date('Y-m-d H:i:s')
+            'date_action' => $date->format('Y-m-d H:i:s')
         ];
         parent::novo($dados);
     }

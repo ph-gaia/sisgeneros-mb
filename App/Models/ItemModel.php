@@ -287,7 +287,7 @@ class ItemModel extends CRUD
 
     private function validaQuantity()
     {
-        $value = v::intVal()->notEmpty()->noWhitespace()->validate($this->getQuantity());
+        $value = v::notEmpty()->noWhitespace()->validate($this->getQuantity());
         if (!$value) {
             msg::showMsg('O campo quantity deve ser preenchido corretamente.'
                 . '<script>focusOn("quantity");</script>', 'danger');
