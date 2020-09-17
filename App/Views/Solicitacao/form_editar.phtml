@@ -1,3 +1,7 @@
+<?php
+
+use App\Helpers\View;
+?>
 <div id="page-wrapper">
     <div class="container-fluid">
         <div class="row">
@@ -15,12 +19,55 @@
                     <div class="panel-body">
                         <div id="resultado"></div>
                         <form action="<?= $this->view->controller; ?>altera/idlista/<?= $this->view->idlista; ?>" method="post" id="form">
+                            <div class="alerta-credito" style="display: none;">
+                                <div class="alert alert-warning" role="alert">
+                                    O saldo de crédito <strong>disponível</strong> atualmente é de <strong><?= View::floatToMoney($this->view->credito['value']) ?></strong>.<br>
+                                    O valor total da sua <strong>solicitação</strong> com essa alteração é de <strong id="valorTotal"></strong><br><br>
+                                    <strong>Você deseja continuar com essa solicitação?</strong><br>
+                                    <span class="btn btn-success btn-credito-yes">
+                                        <i class="fa fa-check"></i> Sim
+                                    </span>
+                                    <span class="btn btn-danger btn-credito-no">
+                                        <i class="fa fa-ban"></i> Não
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="alerta-item" style="display: none;">
+                                <div class="alert alert-warning" role="alert">
+                                    <div class="listItem"></div>
+                                    <strong>Você deseja continuar com essa solicitação?</strong><br>
+                                    <button class="btn btn-success btn-item-yes">
+                                        <i class="fa fa-check"></i> Sim
+                                    </button>
+                                    <span class="btn btn-danger btn-item-no">
+                                        <i class="fa fa-ban"></i> Não
+                                    </span>
+                                </div>
+                            </div>
                             <input type="hidden" name="id" value="<?= $this->view->result['id']; ?>">
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label>Quantidade</label>
-                                        <input type="hidden" name="currentQtd" value="<?= intval($this->view->result['quantity']); ?>" />
+                                        <input type="hidden"
+                                               name="currentQtd"
+                                               value="<?= intval($this->view->result['quantity']); ?>" />
+                                        <input type="hidden"
+                                               id="valueItem"
+                                               name="valueItem"
+                                               value="<?= $this->view->result['value']; ?>">
+                                        <input type="hidden"
+                                               id="qtdAvailable"
+                                               name="qtdAvailable"
+                                               value="<?= $this->view->result['quantity_available']; ?>">
+                                        <input type="hidden"
+                                               id="totalItem"
+                                               name="totalItem"
+                                               value="<?= $this->view->result['total']; ?>">
+                                        <input type="hidden"
+                                               id="totalSolicitacao"
+                                               name="totalSolicitacao"
+                                               value="<?= $this->view->totalSolicitacao['total']; ?>">
                                         <input type="text"
                                                name="quantity"
                                                id="quantity"
@@ -33,7 +80,9 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <button class="btn btn-primary"><i class="fa fa-check"></i> Alterar</button>
+                                        <span class="btn btn-primary btn-save">
+                                            <i class="fa fa-check"></i> Alterar
+                                        </span>
                                         <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $this->view->idlista; ?>" class="btn btn-warning"><i class="fa fa-arrow-left"></i> Voltar</a>
                                     </div>
                                 </div>
@@ -45,3 +94,52 @@
         </div>
     </div>
 </div>
+<script>
+    $('.btn-save').click(function() {
+        var valorAtualPedido = $('#totalSolicitacao').val();
+        var valorTotalItem = $('#totalItem').val();
+        var total = valorAtualPedido - valorTotalItem;
+
+        var precoAtual = $('#valueItem').val();
+        var qtdAtual = $('#quantity').val();
+        var qtdSolicitada = $('#currentQtd').val();
+        var qtdDisponivel = $('#qtdAvailable').val();
+
+        total += qtdAtual * precoAtual;
+
+        if (qtdDisponivel <= qtdAtual) {
+            $('.listItem').html(`A quantidade <strong>disponível</strong> atualmente é de <strong>${qtdDisponivel}</strong>.<br>A quantidade <strong>solicitada</strong> é de <strong>${qtdAtual}</strong>.<br><br>`);
+        } else {
+            $('.listItem').html("Esse item alterado possue saldo disponível para o pedido.");
+        }
+
+        $('#valorTotal').html('R$ ' + total);
+        $(this).hide()
+        $('.alerta-credito').show()
+    });
+    $('.btn-credito-yes').click(function() {
+        $('.alerta-credito').hide()
+        $('.alerta-item').show()
+    });
+    $('.btn-credito-no').click(function() {
+        $('.alerta-credito').hide()
+        $('.btn-save').show()
+        $('input[name="quantity[]"]').each(function() {
+            $(this).prop("disabled", false);
+        });
+    });
+    $('.btn-item-no').click(function() {
+        $('.alerta-credito').show()
+        $('.alerta-item').hide()
+    });
+    $('.btn-item-yes').click(function() {
+        $('input[name="quantity[]"]').each(function() {
+            $(this).prop("disabled", false);
+        });
+        $('.alerta-item').hide()
+    });
+    function addItemList(name, available, requested) {
+        var html = `A quantidade de ${name} <strong>disponível</strong> atualmente é de <strong>${available}</strong>.<br>A quantidade <strong>solicitada</strong> é de <strong>${requested}</strong>.<br><br>`;
+        $('.listItem').append(html);
+    }
+</script>

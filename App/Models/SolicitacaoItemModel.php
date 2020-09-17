@@ -26,6 +26,18 @@ class SolicitacaoItemModel extends CRUD
         return $this->findAll();
     }
 
+    public function findById($id)
+    {
+        $query = "
+            SELECT A.*, C.quantity_available, C.id as itemId, SUM(A.quantity * A.value) as total FROM requests_items as A
+            INNER JOIN requests as B ON B.id = A.requests_id
+            INNER JOIN biddings_items as C ON C.number = A.number and C.biddings_id = B.biddings_id
+            WHERE A.id = ?";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$id]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
     public function recebimento($dados)
     {
         foreach ($dados as $id => $quantity) {

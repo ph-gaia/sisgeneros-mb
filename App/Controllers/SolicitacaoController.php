@@ -108,6 +108,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $this->view->title = 'Editando Registro';
         $this->view->solicitacao = $model->findById($this->getParametro('idlista'));
         $this->view->result = $solicitacaoItem->findById($this->getParametro('id'));
+        $this->view->totalSolicitacao = $solicitacaoItem->findTotalValueByRequestId($this->view->idlista);
         $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
         $this->render('form_editar');
     }
