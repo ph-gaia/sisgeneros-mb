@@ -63,7 +63,7 @@ class EmpenhoItemsModel extends CRUD
                     'value' => $value['value']
                 ];
                 parent::novo($dados);
-                $item->atualizarQtdEmpenhada($result['item_id'], $value['quantidade_solicitada']);
+                $item->atualizarQtdEmpenhada($value['item_id'], $value['quantidade_solicitada']);
             }
         }
     }

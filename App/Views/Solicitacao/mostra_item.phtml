@@ -196,8 +196,8 @@ use App\Helpers\View;
         } else {
             $('.listItem').append("Todos os itens solicitados possuem saldo disponíveis para o pedido.");
         }
-        
-        $('#valorTotal').html('R$ ' + total.toLocaleString('pt-BR'));
+
+        $('#valorTotal').html('R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
         $(this).hide()
         $('.alerta-credito').show()
     });

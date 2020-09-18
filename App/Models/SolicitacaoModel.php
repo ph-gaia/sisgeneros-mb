@@ -613,11 +613,8 @@ class SolicitacaoModel extends CRUD
             msg::showMsg("A solicitação não está apta para ser autorizada!", "danger");
         }
 
-        if ($total['total'] < $creditoProvisionado['value']) {
-            echo "<script>alert('O valor do pedido é superior ao saldo disponível no crédito');</script>";
-            header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
-            //exit;
-            //msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
+        if ($total['total'] > $creditoProvisionado['value']) {
+            msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
         }
 
         $dados = [

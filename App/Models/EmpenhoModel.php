@@ -29,18 +29,20 @@ class EmpenhoModel extends CRUD
     public function paginator($pagina, $user, $busca = null)
     {
         $innerJoin = " INNER JOIN oms ON oms.id = invoices.oms_id ";
-        $innerJoin .= " INNER JOIN invoices_items as invItems ON invItems.invoices_id = invoices.id ";
+        $select = 'invoices.*, oms.naval_indicative, ';
+        $select .= ' (SELECT SUM(quantity * value) FROM invoices_items WHERE invoices_id = invoices.id) as total_requested, ';
+        $select .= ' (SELECT SUM(delivered * value) FROM invoices_items WHERE invoices_id = invoices.id) as total_delivered';
 
         $dados = [
-            'select' => 'invoices.*, oms.naval_indicative, SUM(invItems.quantity * invItems.value) as total_requested, SUM(invItems.delivered * invItems.value) as total_delivered',
+            'select' => $select,
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 100,
-            'orderBy' => ''
+            'orderBy' => 'invoices.updated_at DESC'
         ];
 
         if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
-            $dados['where'] = 'invoices.oms_id = :omsId ';
+            $dados['where'] = ' invoices.oms_id = :omsId ';
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 

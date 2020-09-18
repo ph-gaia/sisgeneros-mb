@@ -113,7 +113,7 @@ use App\Helpers\View;
             $('.listItem').html("Esse item alterado possue saldo disponível para o pedido.");
         }
 
-        $('#valorTotal').html('R$ ' + total);
+        $('#valorTotal').html('R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
         $(this).hide()
         $('.alerta-credito').show()
     });

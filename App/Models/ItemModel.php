@@ -141,6 +141,7 @@ class ItemModel extends CRUD
         $result = $this->findById($id);
 
         $dados = [
+            'quantity_compromised' => $result['quantity_compromised'] - $quantity,
             'quantity_committed' => $result['quantity_committed'] + $quantity
         ];
 
@@ -152,7 +153,7 @@ class ItemModel extends CRUD
 
     private function atualizarQtdDisponivel()
     {
-        $stmt = $this->pdo->prepare("UPDATE biddings_items SET quantity_available = quantity - quantity_committed");
+        $stmt = $this->pdo->prepare("UPDATE biddings_items SET quantity_available = quantity - (quantity_compromised + quantity_committed)");
         if ($stmt->execute()) {
             return true;
         }
