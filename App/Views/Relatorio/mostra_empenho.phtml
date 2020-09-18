@@ -47,7 +47,6 @@ $pagination = Pagination::make($this);
                     </thead>
                     <tbody>
                         <?php
-                        if (empty($this->view->result)) :
                             foreach ($this->view->result as $value) : ?>
                                 <tr>
                                     <td><strong><?= $value['code']; ?></strong></td>
@@ -65,7 +64,6 @@ $pagination = Pagination::make($this);
                                 </tr>
                         <?php
                             endforeach;
-                        endif;
                         ?>
                     </tbody>
                 </table>
