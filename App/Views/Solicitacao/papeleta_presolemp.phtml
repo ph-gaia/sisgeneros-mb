@@ -269,11 +269,11 @@ $total = 0;
                 <thead>
                     <tr>
                         <th class="text-center width-10-percent">Clasificação Item</th>
+                        <th class="text-center width-10-percent">Centro de Custo</th>
                         <th class="text-center width-8-percent">Nº item</th>
                         <th>Descrição</th>
                         <th class="text-center width-8-percent">UF</th>
                         <th class="text-center width-8-percent">Qtd</th>
-                        <th class="text-center width-10-percent">Centro de Custo</th>
                         <th class="text-center width-10-percent">Preço Unit.</th>
                         <th class="text-center width-10-percent">Total por Item</th>
                     </tr>
@@ -287,11 +287,11 @@ $total = 0;
                         ?>
                         <tr>
                             <td><?= $this->view->resultOm['classification_items'] ?: ''; ?></td>
+                            <td><?= $this->view->resultOm['cost_center']; ?></td>
                             <td><?= $value['number'] ?: ''; ?></td>
                             <td class="left"><?= $value['name']; ?></td>
                             <td><?= $value['uf']; ?></td>
                             <td><?= View::floatToMoney($value['quantity'], ''); ?></td>
-                            <td><?= $this->view->resultOm['cost_center']; ?></td>
                             <td><?= View::floatToMoney($value['value'], ''); ?></td>
                             <td><?= View::floatToMoney($totaItem, ''); ?></td>
                         </tr>

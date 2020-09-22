@@ -59,7 +59,7 @@ use App\Helpers\View;
                                         <input type="hidden"
                                                id="qtdAvailable"
                                                name="qtdAvailable"
-                                               value="<?= $this->view->result['quantity_available']; ?>">
+                                               value="<?= View::floatToMoney($this->view->result['quantity_available'], ''); ?>">
                                         <input type="hidden"
                                                id="totalItem"
                                                name="totalItem"

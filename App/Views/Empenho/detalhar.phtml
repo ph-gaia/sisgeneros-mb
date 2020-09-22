@@ -69,6 +69,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                     <td>
                                         <input type="hidden" name="ids[]" value="<?= $value['id']; ?>">
                                         <input type="hidden" name="requested[]" id="requested[]" value="0">
+                                        <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>">
                                         <input type="text" name="quantity[]" id="quantity" class="form-control">
                                     </td>
                                     <td><?= $value['number'] ?: ''; ?></td>

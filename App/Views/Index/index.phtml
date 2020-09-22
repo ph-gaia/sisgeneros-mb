@@ -231,7 +231,7 @@ $statusReal = [
     }
     if (gotoBtnAguardando) {
         gotoBtnAguardando.addEventListener('click', function () {
-            window.location = 'relatorio/solicitacao/pagina/1/status/<?= $statusReal[$this->view->userLoggedIn['level']]; ?>';
+            window.location = 'solicitacao/ver/pagina/1/busca/<?= $statusReal[$this->view->userLoggedIn['level']]; ?>';
         });
     }
 </script>

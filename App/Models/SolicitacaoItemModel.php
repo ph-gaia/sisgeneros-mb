@@ -150,7 +150,7 @@ class SolicitacaoItemModel extends CRUD
         $solicitacaoModel = new Solicitacao();
         $solicitacao = $solicitacaoModel->findById($item['requests_id']);
 
-        if ($solicitacao['status'] !== 'ELABORADO') {
+        if (!in_array($solicitacao['status'], ['ELABORADO', 'REJEITADO'])) {
             // redireciona para solicitacao/ se a Solicitação ja estiver aprovada
             header("Location:" . cfg::DEFAULT_URI . 'solicitacao/');
             return true;
@@ -173,16 +173,16 @@ class SolicitacaoItemModel extends CRUD
             'quantity' => Utils::normalizeFloat($this->getQuantity(), 3),
         ];
 
-        $result = 0;
-        $itemModel = new Item();
-        $itemReq = $this->findItemByRequestIdAndNumber($item['requests_id'], $item['number']);
-        if ($quantity > $currentQtd) {
-            $result = $quantity - $currentQtd;
-            $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'soma');
-        } else {
-            $result = $currentQtd - $quantity;
-            $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'subtrai');
-        }
+        // $result = 0;
+        // $itemModel = new Item();
+        // $itemReq = $this->findItemByRequestIdAndNumber($item['requests_id'], $item['number']);
+        // if ($quantity > $currentQtd) {
+        //     $result = $quantity - $currentQtd;
+        //     $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'soma');
+        // } else {
+        //     $result = $currentQtd - $quantity;
+        //     $itemModel->atualizarQtdComprometida($itemReq['item_id'], $result, 'subtrai');
+        // }
 
         if (parent::editar($dados, $this->getId())) {
             $solicitacaoModel->update($solicitacao['id']);

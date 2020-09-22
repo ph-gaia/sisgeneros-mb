@@ -175,12 +175,13 @@ class EmpenhoModel extends CRUD
                 item.uf, item.quantity,
                 item.value, item.delivered,
                 item.invoice, item.status, item.id, item.number,
-                suppliers.name AS suppliers_name,
-                suppliers.cnpj
+                item.biddings_id, suppliers.name AS suppliers_name,
+                suppliers.cnpj, biddings.number as biddingsNumber
             FROM invoices AS inv
                 INNER JOIN requests_invoices AS item ON item.invoices_id = inv.id
                 INNER JOIN suppliers ON suppliers.id = item.suppliers_id
                 INNER JOIN oms ON oms.id = inv.oms_id
+                INNER JOIN biddings ON biddings.id = item.biddings_id
             WHERE item.code = ? {$where} ";
 
         $stmt = $this->pdo->prepare($query);
@@ -193,7 +194,6 @@ class EmpenhoModel extends CRUD
         $value = filter_input_array(INPUT_POST);
         // Seta todos os valores
         $this->setId(filter_input(INPUT_POST, 'id') ?? time())
-            ->setOmsId($user['oms_id'])
             ->setUserId($user['id'])
             ->setCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS))
             ->setComplement(filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS));
@@ -203,13 +203,14 @@ class EmpenhoModel extends CRUD
             foreach ($value['requests'] as $value) {
                 $id = filter_var($value, FILTER_VALIDATE_INT);
                 $result[] = $id;
-            } 
+            }
         }
         $this->setRequests($result);
 
         // Inicia a Validação dos dados
         $this->validaId();
         $this->validaRequestsList();
+        $this->validaRequest();
     }
 
     // Validação
@@ -229,5 +230,29 @@ class EmpenhoModel extends CRUD
                 . ' selecionar no mínimo uma solicitação.', 'danger');
         }
         return $this;
+    }
+
+    private function validaRequest()
+    {
+        $request = [];
+        foreach ($this->getRequests() as $requestId) {
+            array_push($request, $requestId);
+        }
+
+        $query = "
+            SELECT * FROM requests 
+            WHERE id IN (" . implode(',', $request) . ") 
+            GROUP BY suppliers_id, biddings_id, oms_id ";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $this->setOmsId($result[0]['oms_id']);
+
+        if (count($result) > 1) {
+            msg::showMsg('Verifique as solicitações selecionadas, ' .
+                'só é possível empenhar mais de um pedido, caso a solicitação possua a mesma Licitação, ' .
+                'Fornecedor e Organização Militar', 'danger');
+        }
     }
 }

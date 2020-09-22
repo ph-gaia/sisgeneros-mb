@@ -31,7 +31,7 @@ if (!isset($this->view->result[0])) {
         <td class="number">
             Solicitação Nº
             <strong>
-                <?= ($this->view->result[0]['requests_number']); ?>
+                <?= ($this->view->result[0]['code']); ?>
             </strong>
         </td>
     </tr>
@@ -136,6 +136,29 @@ if (!isset($this->view->result[0])) {
         <td colspan="8" class="obs">
             OBSERVAÇÃO: O material deve ser entregue junto com a NFE, com os dados bancários na mesma.<br>
             Nota Fiscal Nº: <?= $this->view->result[0]['invoice']; ?>
+        </td>
+    </tr>
+    <tr>
+        <td class="assinaturas">
+            <div class="content-assinatura">
+                <?= $this->view->result[0]['munition_manager']; ?><br />
+                <?= $this->view->result[0]['munition_manager_graduation']; ?><br />
+                Gestor(a) de Municiamento
+            </div>
+        </td>
+        <td class="assinaturas">
+            <div class="content-assinatura">
+                <div class="linha-assinatura">
+                    PAIOLEIRO DE SERVIÇO
+                </div>
+            </div>
+        </td>
+        <td class="assinaturas">
+            <div class="content-assinatura">
+                <?= $this->view->result[0]['munition_fiel']; ?><br />
+                <?= $this->view->result[0]['munition_fiel_graduation']; ?><br />
+                Fiel de Municiamento
+            </div>
         </td>
     </tr>
 </table>

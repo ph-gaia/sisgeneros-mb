@@ -12,7 +12,8 @@ $idlista = $this->getParametro('idlista');
                 <div id="resultado"></div>
                 <?php if ($this->view->result[0]['requests_number']): ?>
                     <div class="alert alert-info" role="alert">
-                        Licitação: <strong><?= $this->view->result[0]['requests_number']; ?></strong><br>
+                        Licitação: <strong><?= $this->view->result[0]['biddingsNumber']; ?></strong><br>
+                        Fornecedor: <strong><?= $this->view->result[0]['suppliers_name']; ?></strong><br>
                         Órgão: <strong><?= $this->view->result[0]['uasg'] . " - ". $this->view->result[0]['naval_indicative']; ?></strong><br>
                         OM:
                         <strong>

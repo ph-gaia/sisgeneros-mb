@@ -78,6 +78,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $this->view->resultLicitacao = $licitacao->findById($this->view->idlista);
         $this->view->resultOm = (new OmModel())->findById($this->view->userLoggedIn['oms_id']);
         $this->view->credito = (new CreditoProvisionadoModel())->findByOmId($this->view->userLoggedIn['oms_id']);
+        $this->view->creditoComprometido = (new CreditoProvisionadoModel())->saldoComprometido($this->view->userLoggedIn['oms_id']);
         $this->render('mostra_item');
     }
 

@@ -241,12 +241,13 @@ class SolicitacaoModel extends CRUD
     public function paginator($pagina, $user, $busca = null, $oms = null, $dtInicio = null, $dtFim = null)
     {
         $innerJoin = " AS sol INNER JOIN oms ON oms.id = sol.oms_id INNER JOIN suppliers ON suppliers.id = sol.suppliers_id ";
+        $innerJoin .= " INNER JOIN biddings ON biddings.id = sol.biddings_id ";
         $subQuery = ' (SELECT name FROM suppliers AS f WHERE f.id = sol.suppliers_id) as suppliers_name, ';
         $subQuery .= ' (SELECT SUM(quantity * value) FROM requests_items as items WHERE items.requests_id = sol.id) as total ';
         $strOrdenar = "sol.updated_at DESC";
 
         $dados = [
-            'select' => 'sol.*, ' . $subQuery . ', oms.naval_indicative',
+            'select' => 'sol.*, ' . $subQuery . ', oms.naval_indicative, biddings.number as biddingsNumber ',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 100,
@@ -257,7 +258,7 @@ class SolicitacaoModel extends CRUD
          * perfil NORMAL visualiza apenas pedidos 'ELABORADO', 'REJEITADO', 'CANCELADO'
          */
         if ($user['level'] === 'NORMAL') {
-            $dados['where'] = " status IN ('ELABORADO', 'REJEITADO', 'CANCELADO') and oms_id = :omsId ";
+            $dados['where'] = " oms_id = :omsId ";
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 
@@ -265,8 +266,8 @@ class SolicitacaoModel extends CRUD
          * perfil ENCARREGADO visualiza apenas pedidos 'ENCAMINHADO'
          */
         if ($user['level'] === 'ENCARREGADO') {
-            $dados['where'] = 'status = :status and oms_id = :omsId ';
-            $dados['bindValue'] = [':status' => 'ENCAMINHADO', ':omsId' => $user['oms_id']];
+            $dados['where'] = ' oms_id = :omsId ';
+            $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 
         /**
@@ -581,9 +582,11 @@ class SolicitacaoModel extends CRUD
             $stmt->execute([':id' => $id]);
             $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            $itemModel = new ItemModel();
-            foreach ($items as $item) {
-                $itemModel->atualizarQtdComprometida($item['id'], $item['requested'], 'subtrair');
+            if (!in_array($pedido['status'], ['ELABORADO', 'REJEITADO', 'ENCAMINHADO'])) {
+                $itemModel = new ItemModel();
+                foreach ($items as $item) {
+                    $itemModel->atualizarQtdComprometida($item['id'], $item['requested'], 'subtrair');
+                }
             }
         }
 
@@ -888,7 +891,7 @@ class SolicitacaoModel extends CRUD
             . "FROM {$this->entidade} "
             . "WHERE status LIKE :status";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query .= $where;
         }
@@ -905,7 +908,7 @@ class SolicitacaoModel extends CRUD
             . " COUNT(*) AS quantity "
             . " FROM {$this->entidade} "
             . " WHERE status LIKE :status";
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $where = " AND oms_id = {$user['oms_id']} ";
             $query .= $where;
         }
@@ -922,7 +925,7 @@ class SolicitacaoModel extends CRUD
             . " FROM {$this->entidade} "
             . " WHERE created_at BETWEEN '" . date('Y-m') . "-01' AND '" . date('Y-m-d') . "' ";
 
-        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $query .= " AND oms_id = {$user['oms_id']} ";
         }
 
@@ -939,7 +942,7 @@ class SolicitacaoModel extends CRUD
     public function lastUpdated(array $user): array
     {
         $where = '';
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) {
             $where = " WHERE sol.oms_id = " . $user['oms_id'];
         }
         $query = ""

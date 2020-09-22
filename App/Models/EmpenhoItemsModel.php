@@ -55,6 +55,7 @@ class EmpenhoItemsModel extends CRUD
                     'invoices_id' => $invoicesId,
                     'requests_id' => $requestId,
                     'suppliers_id' => $value['suppliers_id'],
+                    'biddings_id' => $value['biddings_id'],
                     'number' => $value['number'],
                     'name' => $value['name'],
                     'uf' => $value['uf'],

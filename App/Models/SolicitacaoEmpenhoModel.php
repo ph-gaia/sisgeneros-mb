@@ -43,6 +43,7 @@ class SolicitacaoEmpenhoModel extends CRUD
             $dados = [
                 'invoices_id' => $result['invoices_id'],
                 'suppliers_id' => $result['suppliers_id'],
+                'biddings_id' => $result['biddings_id'],
                 'code' => $this->getCode(),
                 'number' => $result['number'],
                 'name' => $result['name'],

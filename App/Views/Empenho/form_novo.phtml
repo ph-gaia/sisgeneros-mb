@@ -53,6 +53,7 @@ use App\Helpers\View;
                                     <th>Nº</th>
                                     <th>OM</th>
                                     <th>Fornecedor</th>
+                                    <th>Licitação</th>
                                     <th>Total</th>
                                     <th>Alteração</th>
                                 </tr>
@@ -64,6 +65,7 @@ use App\Helpers\View;
                                         <td><?= $value['number']; ?></td>
                                         <td><?= $value['naval_indicative']; ?></td>
                                         <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
+                                        <td><?= $value['biddingsNumber']; ?></td>
                                         <td><?= View::floatToMoney($value['total']) ?></td>
                                         <td>
                                             <span class="badge badge-info">
