@@ -69,7 +69,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
-        $this->access->authenticAccess(['ADMINISTRADOR']);
+        $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new AcessoModel();
         $model->novoRegistro();
     }
