@@ -52,7 +52,7 @@ use App\Config\Configurations as cfg;
                                         <p class="help-block" style="color: red;">* Altere este campo apenas se for necessário.</p>
                                     </div>
 
-                                    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR'): ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])): ?>
                                         <div class="form-group">
                                             <label>Nível de Acesso</label>
                                             <select name="level" id="level" class="form-control" required>
@@ -67,7 +67,7 @@ use App\Config\Configurations as cfg;
                                 </div>
 
                                 <div class="col-lg-6">
-                                    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR'): ?>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])): ?>
                                         <div class="form-group">
                                             <label>Nome do Usuário</label>
                                             <input type="text"
@@ -106,7 +106,7 @@ use App\Config\Configurations as cfg;
                                                required>
                                     </div>
 
-                                    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR'): ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])): ?>
                                         <div class="form-group">
                                             <label>Usuário ativo?</label>
                                             <select name="active"
@@ -122,7 +122,7 @@ use App\Config\Configurations as cfg;
                                             </select>
                                         </div>
                                     <?php endif; ?>
-                                    <?php if ($this->view->userLoggedIn['level'] == 'ADMINISTRADOR'): ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])): ?>
                                         <div class="form-group">
                                             <label>OM</label>
                                             <select name="oms_id" id="oms_id" class="form-control" required>

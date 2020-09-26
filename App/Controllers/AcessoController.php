@@ -42,7 +42,7 @@ class AcessoController extends Controller implements CtrlInterface
         $model = new AcessoModel();
         $this->view->title = 'Editando Registro';
         $id = $this->getParametro('id');
-        if ($this->view->userLoggedIn['level'] !== 'ADMINISTRADOR') {
+        if (!in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $id = $this->view->userLoggedIn['id'];
         }
         $this->view->result = $model->findById($id);
@@ -69,7 +69,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
-        $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->access->authenticAccess(['ADMINISTRADOR']);
         $model = new AcessoModel();
         $model->novoRegistro();
     }
