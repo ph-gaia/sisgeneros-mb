@@ -555,12 +555,13 @@ try {
 
             foreach ($oldDate as $value) {
                 $omData = $this->fetchNewOmsData($value['oms_id']);
+                $level = ($value['level'] == 'CONTROLADOR') ? 'CONTROLADOR_OBTENCAO' : $value['level'];
                 $data = [
                     'id' => null,
                     'oms_id' => $omData['id'],
                     'name' => $value['name'],
                     'email' => $value['email'],
-                    'level' => $value['level'],
+                    'level' => $level,
                     'username' => $value['username'],
                     'password' => $value['password'],
                     'change_password' => $this->translateYesNo($value['change_password']),

@@ -126,6 +126,15 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $this->render('form_alteracao_data');
     }
 
+    public function historicoSolicitacaoAction()
+    {
+        $this->view->title = 'Histórico de ações na solicitação';
+
+        $this->view->acoes = (new HistoricoAcaoModel())->allHistoricByRequestId($this->getParametro('id'));
+
+        $this->render('mostra_historico_solicitacao', true, 'blank');
+    }
+
     public function itensLicitadosAction()
     {
         $this->view->busca = $this->getParametro('busca');

@@ -693,7 +693,7 @@ class SolicitacaoModel extends CRUD
     {
         if ($number > 0) {
             $hasEqualsRegister = $this->pdo
-                ->query("SELECT id FROM requests WHERE number = {$number}")
+                ->query("SELECT id FROM requests WHERE number = {$number} and oms_id = '{$this->getOmsId()}'")
                 ->fetch(\PDO::FETCH_OBJ);
 
             // If exists a register with this number, try with the number plus one
@@ -706,7 +706,10 @@ class SolicitacaoModel extends CRUD
 
         $currentYear = date('Y');
         $currentYearShort = date('y');
-        $query = "SELECT COUNT(id) as quantity FROM requests WHERE YEAR(created_at) = '{$currentYear}'";
+        $query = "SELECT COUNT(id) as quantity 
+            FROM requests 
+            WHERE YEAR(created_at) = '{$currentYear}' 
+            and oms_id = '{$this->getOmsId()}'";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
         $registersQuantity = $stmt->fetch(\PDO::FETCH_OBJ)->quantity;
@@ -729,6 +732,7 @@ class SolicitacaoModel extends CRUD
         if (count($request) && $menus['status'] == 'AUTORIZADO') {
             (new CardapioModel)->changeStatus('GERADO', intval($menuId));
             foreach ($request as $values) {
+                $this->setOmsId($values['omsId']);
                 # ITENS LICITADOS
                 if ($values['biddingsId']) {
                     $dados = [

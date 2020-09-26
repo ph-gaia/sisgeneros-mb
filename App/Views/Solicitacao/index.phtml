@@ -152,6 +152,11 @@ $status = [
                                                 <i class="fa fa-file-pdf-o"></i> Visualizar
                                             </a>
                                         </li>
+                                        <li style="margin-top: 5px">
+                                            <a href="<?= $this->view->controller; ?>historicoSolicitacao/id/<?= $value['id']; ?>" class="btn btn-info btn-sm" style="width: 100%;" target="__blank">
+                                                <i class="fa fa-history"></i> Histórico completo
+                                            </a>
+                                        </li>
                                         <?php if (in_array($userNivel, ['ADMINISTRADOR']) || $status[$userNivel] == $value['status']): ?>
                                         <li style="margin-top: 5px">
                                             <button data-id="<?= $value['id']; ?>" class="btn btn-warning btn-sm btn-reject" style="width: 100%;">

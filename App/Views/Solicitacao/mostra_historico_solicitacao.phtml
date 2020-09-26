@@ -1,0 +1,100 @@
+<?php
+
+use App\Config\Configurations as cfg;
+
+setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set(cfg::TIMEZONE);
+
+?>
+<style>
+    body {
+        font-size: 12px !important;
+        background-color: #fff !important;
+    }
+
+    .table-striped>tbody>tr:nth-of-type(2n+1) {
+        background-color: #ccc !important;
+    }
+
+    .table-print {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0px auto;
+        text-align: center;
+    }
+
+    .table-info {
+        width: 100%;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .table-info>tbody>tr>td {
+        padding: 8px;
+        vertical-align: top;
+    }
+
+    .table-condensed>tfoot>tr>td {
+        padding: 2px !important;
+    }
+
+    .right {
+        text-align: right !important;
+    }
+
+    .left {
+        text-align: left !important;
+    }
+
+    .brasao {
+        width: 90px;
+    }
+
+    .cabecalho {
+        font-weight: bold;
+    }
+</style>
+<table class="table-print">
+    <tr>
+        <td>
+            <img src="images/brasao.png" class="brasao">
+        </td>
+    </tr>
+    <tr>
+        <td class="cabecalho text-uppercase">
+            MARINHA DO BRASIL
+            <br>
+            <?= $this->view->resultOm['name']; ?>
+            <br>
+            <br>
+            Histórico Completo de Ações da Solicitação
+        </td>
+    </tr>
+    <tr>
+        <td class="tabela-informacoes">
+            <table class="table table-hover table-condensed" border="1">
+                <thead>
+                    <tr>
+                        <th class="text-center width-5-percent">Ação</th>
+                        <th class="text-center width-5-percent">NIP Usuário</th>
+                        <th class="text-center width-5-percent">Nome Usuário</th>
+                        <th class="text-center width-5-percent">Data/Hora da Ação</th>
+                        <th class="text-center width-5-percent">Perfil Usuário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($this->view->acoes as $value) : ?>
+                        <tr>
+                            <td><?= $value['action'] ?: ''; ?></td>
+                            <td><?= $value['nip'] ?: ''; ?></td>
+                            <td><?= $value['user_name'] ?: ''; ?></td>
+                            <td><?= date('d-m-Y H:i:s', strtotime($value['date_action'])); ?></td>
+                            <td><?= $value['user_profile'] ?: ''; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot></tfoot>
+            </table>
+        </td>
+    </tr>
+</table>

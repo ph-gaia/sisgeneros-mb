@@ -38,6 +38,18 @@ class HistoricoAcaoModel extends CRUD
     {
         $query = "" .
             " SELECT * FROM {$this->entidade} " .
+            " WHERE requests_id = :requestsId " .
+            " GROUP BY action ORDER BY date_action ASC";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':requestsId' => $requestId]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function allHistoricByRequestId($requestId)
+    {
+        $query = "" .
+            " SELECT * FROM {$this->entidade} " .
             " WHERE requests_id = :requestsId ";
 
         $stmt = $this->pdo->prepare($query);
