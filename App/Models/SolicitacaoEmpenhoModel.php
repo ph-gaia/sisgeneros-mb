@@ -20,6 +20,44 @@ class SolicitacaoEmpenhoModel extends CRUD
      */
     protected $paginator;
 
+    public function paginator($pagina, $busca = null)
+    {
+        $innerJoin = " as sol_inv INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id ";
+        $dados = [
+            'select' => 'sol_inv.*, inv.code as codeInvoice',
+            'entidade' => $this->entidade . $innerJoin,
+            'pagina' => $pagina,
+            'maxResult' => 10,
+            'orderBy' => ' sol_inv.updated_at DESC '
+        ];
+
+        if ($busca) {
+            $dados['where'] = " "
+                . ' sol_inv.status LIKE :search '
+                . ' OR inv.code LIKE :search '
+                . ' OR sol_inv.code LIKE :search ';
+
+            $bindValue = [
+                ':search' => '%' . $busca . '%'
+            ];
+            $dados['bindValue'] = $bindValue;
+        }
+
+        $paginator = new Paginator($dados);
+        $this->resultadoPaginator = $paginator->getResultado();
+        $this->navPaginator = $paginator->getNaveBtn();
+    }
+
+    public function getResultadoPaginator()
+    {
+        return $this->resultadoPaginator;
+    }
+
+    public function getNavePaginator()
+    {
+        return $this->navPaginator;
+    }
+
     public function findAllByInvoiceId($idLista)
     {
         $query = "" .
@@ -85,7 +123,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         $stmt = $this->pdo->prepare($query);
         if ($stmt->execute([$id])) {
-            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
 
@@ -100,7 +138,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         $stmt = $this->pdo->prepare($query);
         if ($stmt->execute([$id])) {
-            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
 
@@ -115,7 +153,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         $stmt = $this->pdo->prepare($query);
         if ($stmt->execute([$id])) {
-            header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
 
@@ -220,7 +258,7 @@ class SolicitacaoEmpenhoModel extends CRUD
     private function validaAll()
     {
         $this->setItemsList($this->buildItems(filter_input_array(INPUT_POST)));
-        $this->setCode($this->numberGenerator());
+        $this->setCode($this->codeGenerator());
 
         $this->validaItemsList();
         $this->validaQtdSolMaiorQtdDisponivel();
@@ -272,32 +310,20 @@ class SolicitacaoEmpenhoModel extends CRUD
     }
 
     /**
-     * Generate the number of Solicitação
-     * @return int The solictação number
+     * Generate the code of Solicitação
+     * @return string The solictação code
      */
-    protected function numberGenerator(int $number = 0): int
+    protected function codeGenerator(): string
     {
-        if ($number > 0) {
-            $hasEqualsRegister = $this->pdo
-                ->query("SELECT id FROM requests_invoices WHERE number = {$number}")
-                ->fetch(\PDO::FETCH_OBJ);
+        $invoiceCode = filter_input(INPUT_POST, 'code_invoice');
 
-            // If exists a register with this number, try with the number plus one
-            if ($hasEqualsRegister) {
-                return $this->numberGenerator($number + 1);
-            }
-
-            return $number;
-        }
-
-        $currentYear = date('Y');
-        $currentYearShort = date('y');
-        $query = "SELECT COUNT(id) as quantity FROM requests_invoices WHERE YEAR(created_at) = '{$currentYear}'";
+        $query = "SELECT COUNT(sol_inv.id) as quantity FROM requests_invoices as sol_inv
+            INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id
+            WHERE inv.code LIKE '{$invoiceCode}' GROUP BY sol_inv.code";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        $registersQuantity = $stmt->fetch(\PDO::FETCH_OBJ)->quantity;
-        $number = (int) $currentYearShort . ($registersQuantity + 1);
-        // check if in the exact momsent exists a register with this number
-        return $this->numberGenerator($number);
+        $registersQuantity = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $code = str_replace("NE-", "", $invoiceCode) . (count($registersQuantity) + 1);
+        return $code;
     }
 }

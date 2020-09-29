@@ -1,15 +1,14 @@
 <?php
 
 use App\Helpers\Pagination;
+use App\Helpers\View;
 use App\Helpers\Utils;
 
-$idlista = $this->view->idlista;
-
-$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+$pagination = Pagination::make($this, function ($btn, $controllerName) {
     return [
-        'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
-        'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
-        'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+        'previous' => "{$controllerName}solicitacoes/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}solicitacoes/pagina/{$btn['next']}",
+        'current' => "{$controllerName}solicitacoes/pagina/" . Pagination::CURRENT_PAGE
     ];
 });
 
@@ -18,99 +17,30 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
-                <h5>Pedidos do Empenho</h5>
-                <?php if (isset($this->view->resultEmpenho['code'])) : ?>
-                    <div class="alert alert-info" role="alert">
-                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><br>
-                        OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
-                        Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
-                    </div>
-                <?php endif; ?>
-                <div id="resultado"></div>
-                <form action="<?= $this->view->controller ?>registraItensEmpenho" method="post" id="form">
-                    <input type="hidden" name="code_invoice" value="<?= $this->view->resultEmpenho['code']; ?>">
-                    <button class="btn btn-primary">
-                        <i class="fa fa-check"></i> Gerar solicitação
-                    </button>
-                    <p class="help-block" style="color: #130f0f; font-weight: bold;">* Informe a quantidade para gerar a solicitação.</p>
-                    <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
-                        <i class="fa fa-arrow-left"></i> Voltar
-                    </a>
-                    <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
-                        <div class="col-md-12">
-                            <i class="fa fa-list"></i> <?= $this->view->title; ?>
-                        </div>
-                    </div>
-                    <?= $pagination; ?>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th width="8%">Quantidade</th>
-                                <th>Item</th>
-                                <th>Empenhado</th>
-                                <th>Entregue</th>
-                                <th>Disponível</th>
-                                <th>UF</th>
-                                <th>Nome</th>
-                                <th>Valor (R$)</th>
-                                <th>Subtotal</th>
-                                <th>Subtotal Disponível</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $total = 0;
-                            $totalDisponivel = 0;
-                            foreach ($this->view->result as $value) :
-                                $subTotal = $value['value'] * $value['quantity'];
-                                $total += $subTotal;
-                                $totalDisponivel += ($value['value'] * $value['quantity']) - ($value['value'] * $value['delivered']);
-                            ?>
-                                <tr>
-                                    <td>
-                                        <input type="hidden" name="ids[]" value="<?= $value['id']; ?>">
-                                        <input type="hidden" name="requested[]" id="requested[]" value="0">
-                                        <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>">
-                                        <input type="text" name="quantity[]" id="quantity" class="form-control">
-                                    </td>
-                                    <td><?= $value['number'] ?: ''; ?></td>
-                                    <td><?= floatval($value['quantity']); ?></td>
-                                    <td><?= intval($value['delivered']); ?></td>
-                                    <td>
-                                        <span class="badge badge-primary">
-                                            <?= floatval($value['quantity'] - $value['delivered']); ?>
-                                        </span>
-                                    </td>
-                                    <td><?= $value['uf']; ?></td>
-                                    <td><?= $value['name']; ?></td>
-                                    <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                    <td><?= Utils::floatToMoney($subTotal); ?></td>
-                                    <td><?= Utils::floatToMoney($subTotal - ($value['value'] * $value['delivered'])); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th class="text-right" colspan="8">Total (R$)</th>
-                                <td class="text-left">
-                                    <span class="badge badge-danger">
-                                        <?= Utils::floatToMoney($total); ?>
-                                    </span>
-                                </td>
-                                <td class="text-left">
-                                    <span class="badge badge-danger">
-                                        <?= Utils::floatToMoney($totalDisponivel); ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </form>
-                <?= $pagination; ?>
+                <h5>Solicitações das empresas</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <?= $pagination; ?>
+                    </div>
+                    <div class="col-lg-6">
+                        <form action="<?= $this->view->controller; ?>solicitacoes/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="Nº Empenho, Solicitação ou Status">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <?php
                 $request = 0;
-                foreach ($this->view->resultItems as $result) :
+                foreach ($this->view->result as $result) :
+                    $idlista = $result['invoices_id'];
                     if ($request == $result['code']) {
                         continue;
                     }
@@ -118,9 +48,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     <div class="accordion">
                         <div class="card">
                             <div class="card-header" id="headingOne">
-                                <h5 class="mb-0">
+                                <h5>
                                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                        Solicitação <?= $result['code'] ?> do Empenho
+                                        Solicitação <?= $result['code'] ?> do Empenho <?= $result['codeInvoice'] ?> - <span class="badge badge-primary"><?= $result['status']; ?></span>
                                     </button>
                                 </h5>
                             </div>
@@ -176,7 +106,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         <tbody>
                                             <?php
                                             $total = 0;
-                                            foreach ($this->view->resultItems as $value) :
+                                            foreach ($this->view->result as $value) :
                                                 if ($value['code'] != $result['code']) {
                                                     continue;
                                                 }
@@ -213,7 +143,20 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <?php
                     $request = $result['code'];
                 endforeach; ?>
+
             </div>
         </div>
     </div>
 </div>
+<script>
+    $('.search-button').click(function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var formAction = $('.search-form').attr('action');
+        if (searchValue && formAction) {
+            window.location = formAction + '/busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    });
+</script>

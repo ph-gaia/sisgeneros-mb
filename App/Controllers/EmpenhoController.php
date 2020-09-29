@@ -75,7 +75,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'FISCAL', 'ENCARREGADO', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Lista de itens solicitados';
 
@@ -85,6 +85,22 @@ class EmpenhoController extends Controller implements CtrlInterface
         $this->view->result = $empenho->retornaDadosPapeleta($this->getParametro('id'), $this->view->userLoggedIn);
 
         $this->render('mostra_item_recebimento');
+    }
+
+    public function solicitacoesAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'FISCAL', 'ENCARREGADO', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+
+        $this->view->title = 'Lista de solicitações de empresas';
+
+        $model = new SolicitacaoEmpenhoModel();
+        $model->paginator($this->getParametro('pagina'), $this->getParametro('busca'));
+        $this->view->result = $model->getResultadoPaginator();
+        $this->view->btn = $model->getNavePaginator();
+
+        $this->render('solicitacao_empenho');
     }
 
     public function registrarrecebimentoAction()
