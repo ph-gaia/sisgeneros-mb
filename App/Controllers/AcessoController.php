@@ -51,7 +51,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function eliminarAction()
     {
-        $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->access->authenticAccess(['ADMINISTRADOR']);
         $model = new AcessoModel();
         $model->removerRegistro($this->getParametro('id'));
     }
@@ -69,7 +69,7 @@ class AcessoController extends Controller implements CtrlInterface
 
     public function registraAction()
     {
-        $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->access->authenticAccess(['ADMINISTRADOR']);
         $model = new AcessoModel();
         $model->novoRegistro();
     }

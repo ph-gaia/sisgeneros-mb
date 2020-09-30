@@ -49,8 +49,10 @@ class HistoricoAcaoModel extends CRUD
     public function allHistoricByRequestId($requestId)
     {
         $query = "" .
-            " SELECT * FROM {$this->entidade} " .
-            " WHERE requests_id = :requestsId ";
+            " SELECT historic.*, oms.name FROM {$this->entidade} as historic " .
+            " INNER JOIN requests as sol ON sol.id = historic.requests_id ". 
+            " INNER JOIN oms ON oms.id = sol.oms_id ". 
+            " WHERE historic.requests_id = :requestsId ";
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([':requestsId' => $requestId]);
