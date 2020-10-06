@@ -112,6 +112,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <th width="8%">Quantidade</th>
                                 <th>Item</th>
                                 <th>Empenhado</th>
+                                <th>Solicitado</th>
                                 <th>Entregue</th>
                                 <th>Disponível</th>
                                 <th>UF</th>
@@ -129,20 +130,26 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 $subTotal = $value['value'] * $value['quantity'];
                                 $total += $subTotal;
                                 $totalDisponivel += ($value['value'] * $value['quantity']) - ($value['value'] * $value['delivered']);
+                                $qtdDisponivel = $value['quantity'] - ($value['delivered'] + $value['requested']);
                             ?>
                                 <tr>
                                     <td>
-                                        <input type="hidden" name="ids[]" value="<?= $value['id']; ?>">
-                                        <input type="hidden" name="requested[]" id="requested[]" value="0">
-                                        <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>">
-                                        <input type="text" name="quantity[]" id="quantity" class="form-control">
+                                        <input type="hidden" name="ids[]" value="<?= $value['id']; ?>" 
+                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                        <input type="hidden" name="requested[]" id="requested[]" value="<?= $value['requested'] ?>"
+                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                        <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>"
+                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                        <input type="text" name="quantity[]" id="quantity" class="form-control"
+                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
                                     </td>
                                     <td><?= $value['number'] ?: ''; ?></td>
                                     <td><?= floatval($value['quantity']); ?></td>
+                                    <td><?= floatval($value['requested']); ?></td>
                                     <td><?= intval($value['delivered']); ?></td>
                                     <td>
                                         <span class="badge badge-primary">
-                                            <?= floatval($value['quantity'] - $value['delivered']); ?>
+                                            <?= floatval($qtdDisponivel); ?>
                                         </span>
                                     </td>
                                     <td><?= $value['uf']; ?></td>
@@ -155,7 +162,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th class="text-right" colspan="8">Total (R$)</th>
+                                <th class="text-right" colspan="9">Total (R$)</th>
                                 <td class="text-left">
                                     <span class="badge badge-danger">
                                         <?= Utils::floatToMoney($total); ?>
@@ -256,7 +263,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 $total += $value['value'] * $value['quantity'];
                                             ?>
                                                 <tr>
-                                                    <td><?= $value['code'] ?: ''; ?></td>
+                                                    <td><?= substr($value['code'], -1); ?></td>
                                                     <td><?= floatval($value['quantity']); ?></td>
                                                     <td><?= intval($value['delivered']); ?></td>
                                                     <?php if ($result['status'] == 'SOLICITADO'): ?>

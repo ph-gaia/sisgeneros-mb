@@ -131,7 +131,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $model = new EmpenhoModel();
         $this->view->title = 'Solicitação de Material';
-        $this->view->result = $model->retornaDadosPapeleta($this->getParametro('id'));
+        $this->view->result = $model->retornaDadosPapeleta($this->getParametro('id'), $this->getParametro('idlista'));
         $this->render('papeleta_solicitacao', true, 'blank');
     }
 

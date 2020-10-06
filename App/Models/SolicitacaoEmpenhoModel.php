@@ -299,7 +299,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $solItem = new EmpenhoItemsModel();
         foreach ($this->getItemsList() as $idItem => $value) {
             $result = $solItem->findById($idItem);
-            $disponivel = floatval($result['quantity'] - $result['delivered']);
+            $disponivel = floatval($result['quantity'] - ($result['delivered'] + $value['solicitada']));
             if ($value['quantidade'] > $disponivel) {
                 msg::showMsg('A quantidade solicitada de ' . $result['name']
                     . ' é superior a quantidade disponível.', 'danger');
@@ -328,9 +328,9 @@ class SolicitacaoEmpenhoModel extends CRUD
 
     /**
      * Generate the code of Solicitação
-     * @return string The solictação code
+     * @return The solictação code
      */
-    protected function codeGenerator(): string
+    protected function codeGenerator()
     {
         $invoiceCode = filter_input(INPUT_POST, 'code_invoice');
 
@@ -347,6 +347,6 @@ class SolicitacaoEmpenhoModel extends CRUD
         $stmt2->execute();
         $quantity = $stmt2->fetch(\PDO::FETCH_OBJ)->quantity;
 
-        return $quantity . count($registersQuantity) + 1;
+        return $quantity + 1 . count($registersQuantity) + 1;
     }
 }

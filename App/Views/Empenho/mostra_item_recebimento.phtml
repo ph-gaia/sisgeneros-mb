@@ -27,7 +27,7 @@ $idlista = $this->getParametro('idlista');
                         <br>
                         Solicitação:
                         <strong>
-                            <?= $this->view->result[0]['code']; ?>
+                            <?= substr($this->view->result[0]['code'], -1); ?>
                             - <?= $this->view->result[0]['status']; ?>
                         </strong>
                     </div>

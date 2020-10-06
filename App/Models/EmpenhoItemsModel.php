@@ -20,9 +20,9 @@ class EmpenhoItemsModel extends CRUD
 
     public function paginator($pagina, $idlista)
     {
-
+        $subQuery = ",(SELECT SUM(reqInv.quantity) FROM requests_invoices as reqInv WHERE reqInv.invoices_id = items.invoices_id and reqInv.number = items.number) as requested ";
         $dados = [
-            'select' => 'items.*',
+            'select' => 'items.*' . $subQuery,
             'entidade' => $this->entidade . " as items ",
             'pagina' => $pagina,
             'maxResult' => 50,
