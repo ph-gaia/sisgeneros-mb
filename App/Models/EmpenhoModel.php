@@ -160,7 +160,7 @@ class EmpenhoModel extends CRUD
         $stmt->execute([':invoicesId' => $result['id']]);
     }
 
-    public function retornaDadosPapeleta($id, $user = null)
+    public function retornaDadosPapeleta($id, $invoiceId, $user = null)
     {
         $where = '';
         if (isset($user['level']) && $user['level'] !== 'ADMINISTRADOR') {
@@ -182,10 +182,10 @@ class EmpenhoModel extends CRUD
                 INNER JOIN suppliers ON suppliers.id = item.suppliers_id
                 INNER JOIN oms ON oms.id = inv.oms_id
                 INNER JOIN biddings ON biddings.id = item.biddings_id
-            WHERE item.code = ? {$where} ";
+            WHERE item.code = ? and invoices_id = ? {$where} ";
 
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id]);
+        $stmt->execute([$id, $invoiceId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 

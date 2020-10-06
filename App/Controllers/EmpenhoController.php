@@ -75,14 +75,14 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'FISCAL', 'ENCARREGADO', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO']);
 
         $this->view->title = 'Lista de itens solicitados';
 
         $empenho = new EmpenhoModel();
         $itens = new EmpenhoItemsModel();
         //$this->view->resultSolicitacao = $empenho->findByinvoices_id($this->getParametro('id'));
-        $this->view->result = $empenho->retornaDadosPapeleta($this->getParametro('id'), $this->view->userLoggedIn);
+        $this->view->result = $empenho->retornaDadosPapeleta($this->getParametro('id'), $this->getParametro('idlista'), $this->view->userLoggedIn);
 
         $this->render('mostra_item_recebimento');
     }
@@ -91,7 +91,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'FISCAL', 'ENCARREGADO', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Lista de solicitações de empresas';
 
@@ -107,7 +107,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR']);
 
         $solicitacao = new SolicitacaoEmpenhoModel();
         $solicitacao->recebimento($this->view->userLoggedIn);
@@ -117,12 +117,13 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $id = $this->getParametro('id');
+        $invoiceId = $this->getParametro('idlista');
         $pdf = new Pdf();
         $pdf->number = $id;
-        $pdf->url = $this->view->controller . 'papeleta/id/' . $id;
+        $pdf->url = $this->view->controller . 'papeleta/id/' . $id . '//idlista/' . $invoiceId;
         $pdf->gerar();
     }
 
@@ -145,7 +146,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->cancelarRegistro($this->getParametro('id'));
+        $model->cancelarRegistro($this->getParametro('id'), $this->getParametro('idlista'));
     }
 
     public function registraItensEmpenhoAction()
@@ -157,22 +158,22 @@ class EmpenhoController extends Controller implements CtrlInterface
 
     public function entregarNfAction()
     {
-        $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->entregarNf($this->getParametro('id'));
+        $model->entregarNf($this->getParametro('id'), $this->getParametro('idlista'));
     }
 
     public function liquidarNfAction()
     {
-        $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->liquidarNf($this->getParametro('id'));
+        $model->liquidarNf();
     }
 
     public function pagarNfAction()
     {
-        $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->pagarNf($this->getParametro('id'));
+        $model->pagarNf();
     }
 }

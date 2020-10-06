@@ -68,7 +68,7 @@ class MealsController extends Controller implements CtrlInterface
 
     public function alteraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL']);
         $model = new MealsModel();
         $model->editarRegistro();
     }

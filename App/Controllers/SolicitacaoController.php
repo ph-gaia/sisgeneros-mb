@@ -15,6 +15,7 @@ use App\Models\CreditoProvisionadoModel;
 use App\Models\HistoricoAcaoModel;
 use App\Helpers\Pdf;
 use App\Config\Configurations as cfg;
+use App\Models\SolicitacaoEmpenhoModel;
 use HTR\Helpers\Mensagem\Mensagem as msg;
 
 class SolicitacaoController extends Controller implements CtrlInterface
@@ -39,7 +40,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $licitacao = new Licitacao();
         $this->view->title = 'Licitações Disponíveis';
@@ -53,7 +54,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = "Adicionar itens";
         $this->view->resultFornecedor = (new FornecedorModel())->findAll(function ($e) {
@@ -69,7 +70,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Lista dos Itens da Licitação';
         $item = new Item();
@@ -86,7 +87,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Lista de itens solicitados';
         $solicitacao = new SolicitacaoModel();
@@ -101,7 +102,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $model = new SolicitacaoModel();
         $solicitacaoItem = new SolicitacaoItem();
@@ -118,7 +119,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $model = new SolicitacaoModel();
         $this->view->title = 'Alterando data de entrega';
@@ -135,6 +136,13 @@ class SolicitacaoController extends Controller implements CtrlInterface
         $this->render('mostra_historico_solicitacao', true, 'blank');
     }
 
+    public function solicitarAction()
+    {
+        $result = (new SolicitacaoEmpenhoModel())->findByRequestId($this->getParametro('id'));
+
+        header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
+    }
+
     public function itensLicitadosAction()
     {
         $this->view->busca = $this->getParametro('busca');
@@ -142,7 +150,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
         if ($this->view->busca) {
             $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
                 ->clearAccessList()
-                ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+                ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
             $licitacao = new Licitacao();
             $this->view->title = 'Forncedores e itens encontrados';
@@ -157,7 +165,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $model = new SolicitacaoModel();
         $solicitacaoItem = new SolicitacaoItem();
@@ -171,7 +179,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $model = new SolicitacaoModel();
         $model->avaliaAcesso($this->view->idlista, $this->view->userLoggedIn);
@@ -181,7 +189,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoModel();
         $this->view->title = 'Histórico de Solicitações';
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, $this->getParametro('busca'), null, null, null, $this->getParametro('ordenar'));
@@ -193,7 +201,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
 
     public function detalharAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoModel();
         $licitacao = new Licitacao();
         $solicitacaoItem = new SolicitacaoItem();
@@ -213,7 +221,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $model = new SolicitacaoModel();
         $model->novoRegistro($this->view->userLoggedIn);
@@ -223,7 +231,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         (new SolicitacaoModel())->novoNaoLicitado($this->view->userLoggedIn, getcwd());
     }
@@ -232,7 +240,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $solicitacaoItem = new SolicitacaoItem();
         $solicitacaoItem->editarRegistro($this->view->idlista, $this->view->userLoggedIn);
@@ -272,7 +280,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->access->setRedirect('solicitacao/');
         $this->access->clearAccessList();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL']);
         $model = new SolicitacaoModel();
         $model->pagarnf($this->getParametro('id'));
     }
@@ -281,7 +289,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $licitacao = new Licitacao;
 
         $this->view->result = $licitacao->listaPorFornecedor($this->view->idlista);
@@ -298,7 +306,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $id = $this->getParametro('id');
         $pdf = new Pdf();
@@ -319,7 +327,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $solicitacao = new SolicitacaoModel();
         $resultSolicitacao = $solicitacao->findById($this->getParametro('id'));
@@ -335,7 +343,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $id = (int) $this->getParametro('id');
         $status = strtoupper($this->getParametro('status') ?? '');
@@ -357,7 +365,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'ORDENADOR']);
+            ->authenticAccess(['ADMINISTRADOR', 'ORDENADOR']);
 
         $id = (int) $this->getParametro('id');
 
@@ -412,7 +420,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $file = $this->getParametro('file');
         $solicitacao = (new SolicitacaoModel())->findByIdlista($this->view->idlista);
@@ -428,7 +436,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Adicionar novo arquivo';
         $this->render('form_adicionar_arquivo');
@@ -438,7 +446,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $solicitacaoModel = new SolicitacaoModel();
         $solicitacao = $solicitacaoModel->findByIdlista($this->view->idlista);
@@ -452,7 +460,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $this->view->title = 'Busca de itens licitados';
         $this->render('mostra_busca_fornecedor');

@@ -58,6 +58,16 @@ class SolicitacaoEmpenhoModel extends CRUD
         return $this->navPaginator;
     }
 
+    public function findByRequestId($id)
+    {
+        $query = "" .
+            " SELECT * FROM invoices_items " .
+            " WHERE requests_id = :id ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
     public function findAllByInvoiceId($idLista)
     {
         $query = "" .
@@ -68,7 +78,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $stmt->execute([':id' => $idLista]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-
+ 
     public function novoRegistro()
     {
         $this->validaAll();
@@ -103,56 +113,62 @@ class SolicitacaoEmpenhoModel extends CRUD
             . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $invoicesId . '"; }, 3000); </script>', 'success');
     }
 
-    public function cancelarRegistro($id)
+    public function cancelarRegistro($id, $invoiceId)
     {
         $result = $this->findByCode($id);
-        $stmt = $this->pdo->prepare("DELETE FROM {$this->entidade} WHERE code = ?");
-        if ($stmt->execute([$id])) {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->entidade} WHERE code = ? and invoices_id = ?");
+        if ($stmt->execute([$id, $invoiceId])) {
             header('Location: ' . cfg::DEFAULT_URI . 'empenho/detalhar/idlista/' . $result['invoices_id']);
         }
     }
 
-    public function entregarNf($id)
+    public function entregarNf($id, $invoiceId)
     {
-        $result = $this->findByCode($id);
-
         $query = "UPDATE {$this->entidade} SET
         status = 'NF-ENTREGUE', 
         updated_at = '" . date('Y-m-d H:i:s') . "'
-        WHERE code = ?";
+        WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);
-        if ($stmt->execute([$id])) {
+        if ($stmt->execute([$id, $invoiceId])) {
             header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
 
-    public function liquidarNf($id)
+    public function liquidarNf()
     {
-        $result = $this->findByCode($id);
+        $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
+        $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
+        $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
 
-        $query = "UPDATE {$this->entidade} SET 
-        status = 'NF-LIQUIDADA', 
-        updated_at = '" . date('Y-m-d H:i:s') . "'
-        WHERE code = ?";
+        $query = "
+            UPDATE {$this->entidade} SET 
+            status = 'NF-LIQUIDADA', 
+            number_request = '" . $this->getNumPedido() . "', 
+            updated_at = '" . date('Y-m-d H:i:s') . "'
+            WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);
-        if ($stmt->execute([$id])) {
+        if ($stmt->execute([$this->getPedidoId(), $this->getEmpenhoId()])) {
             header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
 
-    public function pagarNf($id)
+    public function pagarNf()
     {
-        $result = $this->findByCode($id);
+        $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
+        $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
+        $this->setOrdemBancaria(filter_input(INPUT_POST, 'order_bank'));
 
-        $query = "UPDATE {$this->entidade} SET 
-        status = 'NF-PAGA', 
-        updated_at = '" . date('Y-m-d H:i:s') . "'
-        WHERE code = ?";
+        $query = "
+            UPDATE {$this->entidade} SET 
+            status = 'NF-PAGA', 
+            number_order_bank = '" . $this->getOrdemBancaria() . "', 
+            updated_at = '" . date('Y-m-d H:i:s') . "'
+            WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);
-        if ($stmt->execute([$id])) {
+        if ($stmt->execute([$this->getPedidoId(), $this->getEmpenhoId()])) {
             header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }
@@ -184,7 +200,8 @@ class SolicitacaoEmpenhoModel extends CRUD
     public function recebimento()
     {
         $this->setId(filter_input(INPUT_POST, 'request_id'));
-        $this->setInvoice(filter_input(INPUT_POST, 'invoice'));
+        $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
+        $this->setInvoice(filter_input(INPUT_POST, 'nota_fiscal'));
         $this->validaInvoice($this->getInvoice());
         $this->setObservation(filter_input(INPUT_POST, 'observation', FILTER_SANITIZE_SPECIAL_CHARS));
         $this->setItemsList($this->buildItems(filter_input_array(INPUT_POST)));
@@ -195,12 +212,12 @@ class SolicitacaoEmpenhoModel extends CRUD
             UPDATE {$this->entidade} SET 
             status = '" . (($val) ? 'RECEBIDO-PARCIAL' : 'RECEBIDO') . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "', 
-            invoice = " . $this->getInvoice() . ",
-            observation = '" . $this->getObservation() . "' WHERE code = ?";
+            invoice = '" . $this->getInvoice() . "',
+            observation = '" . $this->getObservation() . "' WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);
 
-        if ($stmt->execute([$this->getId()])) {
+        if ($stmt->execute([$this->getId(), $this->getEmpenhoId()])) {
 
             foreach ($this->getItemsList() as $id => $quantity) {
                 $data = $this->findById($id);
@@ -246,7 +263,7 @@ class SolicitacaoEmpenhoModel extends CRUD
             . "  ON req.id = items.invoices_id "
             . " WHERE items.status LIKE :status";
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
             $where = " AND req.oms_id = {$user['oms_id']} ";
             $query .= $where;
         }
@@ -323,7 +340,13 @@ class SolicitacaoEmpenhoModel extends CRUD
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
         $registersQuantity = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        $code = str_replace("NE-", "", $invoiceCode) . (count($registersQuantity) + 1);
-        return $code;
+
+        $query2 = "SELECT COUNT(sol_inv.id) as quantity FROM requests_invoices as sol_inv
+            INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id";
+        $stmt2 = $this->pdo->prepare($query2);
+        $stmt2->execute();
+        $quantity = $stmt2->fetch(\PDO::FETCH_OBJ)->quantity;
+
+        return $quantity . count($registersQuantity) + 1;
     }
 }

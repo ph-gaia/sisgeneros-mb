@@ -36,6 +36,7 @@ $idlista = $this->getParametro('idlista');
                     <form action="<?= $this->view->controller; ?>registrarrecebimento" method="post" id="form">
                         <input type="hidden" name="suppliers_id" value="<?= $this->view->result[0]['suppliers_id'] ?>">
                         <input type="hidden" name="request_id" value="<?= $this->view->result[0]['code']; ?>">
+                        <input type="hidden" name="invoice_id" value="<?= $idlista ?>">
                         <button class="btn btn-success" id='btn_enviar'>
                             <i class="fa fa-check"></i> Confirmar Recebimento
                         </button>
@@ -43,8 +44,9 @@ $idlista = $this->getParametro('idlista');
                         <div class="row" style="padding-top: 10px;">
                             <div class="col-lg-4" id="invoice_container">
                                 <label>Número da Nota Fiscal: </label>
-                                <input type="text" name="invoice"
-                                       id="invoice"
+                                <input type="text"
+                                       name="nota_fiscal"
+                                       id="nota_fiscal"
                                        class="form-control"
                                        maxlength="20"
                                        placeholder="Número da nota fiscal"

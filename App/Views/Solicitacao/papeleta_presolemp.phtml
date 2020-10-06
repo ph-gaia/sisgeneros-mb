@@ -7,10 +7,6 @@ use App\Helpers\Utils;
 setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 date_default_timezone_set(cfg::TIMEZONE);
 
-if (in_array($this->view->resultSolicitacao['status'] ?? false, ['REJEITADO', 'CANCELADO', false])) {
-    die("<i class='fa fa-info-circle'></i> A papeleta não pode ser gerada...");
-}
-
 $total = 0;
 
 ?>

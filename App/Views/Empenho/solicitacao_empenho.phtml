@@ -13,6 +13,72 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
 });
 
 ?>
+<div class="modal fade" id="modalLiquidarAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Liquidar Solicitação</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>liquidarNf" method="post">
+                <div class="modal-body">
+                    <div id="resultado"></div>
+                    <input type="hidden" name="invoice_id" id="invoice_id" />
+                    <input type="hidden" name="request_id" id="request_id" />
+                    <div class="form-group">
+                        <label>Número da NS</label>
+                        <input
+                            type=text
+                            id="number_request"
+                            name="number_request"
+                            placeholder="Digite o número da NS"
+                            class="form-control"
+                            required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalPagarAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Pagar Solicitação</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>pagarNf" method="post">
+                <div class="modal-body">
+                    <div id="resultado"></div>
+                    <input type="hidden" name="invoice_id" id="invoice_pagar_id" />
+                    <input type="hidden" name="request_id" id="request_pagar_id" />
+                    <div class="form-group">
+                        <label>Número da Ordem Bancária (OB)</label>
+                        <input
+                            type=text
+                            id="order_bank"
+                            name="order_bank"
+                            placeholder="Digite o número da OB"
+                            class="form-control"
+                            required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div id="page-wrapper">
     <div class="container-fluid">
         <div class="row">
@@ -50,44 +116,51 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                             <div class="card-header" id="headingOne">
                                 <h5>
                                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                        Solicitação <?= $result['code'] ?> do Empenho <?= $result['codeInvoice'] ?> - <span class="badge badge-primary"><?= $result['status']; ?></span>
+                                        Solicitação a empresa nº <?= substr($result['code'], -1); ?> do Empenho <?= $result['codeInvoice'] ?>  - <span class="badge badge-primary"><?= $result['status']; ?></span>
                                     </button>
                                 </h5>
                             </div>
                             <div id="collapseOne<?= $result['code'] ?>" class="collapse">
                                 <div class="card-body">
+                                <?php if ($result['invoice'] || $result['number_request'] || $result['number_order_bank']) : ?>
+                                    <div class="alert alert-info" role="alert">
+                                        NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
+                                        NS: <strong><?= $result['number_request'] ?? '-'; ?></strong><br>
+                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?></strong>
+                                    </div>
+                                <?php endif; ?>
                                     <?php
                                     if ($result['code']) {
                                         $code = $result['code'];
                                     }
                                     ?>
-                                    <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>" class="btn btn-secondary btn-sm">
+                                    <a href="<?= $this->view->controller; ?>pdf/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-secondary btn-sm">
                                         <i class="fa fa-file-pdf-o"></i> PDF
                                     </a>
-                                    <?php if (isset($code) && in_array($result['status'], ['SOLICITADO'])) : ?>
-                                        <a href="<?= $this->view->controller; ?>receber/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
+                                    <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR']) && in_array($result['status'], ['SOLICITADO'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>receber/id/<?= $result['code'] ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-check"></i> Receber
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (isset($code) && $result['status'] == 'SOLICITADO') : ?>
-                                        <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>')" class="btn btn-danger btn-sm">
+                                    <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR']) && $result['status'] == 'SOLICITADO') : ?>
+                                        <a onclick="confirmar('Tem certeza que deseja CANCELAR este registro?', '<?= $this->view->controller; ?>cancela/id/<?= $code; ?>/idlista/<?= $idlista ?>')" class="btn btn-danger btn-sm">
                                             <i class="fa fa-ban"></i> Cancelar
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (isset($code) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
-                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                    <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
+                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-check"></i> Entregar NF
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (isset($code) && $result['status'] == 'NF-ENTREGUE') : ?>
-                                        <a href="<?= $this->view->controller; ?>liquidarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                    <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-ENTREGUE') : ?>
+                                        <button data-request="<?= $code; ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-liquidar">
                                             <i class="fa fa-check-square-o"></i> Liquidar NF
-                                        </a>
+                                        </button>
                                     <?php endif; ?>
-                                    <?php if (isset($code) && $result['status'] == 'NF-LIQUIDADA') : ?>
-                                        <a href="<?= $this->view->controller; ?>pagarNf/id/<?= $code ?>" class="btn btn-success btn-sm">
+                                    <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-LIQUIDADA') : ?>
+                                        <button data-request="<?= $code; ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-pagar">
                                             <i class="fa fa-dollar"></i> Pagar NF
-                                        </a>
+                                        </button>
                                     <?php endif; ?>
                                     <table class="table">
                                         <thead>
@@ -95,7 +168,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                                 <th>Nº</th>
                                                 <th>Solicitado</th>
                                                 <th>Entregue</th>
+                                                <?php if ($result['status'] == 'SOLICITADO'): ?>
                                                 <th>Disponível</th>
+                                                <?php endif; ?>
                                                 <th>Status</th>
                                                 <th>UF</th>
                                                 <th>Nome</th>
@@ -116,7 +191,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                                     <td><?= $value['code'] ?: ''; ?></td>
                                                     <td><?= floatval($value['quantity']); ?></td>
                                                     <td><?= intval($value['delivered']); ?></td>
+                                                    <?php if ($result['status'] == 'SOLICITADO'): ?>
                                                     <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
+                                                    <?php endif; ?>
                                                     <td><?= $value['status']; ?></td>
                                                     <td><?= $value['uf']; ?></td>
                                                     <td><?= $value['name']; ?></td>
@@ -127,7 +204,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th class="text-right" colspan="8">Total (R$)</th>
+                                                <th class="text-right" colspan="<?= ($result['status'] == 'SOLICITADO') ? 8 : 7 ?>">Total (R$)</th>
                                                 <td class="text-left">
                                                     <span class="badge badge-danger">
                                                         <?= Utils::floatToMoney($total); ?>
@@ -158,5 +235,21 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
         } else {
             searchInput.focus();
         }
+    });
+    $('.btn-liquidar').click(function() {
+        var requestId = $(this).attr('data-request');
+        var invoiceId = $(this).attr('data-invoice');
+
+        $('#request_id').val(requestId);
+        $('#invoice_id').val(invoiceId);
+        $('#modalLiquidarAction').modal('show');
+    });
+    $('.btn-pagar').click(function() {
+        var requestId = $(this).attr('data-request');
+        var invoiceId = $(this).attr('data-invoice');
+
+        $('#request_pagar_id').val(requestId);
+        $('#invoice_pagar_id').val(invoiceId);
+        $('#modalPagarAction').modal('show');
     });
 </script>
