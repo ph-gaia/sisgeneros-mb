@@ -78,7 +78,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $stmt->execute([':id' => $idLista]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
- 
+
     public function novoRegistro()
     {
         $this->validaAll();
@@ -334,19 +334,22 @@ class SolicitacaoEmpenhoModel extends CRUD
     {
         $invoiceCode = filter_input(INPUT_POST, 'code_invoice');
 
-        $query = "SELECT COUNT(sol_inv.id) as quantity FROM requests_invoices as sol_inv
-            INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id
-            WHERE inv.code LIKE '{$invoiceCode}' GROUP BY sol_inv.code";
+        $query = "" .
+            " SELECT MAX(sol_inv.code) as lastId " .
+            " FROM requests_invoices as sol_inv " .
+            " INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id " .
+            " WHERE inv.code LIKE '{$invoiceCode}' ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        $registersQuantity = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $lastId = $stmt->fetch(\PDO::FETCH_OBJ)->lastId;
+        $lastId = $lastId ?? 0;
 
-        $query2 = "SELECT COUNT(sol_inv.id) as quantity FROM requests_invoices as sol_inv
-            INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id";
+        $query2 = "SELECT COUNT(*) as quantity FROM requests_invoices";
         $stmt2 = $this->pdo->prepare($query2);
         $stmt2->execute();
         $quantity = $stmt2->fetch(\PDO::FETCH_OBJ)->quantity;
 
-        return $quantity + 1 . count($registersQuantity) + 1;
+        $code = $quantity + 1 . substr($lastId, -1) + 1;
+        return $code;
     }
 }

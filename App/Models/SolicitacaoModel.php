@@ -241,7 +241,7 @@ class SolicitacaoModel extends CRUD
     public function paginator($pagina, $user, $busca = null, $oms = null, $dtInicio = null, $dtFim = null)
     {
         $innerJoin = " AS sol INNER JOIN oms ON oms.id = sol.oms_id INNER JOIN suppliers ON suppliers.id = sol.suppliers_id ";
-        $innerJoin .= " INNER JOIN biddings ON biddings.id = sol.biddings_id ";
+        $innerJoin .= " LEFT JOIN biddings ON biddings.id = sol.biddings_id ";
         $subQuery = ' (SELECT name FROM suppliers AS f WHERE f.id = sol.suppliers_id) as suppliers_name, ';
         $subQuery .= ' (SELECT SUM(quantity * value) FROM requests_items as items WHERE items.requests_id = sol.id) as total ';
         $strOrdenar = "sol.updated_at DESC";
@@ -519,7 +519,7 @@ class SolicitacaoModel extends CRUD
         $query = "
         SELECT SUM(items.quantity * items.value) as total FROM requests as sol
         INNER JOIN requests_items as items ON items.requests_id = sol.id
-        WHERE account_plan = ? and YEAR(sol.created_at) = ?";
+        WHERE account_plan = ? and YEAR(sol.created_at) = ? and biddings_id = 0";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id, $currentYear]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);

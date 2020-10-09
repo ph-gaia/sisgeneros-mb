@@ -201,7 +201,10 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                     <div class="alert alert-info" role="alert">
                                         NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
                                         NS: <strong><?= $result['number_request'] ?? '-'; ?></strong><br>
-                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?></strong>
+                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?></strong><br>
+                                        <?php if ($result['observation']) : ?>
+                                            Observações do recebimento: <strong><?= $result['observation']; ?></strong>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                                     <?php

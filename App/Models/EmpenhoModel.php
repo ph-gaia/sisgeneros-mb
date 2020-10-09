@@ -179,9 +179,9 @@ class EmpenhoModel extends CRUD
                 suppliers.cnpj, biddings.number as biddingsNumber
             FROM invoices AS inv
                 INNER JOIN requests_invoices AS item ON item.invoices_id = inv.id
-                INNER JOIN suppliers ON suppliers.id = item.suppliers_id
+                LEFT JOIN suppliers ON suppliers.id = item.suppliers_id
                 INNER JOIN oms ON oms.id = inv.oms_id
-                INNER JOIN biddings ON biddings.id = item.biddings_id
+                LEFT JOIN biddings ON biddings.id = item.biddings_id
             WHERE item.code = ? and invoices_id = ? {$where} ";
 
         $stmt = $this->pdo->prepare($query);

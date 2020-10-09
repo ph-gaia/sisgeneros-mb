@@ -31,7 +31,7 @@ if (!isset($this->view->result[0])) {
         <td class="number">
             Solicitação Nº
             <strong>
-                <?= ($this->view->result[0]['code']); ?>
+                <?= substr($this->view->result[0]['code'], -1); ?>
             </strong>
         </td>
     </tr>

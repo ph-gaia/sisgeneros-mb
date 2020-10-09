@@ -59,14 +59,14 @@ class EmpenhoItemsModel extends CRUD
                 $dados = [
                     'invoices_id' => $invoicesId,
                     'requests_id' => $requestId,
-                    'suppliers_id' => $value['suppliers_id'],
-                    'biddings_id' => $value['biddings_id'],
-                    'number' => $value['number'],
-                    'name' => $value['name'],
-                    'uf' => $value['uf'],
+                    'suppliers_id' => $value['suppliers_id'] ?? 0,
+                    'biddings_id' => $value['biddings_id'] ?? 0,
+                    'number' => $value['number'] ?? 0,
+                    'name' => $value['name'] ?? $value['item_name'],
+                    'uf' => $value['uf'] ?? $value['item_uf'],
                     'quantity' => $value['quantidade_solicitada'],
                     'delivered' => 0,
-                    'value' => $value['value']
+                    'value' => $value['value'] ?? $value['item_value']
                 ];
                 parent::novo($dados);
                 $item->atualizarQtdEmpenhada($value['item_id'], $value['quantidade_solicitada']);
