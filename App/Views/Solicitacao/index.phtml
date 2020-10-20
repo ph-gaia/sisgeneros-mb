@@ -164,11 +164,13 @@ $status = [
                                                 <i class="fa fa-repeat"></i> Rejeitar
                                             </button>
                                         </li>
-                                        <li style="margin-top: 5px">
-                                            <button data-id="<?= $value['id']; ?>" class="btn btn-danger btn-sm btn-cancel" style="width: 100%;">
-                                                <i class="fa fa-ban"></i> Cancelar
-                                            </button>
-                                        </li>
+                                        <?php if (!in_array($userNivel, ['CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) : ?>
+                                            <li style="margin-top: 5px">
+                                                <button data-id="<?= $value['id']; ?>" class="btn btn-danger btn-sm btn-cancel" style="width: 100%;">
+                                                    <i class="fa fa-ban"></i> Cancelar
+                                                </button>
+                                            </li>
+                                        <?php endif; ?>
                                         <?php endif; ?>
                                     </ul>
                                     <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
