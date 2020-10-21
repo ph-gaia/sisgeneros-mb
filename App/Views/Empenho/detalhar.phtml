@@ -197,7 +197,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             </div>
                             <div id="collapseOne<?= $result['code'] ?>" class="collapse">
                                 <div class="card-body">
-                                <?php if ($result['invoice'] || $result['number_request'] || $result['number_order_bank']) : ?>
+                                <?php if (isset($result['invoice']) || isset($result['number_request']) || isset($result['number_order_bank'])) : ?>
                                     <div class="alert alert-info" role="alert">
                                         NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
                                         NS: <strong><?= $result['number_request'] ?? '-'; ?></strong><br>

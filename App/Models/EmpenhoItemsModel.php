@@ -54,7 +54,12 @@ class EmpenhoItemsModel extends CRUD
         $solItem = new SolicitacaoItemModel();
         $item = new Item();
         foreach ($dados as $requestId) {
-            $result = $solItem->findAllItemsByRequestId($requestId);
+            $data = (new SolicitacaoModel())->findById($requestId);
+            if ($data->biddings_id == 0) {
+                $result = $solItem->findAllItemsByRequestIdNaoLicitado($requestId);   
+            } else {
+                $result = $solItem->findAllItemsByRequestId($requestId);
+            }
             foreach ($result as $value) {
                 $dados = [
                     'invoices_id' => $invoicesId,
