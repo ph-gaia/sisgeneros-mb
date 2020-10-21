@@ -231,7 +231,7 @@ class SolicitacaoItemModel extends CRUD
         $query = ""
             . " SELECT items.number as item_number, lic_items.id as item_id, "
             . " items.quantity as quantidade_solicitada, "
-            . " lic_items.*, lic.number as licitacao, sol.suppliers_id, "
+            . " lic_items.*, lic.number as licitacao, sol.suppliers_id "
             . " FROM requests_items as items "
             . " INNER JOIN biddings_items as lic_items ON lic_items.number = items.number "
             . " INNER JOIN biddings	as lic ON lic.id = lic_items.biddings_id "
