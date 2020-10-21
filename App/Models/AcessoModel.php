@@ -123,7 +123,7 @@ class AcessoModel extends CRUD
         // consulta dados o usuário logado
         $user = $this->findById($_SESSION['userId']);
 
-        if ($user['level'] == 'ADMINISTRADOR' && ($user['id'] != $this->getId())) {
+        if (in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']) && ($user['id'] != $this->getId())) {
             // seta a troca de senha na próxima vez que o usuário logar
             $dados['change_password'] = 'yes';
         } else {
