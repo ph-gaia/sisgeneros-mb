@@ -89,7 +89,7 @@ if (!isset($this->view->result[0])) {
                         <tr>
                             <td><?= $i++; ?></td>
                             <td class='discricao'><?= $value['name']; ?></td>
-                            <td><?= $value['biddings_number'] ?? 'NL'; ?></td>
+                            <td><?= $value['biddingsNumber'] ?? 'NL'; ?></td>
                             <td><?= $value['uf']; ?></td>
                             <td><?= $q = intval($value['quantity']); ?></td>
                             <td><?= $q2 = intval($value['delivered']) > 0 ? intval($value['delivered']) : ''; ?></td>
