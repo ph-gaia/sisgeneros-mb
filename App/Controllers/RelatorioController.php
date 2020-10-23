@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use HTR\System\ControllerAbstract as Controller;
@@ -42,7 +43,7 @@ class RelatorioController extends Controller implements CtrlInterface
         $modelOms = new OmModel();
         $this->view->title = 'Relatório de Solicitações';
         $this->view->oms = $modelOms->findAll();
-        $this->view->resultOms = (new OmModel())->findAll(function($db) {
+        $this->view->resultOms = (new OmModel())->findAll(function ($db) {
             $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
         });
         $model->paginatorSolicitacoes($this);
@@ -102,11 +103,11 @@ class RelatorioController extends Controller implements CtrlInterface
     public function entregaAction()
     {
         $this->view->title = 'Avaliação de Entrega dos Fornecedores';
-        $this->view->resultOms = (new OmModel())->findAll(function($db) {
+        $this->view->resultOms = (new OmModel())->findAll(function ($db) {
             $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
         });
 
-        $this->view->resultFornecedor = (new FornecedorModel())->findAll(function($db) {
+        $this->view->resultFornecedor = (new FornecedorModel())->findAll(function ($db) {
             $db->setaFiltros()->orderBy('suppliers.name ASC');
         });
 
@@ -132,5 +133,25 @@ class RelatorioController extends Controller implements CtrlInterface
         $this->view->btn = $model->getNavePaginator();
 
         $this->render('mostra_empenho');
+    }
+
+    public function limiteDispensaAction()
+    {
+        $this->view->title = 'Relatório de Limite de despensa de licitação';
+
+        $model = new Solicitacao();
+        $omModel = new OmModel();
+        $om = $this->getParametro('om') ?? $this->view->userLoggedIn['oms_id'];
+        $this->view->om = $omModel->findById($om);
+
+        $this->view->resultOms = $omModel->findAll(function ($db) {
+            $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
+        });
+
+        $model->paginatorSolicitacoesNaoLicitado($this, $om);
+        $this->view->result = $model->getResultadoPaginator();
+        $this->view->btn = $model->getNavePaginator();
+
+        $this->render('limite_dispensa_licitacao');
     }
 }

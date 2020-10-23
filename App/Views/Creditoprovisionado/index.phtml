@@ -28,6 +28,9 @@ $pagination = Pagination::make($this);
                         <tr>
                             <th>OM</th>
                             <th>Valor</th>
+                            <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL'])) : ?>
+                            <th>Saldo Comprometido</th>
+                            <?php endif; ?>
                             <th></th>
                         </tr>
                     </thead>
@@ -36,6 +39,9 @@ $pagination = Pagination::make($this);
                             <tr>
                                 <td><?= $value['naval_indicative']; ?></td>
                                 <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL'])) : ?>
+                                <td><?= Utils::floatToMoney($value['credito_comprometido']); ?></td>
+                                <?php endif; ?>
                                 <td>
                                     <a href="<?= $this->view->controller; ?>detalhar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                         <i class="fa fa-list"></i>

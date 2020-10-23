@@ -37,6 +37,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             class="form-control"
                             required/>
                     </div>
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=date
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            required/>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -69,6 +78,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             class="form-control"
                             required/>
                     </div>
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=date
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            required/>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -93,9 +111,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div id="resultado"></div>
                 <form action="<?= $this->view->controller ?>registraItensEmpenho" method="post" id="form">
                     <input type="hidden" name="code_invoice" value="<?= $this->view->resultEmpenho['code']; ?>">
-                    <button class="btn btn-primary">
-                        <i class="fa fa-check"></i> Gerar solicitação
-                    </button>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                        <button class="btn btn-primary">
+                            <i class="fa fa-check"></i> Gerar solicitação
+                        </button>
+                    <?php endif ?>
                     <p class="help-block" style="color: #130f0f; font-weight: bold;">* Informe a quantidade para gerar a solicitação.</p>
                     <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
                         <i class="fa fa-arrow-left"></i> Voltar
@@ -109,7 +129,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     <table class="table">
                         <thead>
                             <tr>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
                                 <th width="8%">Quantidade</th>
+                                <?php endif ?>
                                 <th>Item</th>
                                 <th>Empenhado</th>
                                 <th>Solicitado</th>
@@ -133,16 +155,18 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 $qtdDisponivel = $value['quantity'] - ($value['delivered'] + $value['requested']);
                             ?>
                                 <tr>
-                                    <td>
-                                        <input type="hidden" name="ids[]" value="<?= $value['id']; ?>" 
-                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
-                                        <input type="hidden" name="requested[]" id="requested[]" value="<?= $value['requested'] ?>"
-                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
-                                        <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>"
-                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
-                                        <input type="text" name="quantity[]" id="quantity" class="form-control"
-                                        <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
-                                    </td>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                                        <td>
+                                            <input type="hidden" name="ids[]" value="<?= $value['id']; ?>" 
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="hidden" name="requested[]" id="requested[]" value="<?= $value['requested'] ?>"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="text" name="quantity[]" id="quantity" class="form-control"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                        </td>
+                                    <?php endif; ?>
                                     <td><?= $value['number'] ?: ''; ?></td>
                                     <td><?= floatval($value['quantity']); ?></td>
                                     <td><?= floatval($value['requested']); ?></td>
@@ -200,8 +224,8 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <?php if (isset($result['invoice']) || isset($result['number_request']) || isset($result['number_order_bank'])) : ?>
                                     <div class="alert alert-info" role="alert">
                                         NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
-                                        NS: <strong><?= $result['number_request'] ?? '-'; ?></strong><br>
-                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?></strong><br>
+                                        NS: <strong><?= $result['number_request'] ?? '-'; ?><?= ($result['number_request_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_request_date'])) : '' ?></strong><br>
+                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?><?= ($result['number_order_bank_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_order_bank_date'])) : '' ?></strong><br>
                                         <?php if ($result['observation']) : ?>
                                             Observações do recebimento: <strong><?= $result['observation']; ?></strong>
                                         <?php endif; ?>
@@ -263,7 +287,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 if ($value['code'] != $result['code']) {
                                                     continue;
                                                 }
-                                                $total += $value['value'] * $value['quantity'];
+                                                if ($result['status'] == 'SOLICITADO') {
+                                                    $total += $value['value'] * $value['quantity'];
+                                                } else {
+                                                    $total += $value['value'] * $value['delivered'];
+                                                }
                                             ?>
                                                 <tr>
                                                     <td><?= substr($value['code'], -1); ?></td>
@@ -276,7 +304,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                     <td><?= $value['uf']; ?></td>
                                                     <td><?= $value['name']; ?></td>
                                                     <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                                    <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                    <?php if ($result['status'] == 'SOLICITADO'): ?>
+                                                        <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                    <?php else : ?>
+                                                        <td><?= Utils::floatToMoney(($value['value'] * $value['delivered'])); ?></td>
+                                                    <?php endif; ?>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>

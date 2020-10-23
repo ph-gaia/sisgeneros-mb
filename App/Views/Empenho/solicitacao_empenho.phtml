@@ -37,6 +37,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                             class="form-control"
                             required/>
                     </div>
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=date
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            required/>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -70,6 +79,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                             class="form-control"
                             required/>
                     </div>
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=date
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            required/>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -93,7 +111,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                     <div class="col-lg-6">
                         <form action="<?= $this->view->controller; ?>solicitacoes/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
                             <div class="input-group search-input-box">
-                                <input type="text" class="form-control search-input" placeholder="Nº Empenho, Solicitação ou Status">
+                                <input type="text" class="form-control search-input" placeholder="Nº Empenho, OM, Solicitação ou Status">
                                 <span class="input-group-btn">
                                     <button class="btn btn-secondary search-button" type="button">
                                         <i class="fa fa-search"></i>
@@ -116,7 +134,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                             <div class="card-header" id="headingOne">
                                 <h5>
                                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                        Solicitação a empresa nº <?= substr($result['code'], -1); ?> do Empenho <?= $result['codeInvoice'] ?>  - <span class="badge badge-primary"><?= $result['status']; ?></span>
+                                        Solicitação a empresa nº <?= substr($result['code'], -1); ?> do Empenho <?= $result['codeInvoice'] ?> - <?= $result['naval_indicative'] ?> - <span class="badge badge-primary"><?= $result['status']; ?></span>
                                     </button>
                                 </h5>
                             </div>
@@ -125,8 +143,8 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                 <?php if (isset($result['invoice']) || isset($result['number_request']) || isset($result['number_order_bank'])) : ?>
                                     <div class="alert alert-info" role="alert">
                                         NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
-                                        NS: <strong><?= $result['number_request'] ?? '-'; ?></strong><br>
-                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?></strong><br>
+                                        NS: <strong><?= $result['number_request'] ?? '-'; ?><?= ($result['number_request_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_request_date'])) : '' ?></strong><br>
+                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?><?= ($result['number_order_bank_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_order_bank_date'])) : '' ?></strong><br>
                                         <?php if ($result['observation']) : ?>
                                             Observações do recebimento: <strong><?= $result['observation']; ?></strong>
                                         <?php endif; ?>
@@ -188,7 +206,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                                 if ($value['code'] != $result['code']) {
                                                     continue;
                                                 }
-                                                $total += $value['value'] * $value['quantity'];
+                                                if ($result['status'] == 'SOLICITADO') {
+                                                    $total += $value['value'] * $value['quantity'];
+                                                } else {
+                                                    $total += $value['value'] * $value['delivered'];
+                                                }
                                             ?>
                                                 <tr>
                                                     <td><?= substr($value['code'], -1); ?></td>
@@ -201,7 +223,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                                     <td><?= $value['uf']; ?></td>
                                                     <td><?= $value['name']; ?></td>
                                                     <td><?= Utils::floatToMoney($value['value']); ?></td>
-                                                    <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                    <?php if ($result['status'] == 'SOLICITADO'): ?>
+                                                        <td><?= Utils::floatToMoney(($value['value'] * $value['quantity'])); ?></td>
+                                                    <?php else : ?>
+                                                        <td><?= Utils::floatToMoney(($value['value'] * $value['delivered'])); ?></td>
+                                                    <?php endif; ?>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>

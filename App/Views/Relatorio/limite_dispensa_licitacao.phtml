@@ -1,0 +1,134 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\Utils;
+use App\Helpers\View;
+use App\Config\Configurations as cfg;
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) {
+    return [
+        'previous' => "{$controllerName}solicitacao/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}solicitacao/pagina/{$btn['next']}",
+        'current' => "{$controllerName}solicitacao/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Limite de Dispensa de Licitação</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <?= $pagination; ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_OBTENCAO', 'ADMINISTRADOR'])) : ?>
+                        <div class="col-lg-5">
+                            <div class="form-group">
+                                <select class="form-control" name="om" id="om">
+                                    <option value="">OM</option>
+                                    <?php foreach ($this->view->resultOms as $value) : ?>
+                                        <option value="<?= $value['id'] ?>" <?= $value['id'] == $this->getParametro('om') ? 'selected' : '' ?>>
+                                            <?= $value['naval_indicative'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <div class="col-lg-5">
+                        <div class="form-group">
+                            <select name="account_plan" id="account_plan" class="form-control">
+                                <option value="0">Plano de Contas</option>
+                                <option value="339030.07">339030.07</option>
+                                <option value="339030.21">339030.21</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-info btn-apply-search">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-info" role="alert">
+                    Valor máximo de pedidos: <strong><?= View::floatToMoney($this->view->om['limit_request_nl']) ?></strong>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>OM</th>
+                            <th>Fornecedor</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $total = 0;
+                        foreach ($this->view->result as $value) :
+                            $total += $value['total'];
+                        ?>
+                            <tr>
+                                <td><?= $value['requests_number']; ?></td>
+                                <td><?= $value['naval_indicative']; ?></td>
+                                <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
+                                <td><?= View::floatToMoney($value['total']) ?></td>
+                                <td><?= $value['requests_status'] ?></td>
+                                <td>
+                                    <a href="<?= cfg::DEFAULT_URI ?>solicitacao/detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-bars"></i> Visualizar
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-right" colspan="3">Total (R$)</th>
+                            <td class="text-left">
+                                <span class="badge badge-danger">
+                                    <?= Utils::floatToMoney($total); ?>
+                                </span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        var btnApplySearch = $('.btn-apply-search');
+        var matchesPage = window.location.href.match(/\/pagina\/(\d+)/);
+        var page = matchesPage && matchesPage[1] || 1;
+
+        btnApplySearch.click(function btnSearch() {
+            var selectOm = $('#om').val();
+            var accountPlan = $('#account_plan').val();
+
+            var url = 'relatorio/limiteDispensa/';
+
+            if (page) {
+                url += 'pagina/' + page + '/';
+            }
+            if (selectOm) {
+                url += 'om/' + selectOm + '/';
+            }
+            if (accountPlan) {
+                url += 'accountplan/' + accountPlan + '/';
+            }
+            window.location = url;
+        });
+    });
+</script>

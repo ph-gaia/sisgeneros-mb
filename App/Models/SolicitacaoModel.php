@@ -385,6 +385,47 @@ class SolicitacaoModel extends CRUD
         $this->paginator = new Paginator($dados);
     }
 
+    public function paginatorSolicitacoesNaoLicitado(ControllerAbstract $controller, $omId)
+    {
+        $select = ""
+            . " sol.number AS requests_number, sol.id, "
+            . " oms.naval_indicative, sol.invoice, "
+            . " sol.biddings_id, sol.observation, "
+            . " sol.status AS requests_status ";
+        $subQuery = ' ,(SELECT name FROM suppliers AS f WHERE f.id = sol.suppliers_id) as suppliers_name, ';
+        $subQuery .= ' (SELECT SUM(quantity * value) FROM requests_items as items WHERE items.requests_id = sol.id) as total ';
+        $innerJoin = ""
+            . " AS sol "
+            . " INNER JOIN oms ON oms.id = sol.oms_id ";
+        $dados = [
+            'entidade' => $this->entidade . $innerJoin,
+            'select' => $select . $subQuery,
+            'pagina' => $controller->getParametro('pagina'),
+            'maxResult' => 500,
+            'orderBy' => 'sol.created_at ASC',
+            'bindValue' => []
+        ];
+        $params = $controller->getParametro();
+        // search by Om
+        $dados['where'] = ' oms.id = :omsId ';
+        $dados['bindValue'][':omsId'] = (isset($params['om']) && intval($params['om']) !== 0) ? $params['om'] : $omId;
+        // search by account plan
+        if (isset($params['accountplan'])) {
+            if (isset($dados['where'])) {
+                $dados['where'] .= ' AND sol.account_plan = :accountplan ';
+            } else {
+                $dados['where'] = ' sol.account_plan = :accountplan ';
+            }
+            $dados['bindValue'][':accountplan'] = $params['accountplan'];
+        }
+        if (isset($dados['where'])) {
+            $dados['where'] .= ' AND biddings_id = 0 ';
+        } else {
+            $dados['where'] = ' biddings_id = 0 ';
+        }
+        $this->paginator = new Paginator($dados);
+    }
+
     public function getResultadoPaginator()
     {
         return $this->paginator->getResultado();

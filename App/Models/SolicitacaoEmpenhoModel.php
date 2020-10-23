@@ -22,9 +22,9 @@ class SolicitacaoEmpenhoModel extends CRUD
 
     public function paginator($pagina, $busca = null)
     {
-        $innerJoin = " as sol_inv INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id ";
+        $innerJoin = " as sol_inv INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id INNER JOIN oms ON oms.id = inv.oms_id ";
         $dados = [
-            'select' => 'sol_inv.*, inv.code as codeInvoice',
+            'select' => 'sol_inv.*, inv.code as codeInvoice, oms.naval_indicative',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 10,
@@ -35,6 +35,7 @@ class SolicitacaoEmpenhoModel extends CRUD
             $dados['where'] = " "
                 . ' sol_inv.status LIKE :search '
                 . ' OR inv.code LIKE :search '
+                . ' OR oms.naval_indicative LIKE :search '
                 . ' OR sol_inv.code LIKE :search ';
 
             $bindValue = [
@@ -140,10 +141,12 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
+        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
 
         $query = "
             UPDATE {$this->entidade} SET 
             status = 'NF-LIQUIDADA', 
+            number_request_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
             number_request = '" . $this->getNumPedido() . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
@@ -159,10 +162,12 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setOrdemBancaria(filter_input(INPUT_POST, 'order_bank'));
+        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
 
         $query = "
             UPDATE {$this->entidade} SET 
             status = 'NF-PAGA', 
+            number_order_bank_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
             number_order_bank = '" . $this->getOrdemBancaria() . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
@@ -284,9 +289,9 @@ class SolicitacaoEmpenhoModel extends CRUD
     private function validaQtdRecebidaMenorQtdSol()
     {
         foreach ($this->getItemsList() as $value) {
-            // if (($value['quantidade'] - $value['entregue']) > $value['solicitada']) {
-            //     msg::showMsg('A quantidade recebida é maior do que a quantidade solicitada.', 'danger');
-            // }
+            if ($value['quantidade'] > $value['solicitada']) {
+                msg::showMsg('Não é possível receber uma quantidade maior que a solicitada.', 'danger');
+            }
             if (($value['quantidade'] - $value['entregue']) != $value['solicitada']) {
                 return true;
             }
