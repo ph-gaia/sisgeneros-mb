@@ -96,7 +96,7 @@ class EmpenhoController extends Controller implements CtrlInterface
         $this->view->title = 'Lista de solicitações de empresas';
 
         $model = new SolicitacaoEmpenhoModel();
-        $model->paginator($this->getParametro('pagina'), $this->getParametro('busca'));
+        $model->paginator($this->getParametro('pagina'), $this->getParametro('busca'), $this->view->userLoggedIn);
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
 

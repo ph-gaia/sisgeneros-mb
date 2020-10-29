@@ -20,7 +20,7 @@ class SolicitacaoEmpenhoModel extends CRUD
      */
     protected $paginator;
 
-    public function paginator($pagina, $busca = null)
+    public function paginator($pagina, $busca = null, $user = null)
     {
         $innerJoin = " as sol_inv INNER JOIN invoices as inv ON inv.id = sol_inv.invoices_id INNER JOIN oms ON oms.id = inv.oms_id ";
         $dados = [
@@ -31,8 +31,13 @@ class SolicitacaoEmpenhoModel extends CRUD
             'orderBy' => ' sol_inv.updated_at DESC '
         ];
 
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+            $dados['where'] = " oms.id =  {$user['oms_id']} ";
+        }
+
         if ($busca) {
-            $dados['where'] = " "
+            $andExists = isset($dados['where']) ? 'AND' : '';
+            $dados['where'] = ($dados['where'] ?? "") . " {$andExists} ( "
                 . ' sol_inv.status LIKE :search '
                 . ' OR inv.code LIKE :search '
                 . ' OR oms.naval_indicative LIKE :search '

@@ -40,10 +40,12 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                     <div class="form-group">
                         <label>Data do documento</label>
                         <input
-                            type=date
+                            type=text
                             id="date_document"
                             name="date_document"
                             class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
                             required/>
                     </div>
                 </div>
@@ -82,10 +84,12 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                     <div class="form-group">
                         <label>Data do documento</label>
                         <input
-                            type=date
+                            type=text
                             id="date_document"
                             name="date_document"
                             class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
                             required/>
                     </div>
                 </div>
