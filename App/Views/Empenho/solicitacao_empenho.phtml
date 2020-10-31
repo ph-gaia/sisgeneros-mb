@@ -13,6 +13,39 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
 });
 
 ?>
+<div class="modal fade" id="modalEntregarAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Entregar Nota fiscal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>entregarNf" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="invoice_id" id="invoice_entregar_id" />
+                    <input type="hidden" name="request_id" id="request_entregar_id" />
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=text
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
+                            required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modalLiquidarAction">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -146,7 +179,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                 <div class="card-body">
                                 <?php if (isset($result['invoice']) || isset($result['number_request']) || isset($result['number_order_bank'])) : ?>
                                     <div class="alert alert-info" role="alert">
-                                        NF: <strong><?= $result['invoice'] ?? '-'; ?></strong><br>
+                                        NF: <strong><?= $result['invoice'] ?? '-'; ?><?= ($result['invoice_date']) ? ' - ' . date('d-m-Y', strtotime($result['invoice_date'])) : '' ?></strong><br>
                                         NS: <strong><?= $result['number_request'] ?? '-'; ?><?= ($result['number_request_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_request_date'])) : '' ?></strong><br>
                                         OB: <strong><?= $result['number_order_bank'] ?? '-'; ?><?= ($result['number_order_bank_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_order_bank_date'])) : '' ?></strong><br>
                                         <?php if ($result['observation']) : ?>
@@ -173,9 +206,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                         </a>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
-                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
+                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-entregar">
                                             <i class="fa fa-check"></i> Entregar NF
-                                        </a>
+                                        </button>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-ENTREGUE') : ?>
                                         <button data-request="<?= $code; ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-liquidar">
@@ -268,6 +301,14 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
         } else {
             searchInput.focus();
         }
+    });
+    $('.btn-entregar').click(function() {
+        var requestId = $(this).attr('data-request');
+        var invoiceId = $(this).attr('data-invoice');
+
+        $('#request_entregar_id').val(requestId);
+        $('#invoice_entregar_id').val(invoiceId);
+        $('#modalEntregarAction').modal('show');
     });
     $('.btn-liquidar').click(function() {
         var requestId = $(this).attr('data-request');

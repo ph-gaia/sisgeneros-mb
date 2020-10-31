@@ -31,7 +31,7 @@ class SolicitacaoEmpenhoModel extends CRUD
             'orderBy' => ' sol_inv.updated_at DESC '
         ];
 
-        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) {
+        if (!in_array($user['level'], ['ADMINISTRADOR', 'CONTROLADOR_FINANCA'])) {
             $dados['where'] = " oms.id =  {$user['oms_id']} ";
         }
 
@@ -128,15 +128,22 @@ class SolicitacaoEmpenhoModel extends CRUD
         }
     }
 
-    public function entregarNf($id, $invoiceId)
+    public function entregarNf()
     {
-        $query = "UPDATE {$this->entidade} SET
-        status = 'NF-ENTREGUE', 
-        updated_at = '" . date('Y-m-d H:i:s') . "'
-        WHERE code = ? and invoices_id = ?";
+        $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
+        $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
+        $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
+        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
+
+        $query = "
+            UPDATE {$this->entidade} SET
+            status = 'NF-ENTREGUE', 
+            invoice_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
+            updated_at = '" . date('Y-m-d H:i:s') . "'
+            WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);
-        if ($stmt->execute([$id, $invoiceId])) {
+        if ($stmt->execute([$this->getPedidoId(), $this->getEmpenhoId()])) {
             header('Location: ' . cfg::DEFAULT_URI . 'empenho/solicitacoes');
         }
     }

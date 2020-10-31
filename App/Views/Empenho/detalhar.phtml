@@ -14,6 +14,39 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
 });
 
 ?>
+<div class="modal fade" id="modalEntregarAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Entregar Nota fiscal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>entregarNf" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="invoice_id" id="invoice_entregar_id" />
+                    <input type="hidden" name="request_id" id="request_entregar_id" />
+                    <div class="form-group">
+                        <label>Data do documento</label>
+                        <input
+                            type=text
+                            id="date_document"
+                            name="date_document"
+                            class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
+                            required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modalLiquidarAction">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -189,8 +222,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
+                        <?php $row = (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) ? 9 : 8; ?>
                             <tr>
-                                <th class="text-right" colspan="9">Total (R$)</th>
+                                <th class="text-right" colspan="<?= $row ?>">Total (R$)</th>
                                 <td class="text-left">
                                     <span class="badge badge-danger">
                                         <?= Utils::floatToMoney($total); ?>
@@ -254,9 +288,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         </a>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
-                                        <a href="<?= $this->view->controller; ?>entregarNf/id/<?= $code ?>/idlista/<?= $idlista ?>" class="btn btn-success btn-sm">
+                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-entregar">
                                             <i class="fa fa-check"></i> Entregar NF
-                                        </a>
+                                        </button>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-ENTREGUE') : ?>
                                         <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-liquidar">
@@ -339,6 +373,14 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
     </div>
 </div>
 <script>
+    $('.btn-entregar').click(function() {
+        var requestId = $(this).attr('data-request');
+        var invoiceId = $(this).attr('data-invoice');
+
+        $('#request_entregar_id').val(requestId);
+        $('#invoice_entregar_id').val(invoiceId);
+        $('#modalEntregarAction').modal('show');
+    });
     $('.btn-liquidar').click(function() {
         var requestId = $(this).attr('data-request');
         var invoiceId = $(this).attr('data-invoice');

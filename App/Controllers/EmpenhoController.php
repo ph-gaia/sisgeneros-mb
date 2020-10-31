@@ -160,7 +160,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
         $model = new SolicitacaoEmpenhoModel();
-        $model->entregarNf($this->getParametro('id'), $this->getParametro('idlista'));
+        $model->entregarNf();
     }
 
     public function liquidarNfAction()

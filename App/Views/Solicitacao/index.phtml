@@ -208,7 +208,7 @@ $status = [
                                             <i class="fa fa-check"></i> Empenhar
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'CONTROLADOR_FINANCA', 'ENCARREGADO', 'NORMAL']) && $value['status'] == 'EMPENHADO'): ?>
+                                    <?php if (in_array($userNivel, ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $value['status'] == 'EMPENHADO'): ?>
                                         <a href="<?= $this->view->controller; ?>solicitar/id/<?= $value['id']; ?>" class="btn btn-success btn-sm">
                                             <i class="fa fa-check"></i> Solicitar
                                         </a>

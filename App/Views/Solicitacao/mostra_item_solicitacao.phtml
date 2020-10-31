@@ -209,6 +209,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <i class="fa fa-check"></i> Autorizar
                     </a>
                 <?php endif; ?>
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'FISCAL']) && $this->view->resultSolicitacao['status'] == 'PROVISIONADO'): ?>
+                    <a href="<?= $this->view->controller; ?>processar/acao/proximo/status/PROVISIONADO/id/<?= $this->view->idlista; ?>" class="btn btn-success pull-right" style="margin-right: 10px;">
+                        <i class="fa fa-check"></i> Verificar
+                    </a>
+                <?php endif; ?>
                 <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL']) && $this->view->resultSolicitacao['status'] == 'ABERTO' && !isset($this->view->resultLicitacao['number'])) : ?>
                     <a href="<?= $this->view->controller; ?>adicionararquivo/idlista/<?= $this->view->idlista; ?>" class="btn btn-info pull-right" style="margin-right: 10px;">
                         <i class="fa fa-file"></i> Adicionar arquivo
@@ -259,8 +264,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <tr>
                             <th>Item</th>
                             <th>Solicitado</th>
-                            <th>Entregue</th>
-                            <th>Disponível</th>
                             <th>UF</th>
                             <th>Nome</th>
                             <th>Valor (R$)</th>
@@ -278,8 +281,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <tr>
                                 <td><?= $value['number'] ?: '-'; ?></td>
                                 <td><?= Utils::floatToMoney($value['quantity'], ''); ?></td>
-                                <td><?= intval($value['delivered']); ?></td>
-                                <td><?= Utils::floatToMoney($value['quantity_available'], ''); ?></td>
                                 <td><?= $value['uf']; ?></td>
                                 <td><?= $value['name']; ?></td>
                                 <td><?= Utils::floatToMoney($value['value']); ?></td>
@@ -301,7 +302,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th class="text-right" colspan="7">Total (R$)</th>
+                            <th class="text-right" colspan="5">Total (R$)</th>
                             <td class="text-left">
                                 <?= Utils::floatToMoney($total); ?>
                             </td>
