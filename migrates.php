@@ -553,6 +553,8 @@ try {
             $oldDate = $this->fetchData($table);
             $this->connectMySQL()->beginTransaction();
 
+            $password = (new \HTR\Helpers\Criptografia\Criptografia())->passHash('administrador' . cfg::STR_SALT);
+
             foreach ($oldDate as $value) {
                 $omData = $this->fetchNewOmsData($value['oms_id']);
                 $level = ($value['level'] == 'CONTROLADOR') ? 'CONTROLADOR_OBTENCAO' : $value['level'];
@@ -563,9 +565,9 @@ try {
                     'email' => $value['email'],
                     'level' => $level,
                     'username' => $value['username'],
-                    'password' => $value['password'],
-                    'change_password' => $this->translateYesNo($value['change_password']),
-                    'active' => $this->translateYesNo($value['active']),
+                    'password' => $password,
+                    'change_password' => 'yes',
+                    'active' => $value['active'],
                     'created_at' => date('Y-m-d', strtotime($value['created_at'])),
                     'updated_at' => date('Y-m-d', strtotime($value['updated_at']))
                 ];
@@ -669,7 +671,7 @@ try {
                     'quantity_committed' => 0,
                     'quantity_available' => $value['quantity'],
                     'value' => $value['value'],
-                    'active' => $this->translateYesNo($value['active'])
+                    'active' => $value['active']
                 ];
 
                 if (!$this->create($data, $table)) {
