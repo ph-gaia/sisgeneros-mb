@@ -58,6 +58,12 @@ try {
             // $this->migrateTableSuppliersEvaluantions();
             $this->migrateTableBillboards();
             $this->migrateTableBillboardsOmsLists();
+            $this->migrateTableIngredients();
+            $this->migrateTableRecipePatterns();
+            $this->migrateTableRecipePatternsItems();
+            $this->migrateTableMenu();
+            $this->migrateTableRecipes();
+            $this->migrateTableRecipesItems();
         }
 
         /**
@@ -889,6 +895,193 @@ try {
                         $this->connectMySQL()->rollBack();
                         throw new \Exception("Erro ao inserir {$value['id']}");
                     }
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'ingredients'
+         * @throws \Exception
+         */
+        private function migrateTableIngredients()
+        {
+            $table = 'ingredients';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+
+                $data = [
+                    'id' => null,
+                    'name' => $value['name']
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'recipes_patterns'
+         * @throws \Exception
+         */
+        private function migrateTableRecipePatterns()
+        {
+            $table = 'recipes_patterns';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+
+                $data = [
+                    'id' => null,
+                    'name' => $value['name']
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'recipes_patterns_items'
+         * @throws \Exception
+         */
+        private function migrateTableRecipePatternsItems()
+        {
+            $table = 'recipes_patterns_items';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+
+                $data = [
+                    'id' => null,
+                    'ingredients_id' => $value['ingredients_id'],
+                    'recipes_patterns_id' => $value['recipes_patterns_id'],
+                    'quantity' => $value['quantity'],
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'menus'
+         * @throws \Exception
+         */
+        private function migrateTableMenu()
+        {
+            $table = 'menus';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+                $omsData = $this->fetchNewOmsData($value['oms_id']);
+
+                $data = [
+                    'id' => null,
+                    'oms_id' => $omsData['id'],
+                    'users_id_requesters' => $value['users_id_requesters'],
+                    'users_id_authorizers' => $value['users_id_authorizers'],
+                    'beginning_date' => $value['beginning_date'],
+                    'ending_date' => $value['ending_date'],
+                    'status' => $value['status'],
+                    'raw_menus_object' => $value['raw_menus_object'],
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'recipes'
+         * @throws \Exception
+         */
+        private function migrateTableRecipes()
+        {
+            $table = 'recipes';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+
+                $data = [
+                    'id' => null,
+                    'meals_id' => $value['meals_id'],
+                    'menus_id' => $value['menus_id'],
+                    'recipes_patterns_id' => $value['recipes_patterns_id'],
+                    'name' => $value['name'],
+                    'quantity_people' => $value['quantity_people'],
+                    'date' => $value['date'],
+                    'sort' => $value['sort'],
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
+                }
+            }
+
+            $this->connectMySQL()->commit();
+            $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        /**
+         * Migrate the data from table 'recipes_items'
+         * @throws \Exception
+         */
+        private function migrateTableRecipesItems()
+        {
+            $table = 'recipes_items';
+            $this->showMessageBeginningAndEndExecution($table);
+            $oldDate = $this->fetchData($table);
+            $this->connectMySQL()->beginTransaction();
+
+            foreach ($oldDate as $value) {
+
+                $data = [
+                    'id' => null,
+                    'recipes_id' => $value['recipes_id'],
+                    'biddings_items_id' => $value['biddings_items_id'],
+                    'name' => $value['name'],
+                    'suggested_quantity' => $value['suggested_quantity'],
+                    'quantity' => $value['quantity']
+                ];
+
+                if (!$this->create($data, $table)) {
+                    $this->connectMySQL()->rollBack();
+                    throw new \Exception("Erro ao inserir {$value['id']}");
                 }
             }
 
