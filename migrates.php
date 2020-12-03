@@ -696,15 +696,19 @@ try {
             $this->connectMySQL()->beginTransaction();
 
             foreach ($oldDate as $value) {
-                $data = [
-                    'id' => null,
-                    'biddings_id' => $value['id'],
-                    'oms_id' => 1,
-                ];
+                $omsData = $this->fetchData('oms', '', 'mysql');
 
-                if (!$this->create($data, $table)) {
-                    $this->connectMySQL()->rollBack();
-                    throw new \Exception("Erro ao inserir {$value['id']}");
+                foreach ($omsData as $oms) {
+                    $data = [
+                        'id' => null,
+                        'biddings_id' => $value['id'],
+                        'oms_id' => $oms['id'],
+                    ];
+    
+                    if (!$this->create($data, $table)) {
+                        $this->connectMySQL()->rollBack();
+                        throw new \Exception("Erro ao inserir {$value['id']}");
+                    }
                 }
             }
 
