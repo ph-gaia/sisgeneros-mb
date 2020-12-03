@@ -509,10 +509,10 @@ try {
                 "ABERTO" => "ELABORADO",
                 "APROVADO" => "ENCAMINHADO",
                 "PROCESSADO" => "CONFERIDO",
-                "EMPENHADO" => "EMPENHADO",
+                "EMPENHADO" => "CONFERIDO",
                 "SOLICITADO" => "SOLICITADO",
                 "RECEBIDO" => "RECEBIDO",
-                'NF-ENTREGUE' => 'NF-ENTREGUE',
+                'NF-ENTREGUE' => 'NF-FINANCAS',
                 'NF-FINANCAS' => 'NF-FINANCAS',
                 'NF-PAGA' => 'NF-PAGA'
             ];
@@ -1108,6 +1108,11 @@ try {
 
             $this->connectMySQL()->commit();
             $this->showMessageBeginningAndEndExecution($table, true);
+        }
+
+        private function processBalanceBiddings()
+        {
+            
         }
     };
 } catch (\Exception $ex) {
