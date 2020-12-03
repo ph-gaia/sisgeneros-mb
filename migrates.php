@@ -500,6 +500,27 @@ try {
         }
 
         /**
+         * The method returns the new status based on the old status
+         * @return string
+         */
+        private function requestStatusFromTo($statusOld)
+        {
+            $status = [
+                "ABERTO" => "ELABORADO",
+                "APROVADO" => "ENCAMINHADO",
+                "PROCESSADO" => "CONFERIDO",
+                "EMPENHADO" => "EMPENHADO",
+                "SOLICITADO" => "SOLICITADO",
+                "RECEBIDO" => "RECEBIDO",
+                'NF-ENTREGUE' => 'NF-ENTREGUE',
+                'NF-FINANCAS' => 'NF-FINANCAS',
+                'NF-PAGA' => 'NF-PAGA'
+            ];
+
+            return $status[$statusOld];
+        }
+
+        /**
          * Migrate the data from table 'om'
          * @throws \Exception
          */
@@ -745,7 +766,7 @@ try {
                         'suppliers_id' => $suppliersData['id'],
                         'biddings_id' => $value['biddings_id'],
                         'number' => $value['number'],
-                        'status' => $value['status'],
+                        'status' => $this->requestStatusFromTo($value['status']),
                         'invoice' => $value['invoice'] ?? 'S/N',
                         'observation' => $value['observation'],
                         'modality' => $value['number'] ? 'Pregão Eletrônico' : 'Dispensa de Licitação Valor',
