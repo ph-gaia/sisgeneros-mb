@@ -47,23 +47,26 @@ try {
         {
             $this->databaseConfig = new DatabaseConfig();
             $this->setUp($args);
-            $this->migrateTableOms();
-            $this->migrateTableUsers();
-            $this->migrateTableSuppliers();
-            $this->migrateTableBiddings();
-            $this->migrateTableBiddingsItems();
-            $this->migrateTableBiddingsOmsLists();
-            $this->migrateTableRequests();
-            $this->migrateTableRequestsItems();
-            // $this->migrateTableSuppliersEvaluantions();
-            $this->migrateTableBillboards();
-            $this->migrateTableBillboardsOmsLists();
-            $this->migrateTableIngredients();
-            $this->migrateTableRecipePatterns();
-            $this->migrateTableRecipePatternsItems();
-            $this->migrateTableMenu();
-            $this->migrateTableRecipes();
-            $this->migrateTableRecipesItems();
+            // $this->migrateTableOms();
+            // $this->migrateTableUsers();
+            // $this->migrateTableSuppliers();
+            // $this->migrateTableBiddings();
+            // $this->migrateTableBiddingsItems();
+            // $this->migrateTableBiddingsOmsLists();
+            // $this->migrateTableRequests();
+            // $this->migrateTableRequestsItems();
+            // // $this->migrateTableSuppliersEvaluantions();
+            // $this->migrateTableBillboards();
+            // $this->migrateTableBillboardsOmsLists();
+            // $this->migrateTableIngredients();
+            // $this->migrateTableRecipePatterns();
+            // $this->migrateTableRecipePatternsItems();
+            // $this->migrateTableMenu();
+            // $this->migrateTableRecipes();
+            // $this->migrateTableRecipesItems();
+            $this->balanceCompromisedBiddings();
+            $this->balanceCommittedBiddings();
+            $this->updateAvailableBiddings();
         }
 
         /**
@@ -731,7 +734,7 @@ try {
                         'biddings_id' => $value['id'],
                         'oms_id' => $oms['id'],
                     ];
-    
+
                     if (!$this->create($data, $table)) {
                         $this->connectMySQL()->rollBack();
                         throw new \Exception("Erro ao inserir {$value['id']}");
@@ -758,13 +761,14 @@ try {
 
                 $omsData = $this->fetchNewOmsData($value['oms_id']);
                 $suppliersData = $this->fetchNewSuppliersData($value['suppliers_id']);
+                $biddingsData = $this->fetchNewBiddingsData($value['biddings_id']);
 
                 if (isset($omsData['id'], $suppliersData['id'])) {
                     $data = [
                         'id' => null,
                         'oms_id' => $omsData['id'],
                         'suppliers_id' => $suppliersData['id'],
-                        'biddings_id' => $value['biddings_id'],
+                        'biddings_id' => $biddingsData['id'],
                         'number' => $value['number'],
                         'status' => $this->requestStatusFromTo($value['status']),
                         'invoice' => $value['invoice'] ?? 'S/N',
@@ -1110,9 +1114,79 @@ try {
             $this->showMessageBeginningAndEndExecution($table, true);
         }
 
-        private function processBalanceBiddings()
+        /**
+         * @throws \Exception
+         */
+        private function balanceCompromisedBiddings()
         {
-            
+            try {
+                $connection = $this->connectMySQL();
+                $sql = " SELECT A.number, B.biddings_id, A.name, A.quantity FROM requests_items as A "
+                    . " INNER JOIN requests as B ON B.id = A.requests_id "
+                    . " WHERE B.status = 'CONFERIDO';";
+                $data = $connection->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+
+                foreach ($data as $value) {
+                    $sqlUpdate = " "
+                        . " UPDATE biddings_items "
+                        . " SET quantity_compromised = {$value['quantity']} "
+                        . " WHERE biddings_id = {$value['biddings_id']} "
+                        . " and number = {$value['number']};";
+                    $connection->exec($sqlUpdate);
+                }
+            } catch (\PDOException $ex) {
+                throw new \Exception(""
+                    . "ERRO!"
+                    . $sqlUpdate
+                    . PHP_EOL
+                    . $ex->getMessage()
+                    . "" . PHP_EOL);
+            }
+        }
+
+        /**
+         * @throws \Exception
+         */
+        private function balanceCommittedBiddings()
+        {
+            try {
+                $connection = $this->connectMySQL();
+                $sql = " SELECT A.number, B.biddings_id, A.name, A.quantity FROM requests_items as A "
+                    . " INNER JOIN requests as B ON B.id = A.requests_id "
+                    . " WHERE B.status IN ('EMPENHADO', 'SOLICITADO', 'RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA');";
+                $data = $connection->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+
+                foreach ($data as $value) {
+                    $sqlUpdate = " "
+                        . " UPDATE biddings_items "
+                        . " SET quantity_committed = {$value['quantity']} "
+                        . " WHERE biddings_id = {$value['biddings_id']} "
+                        . " and number = {$value['number']};";
+                    $connection->exec($sqlUpdate);
+                }
+            } catch (\PDOException $ex) {
+                throw new \Exception(""
+                    . "ERRO!"
+                    . $sqlUpdate
+                    . PHP_EOL
+                    . $ex->getMessage()
+                    . "" . PHP_EOL);
+            }
+        }
+
+        private function updateAvailableBiddings()
+        {
+            try {
+                $connection = $this->connectMySQL();
+                $sql = "UPDATE sisgeneros_mb.biddings_items SET quantity_available = quantity - (quantity_compromised + quantity_committed);";
+                $connection->exec($sql);
+            } catch (\PDOException $ex) {
+                throw new \Exception(""
+                    . "ERRO!"
+                    . PHP_EOL
+                    . $ex->getMessage()
+                    . "" . PHP_EOL);
+            }
         }
     };
 } catch (\Exception $ex) {
