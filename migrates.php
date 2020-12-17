@@ -47,26 +47,26 @@ try {
         {
             $this->databaseConfig = new DatabaseConfig();
             $this->setUp($args);
-            // $this->migrateTableOms();
-            // $this->migrateTableUsers();
-            // $this->migrateTableSuppliers();
-            // $this->migrateTableBiddings();
-            // $this->migrateTableBiddingsItems();
-            // $this->migrateTableBiddingsOmsLists();
+            $this->migrateTableOms();
+            $this->migrateTableUsers();
+            $this->migrateTableSuppliers();
+            $this->migrateTableBiddings();
+            $this->migrateTableBiddingsItems();
+            $this->migrateTableBiddingsOmsLists();
             // $this->migrateTableRequests();
             // $this->migrateTableRequestsItems();
-            // // $this->migrateTableSuppliersEvaluantions();
-            // $this->migrateTableBillboards();
-            // $this->migrateTableBillboardsOmsLists();
-            // $this->migrateTableIngredients();
-            // $this->migrateTableRecipePatterns();
-            // $this->migrateTableRecipePatternsItems();
-            // $this->migrateTableMenu();
-            // $this->migrateTableRecipes();
-            // $this->migrateTableRecipesItems();
-            $this->balanceCompromisedBiddings();
-            $this->balanceCommittedBiddings();
-            $this->updateAvailableBiddings();
+            // $this->migrateTableSuppliersEvaluantions();
+            $this->migrateTableBillboards();
+            $this->migrateTableBillboardsOmsLists();
+            $this->migrateTableIngredients();
+            $this->migrateTableRecipePatterns();
+            $this->migrateTableRecipePatternsItems();
+            $this->migrateTableMenu();
+            $this->migrateTableRecipes();
+            $this->migrateTableRecipesItems();
+            // $this->balanceCompromisedBiddings();
+            // $this->balanceCommittedBiddings();
+            // $this->updateAvailableBiddings();
         }
 
         /**
