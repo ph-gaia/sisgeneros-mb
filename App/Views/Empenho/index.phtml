@@ -72,6 +72,9 @@ $pagination = Pagination::make($this);
                                         <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
                                             <i class="fa fa-copy"></i> Itens
                                         </a>
+                                        <a href="<?= $this->view->controller; ?>cancelarEmpenho/idlista/<?= $value['id']; ?>" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-ban"></i> Cancelar
+                                        </a>
                                     <?php endif; ?>
                                 </td>
                             </tr>

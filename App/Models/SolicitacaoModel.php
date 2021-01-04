@@ -419,7 +419,7 @@ class SolicitacaoModel extends CRUD
             $dados['bindValue'][':accountplan'] = $params['accountplan'];
         }
         if (isset($dados['where'])) {
-            $dados['where'] .= ' AND biddings_id = 0 ';
+            $dados['where'] .= " AND biddings_id = 0 AND sol.status NOT IN ('ELABORADO', 'ENCAMINHADO', 'REJEITADO')";
         } else {
             $dados['where'] = ' biddings_id = 0 ';
         }
@@ -1216,9 +1216,10 @@ class SolicitacaoModel extends CRUD
                     msg::showMsg('Só é permitido o envio de arquivos no formato PDF.', 'danger');
                 }
             }
-        } else {
-            msg::showMsg('Deve ser feito o Upload de pelo menos um arquivo.', 'danger');
         }
+        // else {
+        //     msg::showMsg('Deve ser feito o Upload de pelo menos um arquivo.', 'danger');
+        // }
     }
 
     /**
@@ -1232,6 +1233,7 @@ class SolicitacaoModel extends CRUD
         $fullPath = $directoryReference . cfg::DS . 'arquivos' . cfg::DS . $solicitationNumber . cfg::DS;
 
         if ($files && $this->createDirectory($fullPath)) {
+            chmod($fullPath, 0777);
             foreach ($files["tmp_name"] as $index => $file) {
                 $fileDestination = $fullPath . $solicitationNumber . '_' . $index . '.pdf';
                 move_uploaded_file($file, $fileDestination);

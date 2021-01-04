@@ -10,6 +10,7 @@ use App\Config\Configurations as cfg;
 use App\Models\EmpenhoItemsModel;
 use App\Models\SolicitacaoModel;
 use App\Helpers\Utils;
+use App\Helpers\View;
 
 class EmpenhoModel extends CRUD
 {
@@ -187,6 +188,90 @@ class EmpenhoModel extends CRUD
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id, $invoiceId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function cancelarEmpenho($user)
+    {
+        $this->setItemsList($this->buildItems(filter_input_array(INPUT_POST)));
+        $this->setCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS));
+
+        $creditoModel = new CreditoProvisionadoModel();
+        $item = new ItemModel();
+
+        $creditoProvisionado = $creditoModel->findByOmId($user['oms_id']);
+
+        $total = 0;
+        foreach ($this->getItemsList() as $idItem => $value) {
+            // atualizando a quantidade comprometida da licitação
+            $result = $this->findItemByCodeNumber($this->getCode(), $idItem);
+
+            if ($value['quantidade'] > ($result['quantity'] - $result['delivered'])) {
+                msg::showMsg('A quantidade para cancelar deve ser igual ou inferior a quantidade disponível', 'danger');
+            }
+
+            $produto = $item->findByNumberAnBiddings($result['number'], $result['biddings_id']);
+            $item->cancelarQtdEmpenhada($produto['id'], $value['quantidade']);
+
+            // atualizando a quantidade de itens empenhados
+            $query = "" .
+                " UPDATE invoices_items SET " .
+                " quantity = ? " .
+                " WHERE number = ? and invoices_id = ? ";
+
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute([($result['quantity'] - $value['quantidade']), $result['number'], $result['invoices_id']]);
+
+            // somando o total dos itens cancelados
+            $total += $value['quantidade'] * $result['value'];
+        }
+
+        // devolvendo o saldo do crédito provisionado
+        (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+            $creditoProvisionado['id'],
+            $total,
+            'CREDITO',
+            "CRÉDITO DE " . View::floatToMoney($total) . "; REFERENTE AO CANCELAMENTO DO EMPENHO " . $this->getCode()
+        );
+
+        msg::showMsg('Cancelado os itens do empenho com sucesso!'
+                . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'empenho/" />'
+                . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/"; }, 2000); </script>', 'success');
+    }
+
+    private function findItemByCodeNumber($code, $number)
+    {
+        $query = ""
+            . " SELECT item.* "
+            . " FROM invoices_items as item "
+            . " INNER JOIN invoices ON invoices.id = item.invoices_id "
+            . " WHERE invoices.code LIKE :code AND number = :number; ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':code' => $code, ':number' => $number]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Make the itens of Biggings requests
+     * @param array $values The input values
+     * @return array
+     */
+    private function buildItems(array $values): array
+    {
+        $result = [];
+        if (isset($values['quantity'], $values['ids']) && is_array($values['quantity'])) {
+            foreach ($values['quantity'] as $index => $value) {
+                $id = filter_var($values['ids'][$index], FILTER_VALIDATE_INT);
+                $requested = filter_var(Utils::normalizeFloat($values['requested'][$index]), FILTER_VALIDATE_FLOAT);
+                $delivered = filter_var(Utils::normalizeFloat($values['delivered'][$index]), FILTER_VALIDATE_FLOAT);
+                $delived = filter_var(Utils::normalizeFloat($value), FILTER_VALIDATE_FLOAT);
+
+                if ($id && $delived) {
+                    $result[$id] = ['quantidade' => $delived, 'solicitada' => $requested, 'entregue' => $delivered];
+                }
+            }
+        }
+
+        return $result;
     }
 
     private function validaAll($user)

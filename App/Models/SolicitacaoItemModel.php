@@ -213,14 +213,11 @@ class SolicitacaoItemModel extends CRUD
     public function quantidadeDemanda($itemnumber, $idLicitacao)
     {
         $stmt = $this->pdo->prepare(""
-            . " SELECT SUM(`requests_items`.`delivered`) as sum_quantity "
-            . " FROM `requests_items` "
-            . " INNER JOIN `requests` "
-            . "     ON `requests_items`.`requests_id` = `requests`.`id` "
-            . " WHERE "
-            . "     `requests`.`status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA') "
-            . "     AND `requests_items`.`number` = ? "
-            . "     AND `requests`.`biddings_id` = ?;");
+            . " SELECT SUM(`delivered`) as sum_quantity "
+            . " FROM `requests_invoices` "
+            . " WHERE `status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA') "
+            . "     AND `number` = ? "
+            . "     AND `biddings_id` = ?;");
         $stmt->execute([$itemnumber, $idLicitacao]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $result ? $result['sum_quantity'] : false;

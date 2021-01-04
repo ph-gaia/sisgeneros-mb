@@ -176,4 +176,27 @@ class EmpenhoController extends Controller implements CtrlInterface
         $model = new SolicitacaoEmpenhoModel();
         $model->pagarNf();
     }
+
+    public function cancelarEmpenhoAction()
+    {
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new EmpenhoModel();
+        $items = new EmpenhoItemsModel();
+
+        $this->view->title = 'Cancelar itens do empenho';
+        $this->view->idlista = $this->getParametro('idlista');
+        $this->view->resultEmpenho = $model->findByIdlista($this->getParametro('idlista'));
+        $items->paginator($this->getParametro('pagina'), $this->getParametro('idlista'));
+        $this->view->result = $items->getResultadoPaginator();
+        $this->view->btn = $items->getNavePaginator();
+
+        $this->render('cancelar_empenho');
+    }
+
+    public function cancelarItensEmpenhoAction()
+    {
+        $user = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new EmpenhoModel();
+        $model->cancelarEmpenho($user);
+    }
 }

@@ -29,14 +29,16 @@ class RelatorioModel extends CRUD
                 req.status AS requests_status ";
         $innerJoin = ""
             . " AS ev "
-            . " INNER JOIN requests AS req "
-            . "     ON req.id = ev.requests_id "
+            . " INNER JOIN requests_invoices AS req "
+            . "     ON req.code = ev.requests_id "
+            . " INNER JOIN invoices AS inv "
+            . "     ON inv.id = req.invoices_id "
             . " INNER JOIN suppliers AS supp "
             . "     ON supp.id = req.suppliers_id "
             . " INNER JOIN biddings AS lic "
             . "     ON lic.id = req.biddings_id "
             . " INNER JOIN oms "
-            . "     ON oms.id = req.oms_id ";
+            . "     ON oms.id = inv.oms_id ";
         $dados = [
             'entidade' => $this->entidade . $innerJoin,
             'select' => $select,

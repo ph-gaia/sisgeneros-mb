@@ -48,6 +48,17 @@ class ItemModel extends CRUD
         return $this->paginator->getNaveBtn();
     }
 
+    public function findByNumberAnBiddings($number, $biddings)
+    {
+        $query = ""
+            . " SELECT * "
+            . " FROM {$this->entidade} "
+            . " WHERE biddings_id = :biddings and number = :number; ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([':number' => $number, ':biddings' => $biddings]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
     public function novoRegistro()
     {
         // Valida dados
@@ -155,6 +166,27 @@ class ItemModel extends CRUD
     {
         $stmt = $this->pdo->prepare("UPDATE biddings_items SET quantity_available = quantity - (quantity_compromised + quantity_committed)");
         if ($stmt->execute()) {
+            return true;
+        }
+    }
+
+    /**
+     * função para cancelar a quantidade de itens empenhados
+     * 
+     * @param $id identificador do item
+     * @param $quantity quantidade Empenhada
+     */
+    public function cancelarQtdEmpenhada($id, $quantity)
+    {
+        $result = $this->findById($id);
+
+        $dados = [
+            'quantity' => $result['quantity'] + $quantity,
+            'quantity_committed' => $result['quantity_committed'] - $quantity
+        ];
+
+        if (parent::editar($dados, $id)) {
+            $this->atualizarQtdDisponivel();
             return true;
         }
     }

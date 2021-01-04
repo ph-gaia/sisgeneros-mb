@@ -1,0 +1,127 @@
+<?php
+
+use App\Helpers\Pagination;
+use App\Helpers\Utils;
+
+$idlista = $this->view->idlista;
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($idlista) {
+    return [
+        'previous' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/{$btn['next']}",
+        'current' => "{$controllerName}detalhar/idlista/{$idlista}/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
+
+?>
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Pedidos do Empenho</h5>
+                <?php if (isset($this->view->resultEmpenho['code'])) : ?>
+                    <div class="alert alert-info" role="alert">
+                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><br>
+                        OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
+                        Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
+                    </div>
+                <?php endif; ?>
+                <div id="resultado"></div>
+                <form action="<?= $this->view->controller ?>cancelarItensEmpenho" method="post" id="form">
+                    <input type="hidden" name="code_invoice" value="<?= $this->view->resultEmpenho['code']; ?>">
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                        <button class="btn btn-danger">
+                            <i class="fa fa-ban"></i> Cancelar empenho
+                        </button>
+                    <?php endif ?>
+                    <p class="help-block" style="color: #130f0f; font-weight: bold;">* Informe a quantidade para cancelar do empenho.</p>
+                    <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $idlista ?>" class="btn btn-warning pull-right">
+                        <i class="fa fa-arrow-left"></i> Voltar
+                    </a>
+                    <div class="row" style="margin-bottom: 10px; margin-top: 10px;">
+                        <div class="col-md-12">
+                            <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                        </div>
+                    </div>
+                    <?= $pagination; ?>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                                <th width="8%">Quantidade</th>
+                                <?php endif ?>
+                                <th>Item</th>
+                                <th>Empenhado</th>
+                                <th>Solicitado</th>
+                                <th>Entregue</th>
+                                <th>Disponível</th>
+                                <th>UF</th>
+                                <th>Nome</th>
+                                <th>Valor (R$)</th>
+                                <th>Subtotal</th>
+                                <th>Subtotal Disponível</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $total = 0;
+                            $totalDisponivel = 0;
+                            foreach ($this->view->result as $value) :
+                                $subTotal = $value['value'] * $value['quantity'];
+                                $total += $subTotal;
+                                $totalDisponivel += ($value['value'] * $value['quantity']) - ($value['value'] * $value['delivered']);
+                                $qtdDisponivel = $value['quantity'] - ($value['delivered'] + $value['requested']);
+                            ?>
+                                <tr>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                                        <td>
+                                            <input type="hidden" name="ids[]" value="<?= $value['number']; ?>" 
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="hidden" name="requested[]" id="requested[]" value="<?= $value['requested'] ?>"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="hidden" name="delivered[]" value="<?= intval($value['delivered']); ?>"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                            <input type="text" name="quantity[]" id="quantity" class="form-control"
+                                            <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
+                                        </td>
+                                    <?php endif; ?>
+                                    <td><?= $value['number'] ?: ''; ?></td>
+                                    <td><?= floatval($value['quantity']); ?></td>
+                                    <td><?= floatval($value['requested']); ?></td>
+                                    <td><?= intval($value['delivered']); ?></td>
+                                    <td>
+                                        <span class="badge badge-primary">
+                                            <?= floatval($qtdDisponivel); ?>
+                                        </span>
+                                    </td>
+                                    <td><?= $value['uf']; ?></td>
+                                    <td><?= $value['name']; ?></td>
+                                    <td><?= Utils::floatToMoney($value['value']); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal); ?></td>
+                                    <td><?= Utils::floatToMoney($subTotal - ($value['value'] * $value['delivered'])); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                        <?php $row = (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) ? 9 : 8; ?>
+                            <tr>
+                                <th class="text-right" colspan="<?= $row ?>">Total (R$)</th>
+                                <td class="text-left">
+                                    <span class="badge badge-danger">
+                                        <?= Utils::floatToMoney($total); ?>
+                                    </span>
+                                </td>
+                                <td class="text-left">
+                                    <span class="badge badge-danger">
+                                        <?= Utils::floatToMoney($totalDisponivel); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </form>
+                <?= $pagination; ?>
+            </div>
+        </div>
+    </div>
+</div>

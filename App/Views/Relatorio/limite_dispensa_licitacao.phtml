@@ -45,8 +45,8 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                         <div class="form-group">
                             <select name="account_plan" id="account_plan" class="form-control">
                                 <option value="0">Plano de Contas</option>
-                                <option value="339030.07">339030.07</option>
-                                <option value="339030.21">339030.21</option>
+                                <option value="339030.07"  <?= '339030.07' == $this->getParametro('accountplan') ? 'selected' : '' ?>>339030.07</option>
+                                <option value="339030.21"  <?= '339030.21' == $this->getParametro('accountplan') ? 'selected' : '' ?>>339030.21</option>
                             </select>
                         </div>
                     </div>

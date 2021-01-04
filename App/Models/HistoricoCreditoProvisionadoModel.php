@@ -33,7 +33,7 @@ class HistoricoCreditoProvisionadoModel extends CRUD
             'maxResult' => 10,
             'where' => 'provisioned_credits_id = :id',
             'bindValue' => [':id' => $id],
-            'orderBy' => 'created_at DESC',
+            'orderBy' => 'id DESC',
         ];
 
         $paginator = new Paginator($dados);
@@ -76,7 +76,7 @@ class HistoricoCreditoProvisionadoModel extends CRUD
             'value' => $value,
             'observation' => $observation,
             'provisioned_credits_id' => $id,
-            'created_at' => date('Y-m-d')
+            'created_at' => date('Y-m-d H:i:s')
         ];
         if (parent::novo($dados)) {
             $this->atualizaSaldoCredito($id);
