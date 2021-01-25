@@ -142,6 +142,13 @@ class EmpenhoController extends Controller implements CtrlInterface
         $model->novoRegistro($user);
     }
 
+    public function editarAction()
+    {
+        $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);
+        $model = new EmpenhoModel();
+        $model->editarRegistro();
+    }
+
     public function cancelaAction()
     {
         $user = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR', 'CONTROLADOR_FINANCA']);

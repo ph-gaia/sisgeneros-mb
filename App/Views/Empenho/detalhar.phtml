@@ -133,6 +133,37 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         </div>
     </div>
 </div>
+<div class="modal fade" id="modalEditarAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar empenho</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= $this->view->controller; ?>editar" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="invoice_id" id="invoice_editar_id" />
+                    <div class="form-group">
+                        <label>Número do Empenho</label>
+                        <input
+                            type="text"
+                            name="code_invoice"
+                            id="code_invoice"
+                            class="form-control"
+                            placeholder="Informe o código do empenho"
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary float-right"><i class="fa fa-check"></i> Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div id="page-wrapper">
     <div class="container-fluid">
         <div class="row">
@@ -140,7 +171,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <h5>Pedidos do Empenho</h5>
                 <?php if (isset($this->view->resultEmpenho['code'])) : ?>
                     <div class="alert alert-info" role="alert">
-                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><br>
+                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><button class="btn btn-success btn-sm btn-editar" data-invoice="<?= $this->view->resultEmpenho['code'] ?>"><i class="fa fa-edit"></i></button><br>
                         OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
                         Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
                     </div>
@@ -399,5 +430,12 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         $('#request_pagar_id').val(requestId);
         $('#invoice_pagar_id').val(invoiceId);
         $('#modalPagarAction').modal('show');
+    });
+    $('.btn-editar').click(function() {
+        var invoiceId = $(this).attr('data-invoice');
+
+        $('#invoice_editar_id').val(invoiceId);
+        $('#code_invoice').val(invoiceId);
+        $('#modalEditarAction').modal('show');
     });
 </script>

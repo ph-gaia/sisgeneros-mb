@@ -132,6 +132,29 @@ class EmpenhoModel extends CRUD
         }
     }
 
+    public function editarRegistro()
+    {
+        $this->setCode(filter_input(INPUT_POST, 'invoice_id', FILTER_SANITIZE_SPECIAL_CHARS));
+        $this->setNewCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS));
+
+        $result = $this->findByCode($this->getNewCode());
+
+        if ($result) {
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/');
+            exit;
+        }
+
+        // atualizando o código do empenho
+        $query = "" .
+            " UPDATE invoices SET code = ? WHERE code = ? ";
+
+        $stmt = $this->pdo->prepare($query);
+
+        if ($stmt->execute([$this->getNewCode(), $this->getCode()])) {
+            header('Location: ' . cfg::DEFAULT_URI . 'empenho/');
+        }
+    }
+
     public function atualizarStatus($id)
     {
         $dados = [
@@ -195,16 +218,27 @@ class EmpenhoModel extends CRUD
         $this->setItemsList($this->buildItems(filter_input_array(INPUT_POST)));
         $this->setCode(filter_input(INPUT_POST, 'code_invoice', FILTER_SANITIZE_SPECIAL_CHARS));
 
+        $empenhoResult = $this->findByCode($this->getCode());
         $creditoModel = new CreditoProvisionadoModel();
         $item = new ItemModel();
+        $invoiceItem = new EmpenhoItemsModel();
 
-        $creditoProvisionado = $creditoModel->findByOmId($user['oms_id']);
+        $creditoProvisionado = $creditoModel->findByOmId($empenhoResult['oms_id']);
 
         $total = 0;
         foreach ($this->getItemsList() as $idItem => $value) {
-            // atualizando a quantidade comprometida da licitação
-            $result = $this->findItemByCodeNumber($this->getCode(), $idItem);
+            $result = $invoiceItem->findById($idItem);
 
+            if ($result['biddings_id'] == 0 && $result['number'] == 0) {
+                $this->processaCancelamentoNaoLicitado($result, $value['quantidade'], $idItem);
+
+                // somando o total dos itens cancelados
+                $total += $value['quantidade'] * $result['value'];
+
+                continue;
+            }
+
+            // atualizando a quantidade comprometida da licitação
             if ($value['quantidade'] > ($result['quantity'] - $result['delivered'])) {
                 msg::showMsg('A quantidade para cancelar deve ser igual ou inferior a quantidade disponível', 'danger');
             }
@@ -212,42 +246,55 @@ class EmpenhoModel extends CRUD
             $produto = $item->findByNumberAnBiddings($result['number'], $result['biddings_id']);
             $item->cancelarQtdEmpenhada($produto['id'], $value['quantidade']);
 
-            // atualizando a quantidade de itens empenhados
-            $query = "" .
-                " UPDATE invoices_items SET " .
-                " quantity = ? " .
-                " WHERE number = ? and invoices_id = ? ";
-
-            $stmt = $this->pdo->prepare($query);
-            $stmt->execute([($result['quantity'] - $value['quantidade']), $result['number'], $result['invoices_id']]);
+            $this->atualizaQuantidaEmpenho($value['quantidade'], $result['quantity'], $idItem);
 
             // somando o total dos itens cancelados
             $total += $value['quantidade'] * $result['value'];
         }
 
-        // devolvendo o saldo do crédito provisionado
-        (new HistoricoCreditoProvisionadoModel())->novaTransacao(
-            $creditoProvisionado['id'],
-            $total,
-            'CREDITO',
-            "CRÉDITO DE " . View::floatToMoney($total) . "; REFERENTE AO CANCELAMENTO DO EMPENHO " . $this->getCode()
-        );
+        if ($total > 0) {
+            // devolvendo o saldo do crédito provisionado
+            (new HistoricoCreditoProvisionadoModel())->novaTransacao(
+                $creditoProvisionado['id'],
+                $total,
+                'CREDITO',
+                "CRÉDITO DE " . View::floatToMoney($total) . "; REFERENTE AO CANCELAMENTO DO EMPENHO " . $this->getCode()
+            );
+        }
 
         msg::showMsg('Cancelado os itens do empenho com sucesso!'
-                . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'empenho/" />'
-                . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/"; }, 2000); </script>', 'success');
+            . '<meta http-equiv="refresh" content="5;URL=' . cfg::DEFAULT_URI . 'empenho/" />'
+            . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'empenho/"; }, 2000); </script>', 'success');
     }
 
-    private function findItemByCodeNumber($code, $number)
+    private function atualizaQuantidaEmpenho($quantitySol, $quantityCurrent, $id)
     {
-        $query = ""
-            . " SELECT item.* "
-            . " FROM invoices_items as item "
-            . " INNER JOIN invoices ON invoices.id = item.invoices_id "
-            . " WHERE invoices.code LIKE :code AND number = :number; ";
+        $query = "" .
+            " UPDATE invoices_items SET " .
+            " quantity = ? " .
+            " WHERE id = ? ";
+
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute([':code' => $code, ':number' => $number]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($stmt->execute([($quantityCurrent - $quantitySol), $id])) {
+            return true;
+        }
+    }
+
+    private function processaCancelamentoNaoLicitado($item, $quantitySol, $id)
+    {
+        // atualizando a quantidade comprometida da licitação
+        if ($quantitySol > ($item['quantity'] - $item['delivered'])) {
+            msg::showMsg('A quantidade para cancelar deve ser igual ou inferior a quantidade disponível', 'danger');
+        }
+
+        $this->atualizaQuantidaEmpenho($quantitySol, $item['quantity'], $id);
+
+        $query = "" .
+            " UPDATE requests_items SET quantity = quantity - ? " .
+            " WHERE requests_id = ? and name LIKE ?";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$quantitySol, $item['requests_id'], $item['name']]);
     }
 
     /**

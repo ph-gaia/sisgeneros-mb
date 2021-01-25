@@ -29,7 +29,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div id="resultado"></div>
                 <form action="<?= $this->view->controller ?>cancelarItensEmpenho" method="post" id="form">
                     <input type="hidden" name="code_invoice" value="<?= $this->view->resultEmpenho['code']; ?>">
-                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
                         <button class="btn btn-danger">
                             <i class="fa fa-ban"></i> Cancelar empenho
                         </button>
@@ -47,7 +47,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     <table class="table">
                         <thead>
                             <tr>
-                                <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
                                 <th width="8%">Quantidade</th>
                                 <?php endif ?>
                                 <th>Item</th>
@@ -73,9 +73,9 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 $qtdDisponivel = $value['quantity'] - ($value['delivered'] + $value['requested']);
                             ?>
                                 <tr>
-                                    <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
+                                    <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
                                         <td>
-                                            <input type="hidden" name="ids[]" value="<?= $value['number']; ?>" 
+                                            <input type="hidden" name="ids[]" value="<?= $value['id']; ?>" 
                                             <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
                                             <input type="hidden" name="requested[]" id="requested[]" value="<?= $value['requested'] ?>"
                                             <?= ($qtdDisponivel <= 0) ? 'disabled' : '' ?>>
@@ -103,7 +103,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot>
-                        <?php $row = (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) ? 9 : 8; ?>
+                        <?php $row = (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) ? 9 : 8; ?>
                             <tr>
                                 <th class="text-right" colspan="<?= $row ?>">Total (R$)</th>
                                 <td class="text-left">
