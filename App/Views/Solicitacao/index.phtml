@@ -105,10 +105,28 @@ $status = [
                         </form>
                     </div>
                 </div>
+                <?php if (in_array($userNivel, ['ADMINISTRADOR', 'FISCAL', 'ORDENADOR'])): ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-info check-all btn-sm">
+                                <i class="fa fa-check-square"></i> Marcar todos
+                            </button>
+                            <button class="btn btn-danger uncheck-all btn-sm">
+                                <i class="fa fa-square"></i> Desmarcar todos
+                            </button>
+                            <?php if (in_array($userNivel, ['ADMINISTRADOR', 'FISCAL'])): ?>
+                            <button class="btn btn-success verify-action btn-sm" data-action="<?= $this->view->controller; ?>verificarEmLote">
+                                <i class="fa fa-check"></i> Verificar
+                            </button>
+                            <?php endif ?>
+                        </div>
+                    </div>
+                <?php endif ?>
                 <?= "Total de resultados " . count($this->view->result) ?>
                 <table class="table">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Nº</th>
                             <th>OM</th>
                             <th>Fornecedor</th>
@@ -123,6 +141,16 @@ $status = [
                     <tbody>
                         <?php foreach ($this->view->result as $value): ?>
                             <tr>
+                                <?php if (in_array($userNivel, ['ADMINISTRADOR', 'FISCAL']) && $value['status'] == 'PROVISIONADO') { ?>
+                                <td>
+                                    <input type="checkbox"
+                                        name="requests[]"
+                                        value="<?= $value['id']; ?>"
+                                        class="requests">
+                                </td>
+                                <?php } else { ?>
+                                <td></td>
+                                <?php } ?>
                                 <td><?= $value['number']; ?></td>
                                 <td><?= $value['naval_indicative']; ?></td>
                                 <td><?= View::limitString($value['suppliers_name'], 17); ?></td>
@@ -265,5 +293,27 @@ $status = [
         $('#action').val('CANCELADO');
         $('#request_id').val(id);
         $('#modalAction').modal('show');
+    });
+    $('.check-all').click(function () {
+        $('input[type=checkbox]').each(function (i, v) {
+            $(v).prop('checked', true);
+        });
+    });
+    $('.uncheck-all').click(function () {
+        $('input[type=checkbox]').each(function (i, v) {
+            $(v).prop('checked', false);
+        });
+    });
+    $('.verify-action').click(function btnSearch() {
+        var requests = [];
+        var action = $(this).attr('data-action');
+        $("input[type=checkbox]:checked").each(function() {
+            requests.push($(this).val());
+        });
+        if (requests.length > 0 && action) {
+            window.location = action + '/ids/' + requests;
+        } else {
+            alert("Selecione uma opção");
+        }
     });
 </script>

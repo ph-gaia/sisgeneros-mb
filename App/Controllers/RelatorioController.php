@@ -154,4 +154,19 @@ class RelatorioController extends Controller implements CtrlInterface
 
         $this->render('limite_dispensa_licitacao');
     }
+
+    public function indicadorTempoAction()
+    {
+        $this->view->title = 'Relatório de indicador de tempo de pagamento das notas fiscais';
+
+        $model = new SolicitacaoEmpenhoModel();
+        $omModel = new OmModel();
+        $this->view->resultOms = $omModel->findAll(function ($db) {
+            $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
+        });
+
+        $this->view->result = $model->findIndicadorTempo($this);
+
+        $this->render('mostra_indicador_tempo');
+    }
 }

@@ -361,6 +361,24 @@ class SolicitacaoController extends Controller implements CtrlInterface
         }
     }
 
+    public function verificarEmLoteAction()
+    {
+        $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
+            ->clearAccessList()
+            ->authenticAccess(['ADMINISTRADOR', 'FISCAL']);
+
+        $ids = $this->getParametro('ids');
+        $ids = explode(",", $ids);
+        $status = 'PROVISIONADO';
+        $action = 'PROXIMO';
+
+        foreach ($ids as $id) {
+            (new SolicitacaoModel())->processStatus($id, $status, $action, $this->view->userLoggedIn['id']);
+        }
+
+        header('location: ' . $this->view->controller);
+    }
+
     public function autorizarAction()
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')

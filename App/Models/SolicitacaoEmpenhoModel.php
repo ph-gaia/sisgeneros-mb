@@ -9,6 +9,7 @@ use HTR\Helpers\Paginator\Paginator;
 use HTR\System\ModelCRUD as CRUD;
 use App\Models\EmpenhoItemsModel;
 use App\Helpers\Utils;
+use HTR\System\ControllerAbstract;
 
 class SolicitacaoEmpenhoModel extends CRUD
 {
@@ -52,6 +53,44 @@ class SolicitacaoEmpenhoModel extends CRUD
         $paginator = new Paginator($dados);
         $this->resultadoPaginator = $paginator->getResultado();
         $this->navPaginator = $paginator->getNaveBtn();
+    }
+
+    public function findIndicadorTempo(ControllerAbstract $controller)
+    {
+        $query = ""
+            . " SELECT "
+            . " DATEDIFF(req_inv.number_order_bank_date, req_inv.invoice_date) as date_diff, "
+            . " count(req_inv.id) as qtd "
+            . " FROM requests_invoices as req_inv "
+            . " INNER JOIN invoices as inv ON inv.id = req_inv.invoices_id "
+            . " WHERE req_inv.status = 'NF-PAGA' ";
+
+        $params = $controller->getParametro();
+        $dados = [];
+
+        // search by Om
+        if (isset($params['om']) && intval($params['om']) !== 0) {
+            $query .= " AND inv.oms_id = {$params['om']} ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
+            $date = Utils::dateDatabaseFormate($params['dateInit']);
+
+            $query .= " AND req_inv.created_at >= '{$date}' ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
+            $date = Utils::dateDatabaseFormate($params['dateEnd']);
+
+            $query .= " AND req_inv.created_at <= '{$date}' ";
+        }
+
+        $query .= " GROUP BY req_inv.code ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getResultadoPaginator()

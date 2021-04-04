@@ -33,7 +33,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                 id="om">
                                 <option value="">OM</option>
                                 <?php foreach ($this->view->resultOms as $value): ?>
-                                    <option value="<?= $value['id'] ?>" <?= View::isSelected($value['id'], $this->getParametro('om')); ?>>
+                                    <option value="<?= $value['id'] ?>" <?= View::isSelected($value['id'], $this->getParametro('oms')); ?>>
                                         <?= $value['naval_indicative'] ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -141,7 +141,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                 url += 'pagina/' + page + '/';
             }
             if (selectOm) {
-                url += 'om/' + selectOm + '/';
+                url += 'oms/' + selectOm + '/';
             }
             if (status) {
                 url += 'status/' + status + '/';
