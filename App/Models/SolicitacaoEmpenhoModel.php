@@ -38,7 +38,7 @@ class SolicitacaoEmpenhoModel extends CRUD
 
         if ($busca) {
             $andExists = isset($dados['where']) ? 'AND' : '';
-            $dados['where'] = ($dados['where'] ?? "") . " {$andExists} ( "
+            $dados['where'] = ($dados['where'] ?? "") . " {$andExists} "
                 . ' sol_inv.status LIKE :search '
                 . ' OR inv.code LIKE :search '
                 . ' OR oms.naval_indicative LIKE :search '
