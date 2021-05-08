@@ -165,7 +165,8 @@ class RelatorioController extends Controller implements CtrlInterface
             $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
         });
 
-        $this->view->result = $model->findIndicadorTempo($this);
+        $this->view->result = $model->findIndicadorTemporResume($this);
+        $this->view->dados = $model->findIndicadorTempo($this);
 
         $this->render('mostra_indicador_tempo');
     }

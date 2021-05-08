@@ -115,20 +115,20 @@ $idlista = $this->getParametro('idlista');
                                                    value="<?= $value['uf']; ?>">
                                             <input type="hidden"
                                                    name="requested[]"
-                                                   value="<?= intval($value['quantity']); ?>">
+                                                   value="<?= floatval($value['quantity']); ?>">
                                             <input type="hidden"
                                                    name="delivered[]"
-                                                   value="<?= intval($value['delivered']); ?>">
+                                                   value="<?= floatval($value['delivered']); ?>">
                                             <input type="hidden"
                                                    name="name[]"
                                                    value="---">
                                             <input type="text"
                                                    name="quantity[]"
                                                    id="quantity"
-                                                   value="<?= intval($value['quantity']); ?>"
+                                                   value="<?= floatval($value['quantity']); ?>"
                                                    class="form-control">
                                         </td>
-                                        <td><?= intval($value['quantity']); ?></td>
+                                        <td><?= floatval($value['quantity']); ?></td>
                                         <td><?= $value['number']; ?></td>
                                         <td><?= View::floatToMoney($value['value']); ?></td>
                                         <td><?= $value['uf']; ?></td>

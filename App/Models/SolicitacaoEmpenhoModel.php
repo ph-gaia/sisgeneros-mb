@@ -55,7 +55,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->navPaginator = $paginator->getNaveBtn();
     }
 
-    public function findIndicadorTempo(ControllerAbstract $controller)
+    public function findIndicadorTemporResume(ControllerAbstract $controller)
     {
         $query = ""
             . " SELECT "
@@ -63,6 +63,44 @@ class SolicitacaoEmpenhoModel extends CRUD
             . " count(req_inv.id) as qtd "
             . " FROM requests_invoices as req_inv "
             . " INNER JOIN invoices as inv ON inv.id = req_inv.invoices_id "
+            . " WHERE req_inv.status = 'NF-PAGA' ";
+
+        $params = $controller->getParametro();
+        $dados = [];
+
+        // search by Om
+        if (isset($params['om']) && intval($params['om']) !== 0) {
+            $query .= " AND inv.oms_id = {$params['om']} ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
+            $date = Utils::dateDatabaseFormate($params['dateInit']);
+
+            $query .= " AND req_inv.created_at >= '{$date}' ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
+            $date = Utils::dateDatabaseFormate($params['dateEnd']);
+
+            $query .= " AND req_inv.created_at <= '{$date}' ";
+        }
+
+        $query .= " GROUP BY req_inv.code ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findIndicadorTempo(ControllerAbstract $controller)
+    {
+        $query = ""
+            . " SELECT "
+            . " req_inv.*, oms.naval_indicative "
+            . " FROM requests_invoices as req_inv "
+            . " INNER JOIN invoices as inv ON inv.id = req_inv.invoices_id "
+            . " INNER JOIN oms ON oms.id = inv.oms_id "
             . " WHERE req_inv.status = 'NF-PAGA' ";
 
         $params = $controller->getParametro();

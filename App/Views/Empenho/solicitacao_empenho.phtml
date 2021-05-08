@@ -252,7 +252,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                                 <tr>
                                                     <td><?= substr($value['code'], -1); ?></td>
                                                     <td><?= floatval($value['quantity']); ?></td>
-                                                    <td><?= intval($value['delivered']); ?></td>
+                                                    <td><?= floatval($value['delivered']); ?></td>
                                                     <?php if ($result['status'] == 'SOLICITADO'): ?>
                                                     <td><?= floatval($value['quantity'] - $value['delivered']); ?></td>
                                                     <?php endif; ?>

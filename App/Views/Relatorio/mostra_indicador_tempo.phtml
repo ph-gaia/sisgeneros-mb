@@ -1,5 +1,9 @@
 <?php
 
+use App\Helpers\Utils;
+use App\Helpers\View;
+use App\Config\Configurations as cfg;
+
 $showMedia = false;
 
 if (isset($this->view->result) && $total = count($this->view->result)) {
@@ -73,6 +77,37 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                             Total de notas pagas: <?= $total; ?><br>
                             Tempo médio: <?= $media; ?>
                         </div>
+                    </div>
+                    <div class="row">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nº.</th>
+                                    <th>OM</th>
+                                    <th>Nota Fiscal</th>
+                                    <th>Recebida NF</th>
+                                    <th>OB</th>
+                                    <th>Recebida OB</th>
+                                    <th>Data de criação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                foreach ($this->view->dados as $value) : ?>
+                                    <tr>
+                                        <td><strong><?= substr($value['code'], -1); ?></strong></td>
+                                        <td><?= $value['naval_indicative']; ?></td>
+                                        <td><?= $value['invoice']; ?></td>
+                                        <td><?= View::humanDate($value['invoice_date']); ?></td>
+                                        <td><?= $value['number_order_bank']; ?></td>
+                                        <td><?= View::humanDate($value['number_order_bank_date']); ?></td>
+                                        <td><?= View::humanDate($value['created_at']); ?></td>
+                                    </tr>
+                                <?php
+                                endforeach;
+                                ?>
+                            </tbody>
+                        </table>
                     </div>
                 <?php else: ?>
                 <div class="row alert alert-danger">
