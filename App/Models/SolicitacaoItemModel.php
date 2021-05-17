@@ -215,7 +215,7 @@ class SolicitacaoItemModel extends CRUD
         $stmt = $this->pdo->prepare(""
             . " SELECT SUM(`delivered`) as sum_quantity "
             . " FROM `requests_invoices` "
-            . " WHERE `status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-FINANCAS', 'NF-PAGA') "
+            . " WHERE `status` IN ('RECEBIDO', 'NF-ENTREGUE', 'NF-LIQUIDADA', 'NF-FINANCAS', 'NF-PAGA') "
             . "     AND `number` = ? "
             . "     AND `biddings_id` = ?;");
         $stmt->execute([$itemnumber, $idLicitacao]);
