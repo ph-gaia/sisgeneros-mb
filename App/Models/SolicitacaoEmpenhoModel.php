@@ -77,14 +77,14 @@ class SolicitacaoEmpenhoModel extends CRUD
         if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
             $date = Utils::dateDatabaseFormate($params['dateInit']);
 
-            $query .= " AND req_inv.created_at >= '{$date}' ";
+            $query .= " AND req_inv.number_order_bank_date >= '{$date}' ";
         }
 
         // search by Date Init
         if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
             $date = Utils::dateDatabaseFormate($params['dateEnd']);
 
-            $query .= " AND req_inv.created_at <= '{$date}' ";
+            $query .= " AND req_inv.number_order_bank_date <= '{$date}' ";
         }
 
         $query .= " GROUP BY req_inv.code ";
@@ -115,14 +115,14 @@ class SolicitacaoEmpenhoModel extends CRUD
         if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
             $date = Utils::dateDatabaseFormate($params['dateInit']);
 
-            $query .= " AND req_inv.created_at >= '{$date}' ";
+            $query .= " AND req_inv.number_order_bank_date >= '{$date}' ";
         }
 
         // search by Date Init
         if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
             $date = Utils::dateDatabaseFormate($params['dateEnd']);
 
-            $query .= " AND req_inv.created_at <= '{$date}' ";
+            $query .= " AND req_inv.number_order_bank_date <= '{$date}' ";
         }
 
         $query .= " GROUP BY req_inv.code ";
@@ -210,7 +210,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
-        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
+        $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
         $query = "
             UPDATE {$this->entidade} SET
@@ -230,7 +230,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
-        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
+        $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
         $query = "
             UPDATE {$this->entidade} SET 
@@ -251,7 +251,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setOrdemBancaria(filter_input(INPUT_POST, 'order_bank'));
-        $this->setDataDocumento(filter_input(INPUT_POST, 'date_document'));
+        $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
         $query = "
             UPDATE {$this->entidade} SET 
@@ -418,6 +418,25 @@ class SolicitacaoEmpenhoModel extends CRUD
                 . '<script>focusOn("invoice");</script>', 'danger');
         }
         return $this;
+    }
+
+    private function abstractDateValidate(string $value)
+    {
+        try {
+            $date = Utils::dateDatabaseFormate($value);
+            if (!v::date()->validate($date)) {
+                echo '<script>
+                window.location.replace("'. cfg::DEFAULT_URI . 'empenho/solicitacoes");
+                alert("O campo de data deve ser preenchido corretamente.");</script>';
+                exit;
+            }
+            return $date;
+        } catch (\Exception $e) {
+            echo '<script>
+            window.location.replace("'. cfg::DEFAULT_URI . 'empenho/solicitacoes");
+            alert("' . $e->getMessage() . '");</script>';
+            exit;
+        }
     }
 
     /**

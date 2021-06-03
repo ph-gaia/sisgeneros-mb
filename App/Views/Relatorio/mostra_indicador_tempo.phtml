@@ -75,14 +75,13 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                     <div class="row alert alert-info">
                         <div class="col-md-6">
                             Total de notas pagas: <?= $total; ?><br>
-                            Tempo médio: <?= $media; ?>
+                            Tempo médio: <?= round($media, 2); ?>
                         </div>
                     </div>
                     <div class="row">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Nº.</th>
                                     <th>OM</th>
                                     <th>Nota Fiscal</th>
                                     <th>Recebida NF</th>
@@ -95,7 +94,6 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                                 <?php
                                 foreach ($this->view->dados as $value) : ?>
                                     <tr>
-                                        <td><strong><?= substr($value['code'], -1); ?></strong></td>
                                         <td><?= $value['naval_indicative']; ?></td>
                                         <td><?= $value['invoice']; ?></td>
                                         <td><?= View::humanDate($value['invoice_date']); ?></td>
