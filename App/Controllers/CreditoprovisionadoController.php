@@ -37,7 +37,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function detalharAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'FISCAL', 'NORMAL', 'ADMINISTRADOR', 'ORDENADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'FISCAL', 'FISCAL_SUBSTITUTO', 'NORMAL', 'ADMINISTRADOR', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $this->view->title = 'Editando Registro';
         $this->view->result = $model->findById($this->getParametro('id'));
@@ -59,7 +59,7 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'FISCAL', 'ADMINISTRADOR', 'ORDENADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ADMINISTRADOR', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $this->view->title = 'Lista de Todos os Créditos provisionados';
         $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn);

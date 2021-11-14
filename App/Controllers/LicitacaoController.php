@@ -54,7 +54,7 @@ class LicitacaoController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO']);
         $model = new LicitacaoModel();
         $this->view->title = 'Lista de Todas as Licitações';
         $model->paginator($this->getParametro('pagina'), null, $this->view->userLoggedIn['oms_id']);

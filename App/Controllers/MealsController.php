@@ -27,7 +27,7 @@ class MealsController extends Controller implements CtrlInterface
 
     public function novoAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
         $this->view->title = 'Novo Registro';
         $this->render('form_novo');
     }
@@ -68,7 +68,7 @@ class MealsController extends Controller implements CtrlInterface
 
     public function alteraAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO']);
         $model = new MealsModel();
         $model->editarRegistro();
     }

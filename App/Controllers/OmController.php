@@ -17,7 +17,7 @@ class OmController extends Controller implements CtrlInterface
         parent::__construct($bootstrap);
         $this->view->controller = cfg::DEFAULT_URI . 'om/';
         $this->access = new Access();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
     }
 
     public function indexAction()

@@ -250,7 +250,7 @@ class SolicitacaoModel extends CRUD
             'select' => 'sol.*, ' . $subQuery . ', oms.naval_indicative, biddings.number as biddingsNumber ',
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
-            'maxResult' => 100,
+            'maxResult' => 350,
             'orderBy' => $strOrdenar
         ];
 
@@ -284,6 +284,16 @@ class SolicitacaoModel extends CRUD
         if ($user['level'] === 'ORDENADOR') {
             $dados['where'] = 'status = :status and oms_id = :omsId';
             $dados['bindValue'] = [':status' => 'VERIFICADO', ':omsId' => $user['oms_id']];
+        }
+
+        if (in_array($user['level'], ['FISCAL_SUBSTITUTO'])) {
+            $dados['where'] = "status IN ('PROVISIONADO','ENCAMINHADO') and oms_id = :omsId";
+            $dados['bindValue'] = [':omsId' => $user['oms_id']];
+        }
+
+        if (in_array($user['level'], ['ORDENADOR_SUBSTITUTO'])) {
+            $dados['where'] = "status IN ('VERIFICADO', 'PROVISIONADO') and oms_id = :omsId";
+            $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 
         /**
@@ -654,11 +664,11 @@ class SolicitacaoModel extends CRUD
         $creditoProvisionado = $creditoModel->findByOmId($pedido['oms_id']);
 
         if ($pedido['status'] != 'VERIFICADO') {
-            msg::showMsg("A solicitação não está apta para ser autorizada!", "danger");
+            msg::showMsg("A solicitação " . $pedido['number'] . " não está apta para ser autorizada!", "danger");
         }
 
         if ($total['total'] > $creditoProvisionado['value']) {
-            msg::showMsg("O valor do pedido é superior ao saldo disponível no crédito", "danger");
+            msg::showMsg("O valor da solicitação " . $pedido['number'] . " é superior ao saldo disponível no crédito", "danger");
         }
 
         $dados = [
@@ -674,8 +684,6 @@ class SolicitacaoModel extends CRUD
                 'DEBITO',
                 "DÉBITO DE " . View::floatToMoney($total['total']) . "; REFERENTE A SOLICITAÇÃO " . $pedido['number']
             );
-
-            header('Location: ' . cfg::DEFAULT_URI . 'solicitacao/');
         }
     }
 

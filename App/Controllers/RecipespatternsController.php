@@ -37,7 +37,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function editarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR', 'ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['NORMAL', 'ENCARREGADO', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new RecipesPatternsModel();
         $this->view->title = 'Editando Registro';
         $this->view->result = $model->findById($this->getParametro('id'));
@@ -62,7 +62,7 @@ class RecipespatternsController extends Controller implements CtrlInterface
 
     public function verAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO']);
         $model = new RecipesPatternsModel();
         $this->view->title = 'Lista de Todas as Receitas Padrões';
         $model->paginator($this->getParametro('pagina'));

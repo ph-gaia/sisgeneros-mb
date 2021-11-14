@@ -19,7 +19,9 @@ class IndexController extends Controller implements CtrlInterface
         "NORMAL" => "ELABORADO",
         "ENCARREGADO" => "ENCAMINHADO",
         "FISCAL" => "PROVISIONADO",
+        "FISCAL_SUBSTITUTO" => "PROVISIONADO",
         "ORDENADOR" => "VERIFICADO",
+        "ORDENADOR_SUBSTITUTO" => "VERIFICADO",
         "CONTROLADOR_OBTENCAO" => "AUTORIZADO",
         "CONTROLADOR_FINANCA" => "CONFERIDO",
     ];
@@ -28,7 +30,7 @@ class IndexController extends Controller implements CtrlInterface
     {
         parent::__construct($bootstrap);
         $this->access = new Access();
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'ORDENADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'ENCARREGADO', 'NORMAL', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
     }
 
     public function indexAction()

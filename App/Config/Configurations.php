@@ -18,7 +18,9 @@ class Configurations extends InternalConfigurations
         'NORMAL',
         'ENCARREGADO',
         'FISCAL',
+        'FISCAL_SUBSTITUTO',
         'ORDENADOR',
+        'ORDENADOR_SUBSTITUTO',
         'CONTROLADOR_OBTENCAO',
         'CONTROLADOR_FINANCA',
         'ADMINISTRADOR'

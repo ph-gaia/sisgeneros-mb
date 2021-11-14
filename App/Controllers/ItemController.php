@@ -68,7 +68,7 @@ class ItemController extends Controller implements CtrlInterface
 
     public function listarAction()
     {
-        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'FISCAL']);
+        $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'FISCAL', 'FISCAL_SUBSTITUTO']);
         $model = new ItemModel();
         $this->view->title = 'Lista de Itens da Licitação';
         $model->paginator($this->getParametro('pagina'), $this->view->idlista);
