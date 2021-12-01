@@ -73,7 +73,16 @@ $pagination = Pagination::make($this);
     </div>
 </div>
 <script>
-    $('.search-button').click(function btnSearch() {
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    $('.search-input').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    function btnSearch() {
         var searchInput = $('.search-input');
         var searchValue = searchInput.val();
         var formAction = $('.search-form').attr('action');
@@ -82,5 +91,5 @@ $pagination = Pagination::make($this);
         } else {
             searchInput.focus();
         }
-    });
+    }
 </script>

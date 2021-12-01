@@ -134,6 +134,8 @@ class AcessoModel extends CRUD
             $dados['oms_id'] = $user['oms_id'];
         }
 
+        $this->saveOneFile(getcwd(), $this->getNip());
+
         if (parent::editar($dados, $this->getId())) {
             msg::showMsg('001', 'success');
         }
@@ -273,6 +275,33 @@ class AcessoModel extends CRUD
     {
         $session = new Session();
         return $session->stopSession();
+    }
+
+    /**
+     * Create a new directory
+     * @param string $fullPath The full path of directory
+     * @return bool
+     */
+    private function createDirectory(string $fullPath): bool
+    {
+        if (file_exists($fullPath)) {
+            return true;
+        }
+
+        return mkdir($fullPath, 0777, true);
+    }
+
+    public function saveOneFile(string $directoryReference, int $nipUser)
+    {
+        $file = $_FILES['arquivo'] ?? false;
+        $fullPath = $directoryReference . cfg::DS . 'arquivos' . cfg::DS . $nipUser . cfg::DS;
+
+        if ($file && $file['type'] === 'application/pdf' && $this->createDirectory($fullPath)) {
+            $fileDestination = $fullPath . $nipUser . '_' . date('Y-m-d-h-m-i-s') . '.pdf';
+            move_uploaded_file($file['tmp_name'], $fileDestination);
+            return true;
+        }
+        return false;
     }
 
     private function buildSetters()

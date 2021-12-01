@@ -27,6 +27,16 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div class="modal-body">
                     <input type="hidden" name="invoice_id" id="invoice_entregar_id" />
                     <input type="hidden" name="request_id" id="request_entregar_id" />
+                    <input type="hidden" name="method_action" id="method_action_entregar" />
+                    <div class="form-group">
+                        <label>Número da Nota Fiscal:</label>
+                        <input
+                            type=text
+                            id="nota_fiscal"
+                            name="nota_fiscal"
+                            placeholder="Digite o número da nota fiscal"
+                            class="form-control"/>
+                    </div>
                     <div class="form-group">
                         <label>Data do documento</label>
                         <input
@@ -61,6 +71,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div class="modal-body">
                     <input type="hidden" name="invoice_id" id="invoice_id" />
                     <input type="hidden" name="request_id" id="request_id" />
+                    <input type="hidden" name="method_action" id="method_action_liquidar" />
                     <div class="form-group">
                         <label>Número da NS</label>
                         <input
@@ -75,7 +86,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <label>Data do documento</label>
                         <input
                             type=text
-                            id="date_document"
+                            id="date_document_liquidar"
                             name="date_document"
                             class="form-control"
                             placeholder="Data no formato DD-MM-AAAA"
@@ -105,6 +116,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <div class="modal-body">
                     <input type="hidden" name="invoice_id" id="invoice_pagar_id" />
                     <input type="hidden" name="request_id" id="request_pagar_id" />
+                    <input type="hidden" name="method_action" id="method_action_pagar" />
                     <div class="form-group">
                         <label>Número da Ordem Bancária (OB)</label>
                         <input
@@ -119,7 +131,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                         <label>Data do documento</label>
                         <input
                             type=text
-                            id="date_document"
+                            id="date_document_ob"
                             name="date_document"
                             class="form-control"
                             placeholder="Data no formato DD-MM-AAAA"
@@ -298,12 +310,70 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <div class="card-body">
                                 <?php if (isset($result['invoice']) || isset($result['number_request']) || isset($result['number_order_bank'])) : ?>
                                     <div class="alert alert-info" role="alert">
-                                        NF: <strong><?= $result['invoice'] ?? '-'; ?><?= ($result['invoice_date']) ? ' - ' . date('d-m-Y', strtotime($result['invoice_date'])) : '' ?></strong><br>
-                                        NS: <strong><?= $result['number_request'] ?? '-'; ?><?= ($result['number_request_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_request_date'])) : '' ?></strong><br>
-                                        OB: <strong><?= $result['number_order_bank'] ?? '-'; ?><?= ($result['number_order_bank_date']) ? ' - ' . date('d-m-Y', strtotime($result['number_order_bank_date'])) : '' ?></strong><br>
-                                        <?php if ($result['observation']) : ?>
-                                            Observações do recebimento: <strong><?= $result['observation']; ?></strong>
-                                        <?php endif; ?>
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <h5 class="alert-heading">
+                                                Nota Fiscal
+                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['invoice'] && $result['invoice_date']): ?>
+                                                    <button
+                                                        data-method-action="edit"
+                                                        data-request="<?= $result['code'] ?>"
+                                                        data-invoice="<?= $result['invoices_id'] ?>"
+                                                        data-nota-fiscal=<?= $result['invoice'] ?>
+                                                        data-nota-fiscal-date=<?= date('d-m-Y', strtotime($result['invoice_date'])) ?>
+                                                        class="btn btn-success btn-sm btn-entregar">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                </h5>
+                                                <strong>Nº:</strong> <?= $result['invoice'] ?? '-'; ?>
+                                                <br>
+                                                <strong>Data:</strong> <?= ($result['invoice_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <h5 class="alert-heading">
+                                                Nota de Sistema
+                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['number_request'] && $result['number_request_date']): ?>
+                                                    <button
+                                                        class="btn btn-success btn-sm btn-liquidar"
+                                                        data-method-action="edit"
+                                                        data-request="<?= $result['code'] ?>"
+                                                        data-invoice="<?= $result['invoices_id'] ?>"
+                                                        data-ns-number="<?= $result['number_request'] ?>"
+                                                        data-ns-number-date="<?= date('d-m-Y', strtotime($result['number_request_date'])) ?>">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                </h5>
+                                                <strong>Nº:</strong> <?= $result['number_request'] ?? '-'; ?>
+                                                <br>
+                                                <strong>Data:</strong> <?= ($result['number_request_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <h5 class="alert-heading">
+                                                Ordem Bancária
+                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['number_order_bank'] && $result['number_order_bank_date']): ?>
+                                                    <button
+                                                        class="btn btn-success btn-sm btn-pagar"
+                                                        data-method-action="edit"
+                                                        data-request="<?= $result['code'] ?>"
+                                                        data-invoice="<?= $result['invoices_id'] ?>"
+                                                        data-ob-number="<?= $result['number_order_bank'] ?>"
+                                                        data-ob-number-date="<?= date('d-m-Y', strtotime($result['number_order_bank_date'])) ?>">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                </h5>
+                                                <strong>Nº:</strong> <?= $result['number_order_bank'] ?? '-'; ?>
+                                                <br>
+                                                <strong>Data:</strong> <?= ($result['number_order_bank_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <?php if ($result['observation']) : ?>
+                                                Observações do recebimento: <strong><?= $result['observation']; ?></strong>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 <?php endif; ?>
                                     <?php
@@ -325,17 +395,17 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         </a>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
-                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-entregar">
+                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" data-method-action="add" class="btn btn-success btn-sm btn-entregar">
                                             <i class="fa fa-check"></i> Entregar NF
                                         </button>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-ENTREGUE') : ?>
-                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-liquidar">
+                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" data-method-action="add" class="btn btn-success btn-sm btn-liquidar">
                                             <i class="fa fa-check-square-o"></i> Liquidar NF
                                         </button>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['status'] == 'NF-LIQUIDADA') : ?>
-                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" class="btn btn-success btn-sm btn-pagar">
+                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" data-method-action="add" class="btn btn-success btn-sm btn-pagar">
                                             <i class="fa fa-dollar"></i> Pagar NF
                                         </button>
                                     <?php endif; ?>
@@ -413,25 +483,43 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
     $('.btn-entregar').click(function() {
         var requestId = $(this).attr('data-request');
         var invoiceId = $(this).attr('data-invoice');
+        var invoice = $(this).attr('data-nota-fiscal');
+        var invoiceDate = $(this).attr('data-nota-fiscal-date');
+        var action = $(this).attr('data-method-action');
 
         $('#request_entregar_id').val(requestId);
         $('#invoice_entregar_id').val(invoiceId);
+        $('#nota_fiscal').val(invoice);
+        $('#date_document').val(invoiceDate);
+        $('#method_action').val(action);
         $('#modalEntregarAction').modal('show');
     });
     $('.btn-liquidar').click(function() {
         var requestId = $(this).attr('data-request');
         var invoiceId = $(this).attr('data-invoice');
+        var nsNumber = $(this).attr('data-ns-number');
+        var nsNumberDate = $(this).attr('data-ns-number-date');
+        var action = $(this).attr('data-method-action');
 
         $('#request_id').val(requestId);
         $('#invoice_id').val(invoiceId);
+        $('#number_request').val(nsNumber);
+        $('#date_document_liquidar').val(nsNumberDate);
+        $('#method_action').val(action);
         $('#modalLiquidarAction').modal('show');
     });
     $('.btn-pagar').click(function() {
         var requestId = $(this).attr('data-request');
         var invoiceId = $(this).attr('data-invoice');
+        var obNumber = $(this).attr('data-ob-number');
+        var obNumberDate = $(this).attr('data-ob-number-date');
+        var action = $(this).attr('data-method-action');
 
         $('#request_pagar_id').val(requestId);
         $('#invoice_pagar_id').val(invoiceId);
+        $('#order_bank').val(obNumber);
+        $('#date_document_ob').val(obNumberDate);
+        $('#method_action').val(action);
         $('#modalPagarAction').modal('show');
     });
     $('.btn-editar').click(function() {

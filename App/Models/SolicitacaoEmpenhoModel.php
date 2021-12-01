@@ -209,13 +209,16 @@ class SolicitacaoEmpenhoModel extends CRUD
     {
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
-        $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
+        $this->setInvoice(filter_input(INPUT_POST, 'nota_fiscal'));
+        $this->setAction(filter_input(INPUT_POST, 'method_action'));
         $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
+        $status = ($this->getAction() == 'add') ? " status = 'NF-ENTREGUE', " : "";
         $query = "
-            UPDATE {$this->entidade} SET
-            status = 'NF-ENTREGUE', 
-            invoice_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
+            UPDATE {$this->entidade} SET "
+            . $status .
+            "invoice_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
+            invoice = '" . $this->getInvoice() . "',
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
 
@@ -230,12 +233,15 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
+        $this->setAction(filter_input(INPUT_POST, 'method_action'));
         $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
+        $status = ($this->getAction() == 'add') ? " status = 'NF-LIQUIDADA', " : "";
+
         $query = "
-            UPDATE {$this->entidade} SET 
-            status = 'NF-LIQUIDADA', 
-            number_request_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
+            UPDATE {$this->entidade} SET "
+            . $status .
+            "number_request_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
             number_request = '" . $this->getNumPedido() . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
@@ -251,12 +257,15 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setPedidoId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setOrdemBancaria(filter_input(INPUT_POST, 'order_bank'));
+        $this->setAction(filter_input(INPUT_POST, 'method_action'));
         $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
 
+        $status = ($this->getAction() == 'add') ? " status = 'NF-PAGA', " : "";
+
         $query = "
-            UPDATE {$this->entidade} SET 
-            status = 'NF-PAGA', 
-            number_order_bank_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
+            UPDATE {$this->entidade} SET "
+            . $status .
+            "number_order_bank_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
             number_order_bank = '" . $this->getOrdemBancaria() . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
@@ -296,6 +305,8 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setId(filter_input(INPUT_POST, 'request_id'));
         $this->setEmpenhoId(filter_input(INPUT_POST, 'invoice_id'));
         $this->setInvoice(filter_input(INPUT_POST, 'nota_fiscal'));
+        $this->setDateEmission($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document_emission')));
+        $this->setDateDelivery($this->abstractDateValidate(filter_input(INPUT_POST, 'date_delivery')));
         $this->validaInvoice($this->getInvoice());
         $this->setObservation(filter_input(INPUT_POST, 'observation', FILTER_SANITIZE_SPECIAL_CHARS));
         $this->setItemsList($this->buildItems(filter_input_array(INPUT_POST)));
@@ -307,6 +318,8 @@ class SolicitacaoEmpenhoModel extends CRUD
             status = '" . (($val) ? 'RECEBIDO-PARCIAL' : 'RECEBIDO') . "', 
             updated_at = '" . date('Y-m-d H:i:s') . "', 
             invoice = '" . $this->getInvoice() . "',
+            invoice_date_emission = '" . date('Y-m-d', strtotime($this->getDateEmission())) . "',
+            date_delivery = '" . date('Y-m-d', strtotime($this->getDateDelivery())) . "',
             observation = '" . $this->getObservation() . "' WHERE code = ? and invoices_id = ?";
 
         $stmt = $this->pdo->prepare($query);

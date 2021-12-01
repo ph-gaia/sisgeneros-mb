@@ -63,6 +63,11 @@ use App\Config\Configurations as cfg;
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
+                                        <div class="form-group attachment" style="display: none;">
+                                            <label>Anexar documento</label>
+                                            <input type="file" class="form-control" name="arquivo" accept="application/pdf">
+                                            <p class="help-block" style="color: red;">* Só aceita pdf</p>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
 
@@ -148,3 +153,19 @@ use App\Config\Configurations as cfg;
         </div>
     </div>
 </div>
+<script>
+    var level = $('#level').find('option').filter(':selected').text();
+    changeComponentVisibility(level);
+
+    $('#level').on('change', function () {
+        changeComponentVisibility(this.value)
+    });
+
+    function changeComponentVisibility(value) {
+        if (value.trim() === 'FISCAL_SUBSTITUTO' || value.trim() === 'ORDENADOR_SUBSTITUTO') {
+            $('.attachment').show()
+        } else {
+            $('.attachment').hide()
+        }
+    }
+</script>

@@ -53,30 +53,66 @@ $idlista = $this->getParametro('idlista');
                                        autofocus
                                        required>
                             </div>
-                            
-                                <div class="col-lg-4" id='evaluation'>
-                                    <label>Avaliação da entrega: </label><br>
-                                    <input type="radio" name='evaluation' value="1">
-                                    <span class="badge badge-danger">
-                                        1
-                                    </span>&nbsp;
-                                    <input type="radio" name='evaluation' value="2">
-                                    <span class="badge badge-warning">
-                                        2
-                                    </span>&nbsp;
-                                    <input type="radio" name='evaluation' value="3" checked>
-                                    <span class="badge badge-dark">
-                                        3
-                                    </span>&nbsp;
-                                    <input type="radio" name='evaluation' value="4">
-                                    <span class="badge badge-info">
-                                        4
-                                    </span>&nbsp;
-                                    <input type="radio" name='evaluation' value="5">
-                                    <span class="badge badge-success">
-                                        5
-                                    </span>
-                                </div>
+                            <div class="col-lg-4" id='evaluation'>
+                                <label>Avaliação da entrega: </label><br>
+                                <input type="radio" name='evaluation' value="1">
+                                <span class="badge badge-danger">
+                                    1
+                                </span>&nbsp;
+                                <input type="radio" name='evaluation' value="2">
+                                <span class="badge badge-warning">
+                                    2
+                                </span>&nbsp;
+                                <input type="radio" name='evaluation' value="3" checked>
+                                <span class="badge badge-dark">
+                                    3
+                                </span>&nbsp;
+                                <input type="radio" name='evaluation' value="4">
+                                <span class="badge badge-info">
+                                    4
+                                </span>&nbsp;
+                                <input type="radio" name='evaluation' value="5">
+                                <span class="badge badge-success">
+                                    5
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-lg-4">
+                                <label>Data de emissão da Nota Fiscal: </label>
+                                <input
+                                    type=text
+                                    id="date_document_emission"
+                                    name="date_document_emission"
+                                    class="form-control"
+                                    placeholder="Data no formato DD-MM-AAAA"
+                                    data-mask="00-00-0000"
+                                    data-mask-reverse="true"/>
+                            </div>
+                            <div class="col-lg-6" id="legenda">
+                                <label>Legenda:</label><br>
+                                <span class="badge badge-danger" style="font-size: 14px !important;">1 - Muito insatisfeito</span> à
+                                <span class="badge badge-success" style="font-size: 14px !important;">5 - Muito satisfeito</span>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-lg-4">
+                                <label>Data da entrega do material: </label>
+                                <input
+                                    type=text
+                                    id="date_delivery"
+                                    name="date_delivery"
+                                    class="form-control"
+                                    placeholder="Data no formato DD-MM-AAAA"
+                                    data-mask="00-00-0000"
+                                    data-mask-reverse="true"/>
+                            </div>
+                            <div class="col-lg-3" style="padding-top: 35px;">
+                                <label>Igual a data de emissão?</label>
+                                <input type="checkbox"
+                                        name="date_delivery_emission"
+                                        id="date_delivery_emission"> <span class='label label-danger'>Sim!</span>
+                            </div>
                         </div>
                         <div class="row" style="padding-top: 10px; margin-bottom: 20px;">
                             <div class="col-lg-4" id="observation">
@@ -84,11 +120,6 @@ $idlista = $this->getParametro('idlista');
                                 <textarea name="observation"
                                           placeholder="Observações"
                                           class="form-control"></textarea>
-                            </div>
-                            <div class="col-lg-6" id="legenda">
-                                <label>Legenda:</label><br>
-                                <span class="badge badge-danger" style="font-size: 14px !important;">1 - Muito insatisfeito</span> à
-                                <span class="badge badge-success" style="font-size: 14px !important;">5 - Muito satisfeito</span>
                             </div>
                         </div>
                         <table class="table" id='tabela_result'>
@@ -164,4 +195,12 @@ $idlista = $this->getParametro('idlista');
     function ocultar(id) {
         $("#" + id).hide();
     }
+    $("#date_delivery_emission").change(function() {
+        if(this.checked) {
+            var dateEmission = $('#date_document_emission').val()
+            $('#date_delivery').val(dateEmission)
+        } else {
+            $('#date_delivery').val("")
+        }
+    });
 </script>

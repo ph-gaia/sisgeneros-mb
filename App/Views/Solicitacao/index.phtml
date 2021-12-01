@@ -284,7 +284,16 @@ $status = [
     </div>
 </div>
 <script>
-    $('.search-button').click(function btnSearch() {
+    $('.search-input').keypress(function(event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    function btnSearch() {
         var searchInput = $('.search-input');
         var searchValue = searchInput.val();
         var formAction = $('.search-form').attr('action');
@@ -293,7 +302,7 @@ $status = [
         } else {
             searchInput.focus();
         }
-    });
+    }
     $('.btn-reject').click(function() {
         var id = $(this).attr('data-id');
 

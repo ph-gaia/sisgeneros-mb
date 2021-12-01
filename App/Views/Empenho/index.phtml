@@ -15,18 +15,18 @@ $pagination = Pagination::make($this);
                 <i class="fa fa-list"></i> <?= $this->view->title; ?>
 
                 <div class="row">
-                    <div class="col-md-2">
                     <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_FINANCA'])) : ?>
-                        <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
-                            <i class="fa fa-plus-circle"></i> Novo Registro
-                        </a>
+                        <div class="col-md-2">
+                            <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
+                                <i class="fa fa-plus-circle"></i> Novo Registro
+                            </a>
+                        </div>
                     <?php endif ?>
-                    </div>
                     <div class="col-md-5">
                         <?= $pagination; ?>
                     </div>
 
-                    <div class="col-lg-5">
+                    <div class="col-md-<?= (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_FINANCA']))? 5 : 7 ?>">
                         <form action="<?= $this->view->controller; ?>ver/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
                             <div class="input-group search-input-box">
                                 <input type="text" class="form-control search-input" placeholder="Nº Empenho, OM, Status ou Data (DD-MM-YYYY)">
@@ -89,7 +89,16 @@ $pagination = Pagination::make($this);
     </div>
 </div>
 <script>
-    $('.search-button').click(function btnSearch() {
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    $('.search-input').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    function btnSearch() {
         var searchInput = $('.search-input');
         var searchValue = searchInput.val();
         var formAction = $('.search-form').attr('action');
@@ -98,5 +107,5 @@ $pagination = Pagination::make($this);
         } else {
             searchInput.focus();
         }
-    });
+    }
 </script>
