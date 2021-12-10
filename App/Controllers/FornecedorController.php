@@ -53,7 +53,8 @@ class FornecedorController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'NORMAL', 'ENCARREGADO']);
         $model = new FornecedorModel();
         $this->view->title = 'Lista de Todos os Fornecedores';
-        $model->paginator($this->getParametro('pagina'));
+        $this->view->busca = $this->getParametro('busca');
+        $model->paginator($this->getParametro('pagina'), $this->view->busca);
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
         $this->render('index');

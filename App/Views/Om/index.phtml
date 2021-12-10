@@ -15,7 +15,23 @@ $pagination = Pagination::make($this);
                 <a href="<?= $this->view->controller; ?>novo/" class="btn btn-info">
                     <i class="fa fa-plus-circle"></i> Novo Registro
                 </a>
-                <?= $pagination; ?>
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+                    <div class="col-lg-5">
+                        <form action="#" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="UASG, Nome ou Ind. Naval">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <table class="table">
                     <thead>
                         <tr>
@@ -52,3 +68,24 @@ $pagination = Pagination::make($this);
         </div>
     </div>
 </div>
+<script>
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    $('.search-input').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var url = 'om/ver/';
+        if (searchValue && url) {
+            window.location = url + 'busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    }
+</script>

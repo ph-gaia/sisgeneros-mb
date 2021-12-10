@@ -49,7 +49,8 @@ class OmController extends Controller implements CtrlInterface
     {
         $model = new OmModel();
         $this->view->title = 'Lista de Todas as OM';
-        $model->paginator($this->getParametro('pagina'));
+        $this->view->busca = $this->getParametro('busca');
+        $model->paginator($this->getParametro('pagina'), $this->view->busca);
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
         $this->render('index');

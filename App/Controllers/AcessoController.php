@@ -61,7 +61,8 @@ class AcessoController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO']);
         $model = new AcessoModel();
         $this->view->title = 'Lista de Todos os Usuários';
-        $model->paginator($this->getParametro('pagina'));
+        $this->view->busca = $this->getParametro('busca');
+        $model->paginator($this->getParametro('pagina'), $this->view->busca);
         $this->view->result = $model->getResultadoPaginator();
         $this->view->btn = $model->getNavePaginator();
         $this->render('index');

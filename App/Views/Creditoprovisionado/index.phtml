@@ -22,7 +22,23 @@ $pagination = Pagination::make($this);
                         <?php endif; ?>
                     </div>
                 </div>
-                <?= $pagination; ?>
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+                    <div class="col-lg-5">
+                        <form action="#" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="OM">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <table class="table">
                     <thead>
                         <tr>
@@ -61,3 +77,24 @@ $pagination = Pagination::make($this);
         </div>
     </div>
 </div>
+<script>
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    $('.search-input').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var url = 'creditoprovisionado/ver/';
+        if (searchValue && url) {
+            window.location = url + 'busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    }
+</script>

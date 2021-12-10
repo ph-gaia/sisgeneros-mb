@@ -1,9 +1,5 @@
 <?php
 
-use App\Helpers\Pagination;
-use App\Helpers\View;
-use App\Config\Configurations as cfg;
-
 $showMedia = false;
 
 if (isset($this->view->result) && $total = count($this->view->result)) {
@@ -44,7 +40,7 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                                    name="dateInit"
                                    id="dateInit"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de inicial"
+                                   placeholder="Data inicial"
                                    value="<?= $this->getParametro('dateInit'); ?>"
                                    class="form-control">
                         </div>
@@ -55,7 +51,7 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                                    name="dateEnd"
                                    id="dateEnd"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de final"
+                                   placeholder="Data final"
                                    value="<?= $this->getParametro('dateEnd'); ?>"
                                    class="form-control">
                         </div>
@@ -69,38 +65,9 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                 <?php if ($showMedia): ?>
                     <div class="row alert alert-info">
                         <div class="col-md-6">
-                            Total de notas pagas: <?= $total; ?><br>
+                            Total de notas: <?= $total; ?><br>
                             Tempo médio: <?= round($media, 2); ?>
                         </div>
-                    </div>
-                    <div class="row">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>OM</th>
-                                    <th>Nota Fiscal</th>
-                                    <th>Recebida NF</th>
-                                    <th>OB</th>
-                                    <th>Recebida OB</th>
-                                    <th>Data de criação</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                foreach ($this->view->dados as $value) : ?>
-                                    <tr>
-                                        <td><?= $value['naval_indicative']; ?></td>
-                                        <td><?= $value['invoice']; ?></td>
-                                        <td><?= View::humanDate($value['invoice_date']); ?></td>
-                                        <td><?= $value['number_order_bank']; ?></td>
-                                        <td><?= View::humanDate($value['number_order_bank_date']); ?></td>
-                                        <td><?= View::humanDate($value['created_at']); ?></td>
-                                    </tr>
-                                <?php
-                                endforeach;
-                                ?>
-                            </tbody>
-                        </table>
                     </div>
                 <?php else: ?>
                 <div class="row alert alert-danger">
@@ -130,11 +97,22 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
     $(document).ready(function () {
         var btnApplySearch = $('.btn-apply-search');
 
-        btnApplySearch.click(function btnSearch() {
+        $('#dateEnd').keypress(function(event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13') {
+                btnSearch();
+            }
+        });
+
+        btnApplySearch.click(function() {
+            btnSearch();
+        });
+
+        function btnSearch() {
             var selectOm = $('#om').val();
             var dateInit = $('#dateInit').val();
             var dateEnd = $('#dateEnd').val();
-            var url = 'relatorio/indicadorTempo/';
+            var url = 'relatorio/emissaoEntrega/';
             var regexDate = /\d{2}-\d{2}-\d{4}/;
 
             if (!selectOm && !dateInit && !dateEnd) {
@@ -161,6 +139,6 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                 url += 'dateEnd/' + dateEnd + '/';
             }
             window.location = url;
-        });
+        }
     });
 </script>

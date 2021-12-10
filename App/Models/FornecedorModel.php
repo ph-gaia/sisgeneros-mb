@@ -22,7 +22,7 @@ class FornecedorModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina)
+    public function paginator($pagina, $busca = null)
     {
         $dados = [
             'entidade' => $this->entidade,
@@ -30,6 +30,13 @@ class FornecedorModel extends CRUD
             'maxResult' => 100,
             'orderBy' => 'name ASC'
         ];
+
+        if ($busca) {
+            $dados['where'] = " "
+            . " suppliers.name LIKE :seach"
+            . " OR suppliers.cnpj LIKE :seach";
+            $dados['bindValue'][':seach'] = '%' . $busca . '%';
+        }
 
         $this->paginator = new Paginator($dados);
     }

@@ -20,7 +20,7 @@ $pagination = Pagination::make($this);
                     </div>
 
                     <div class="col-lg-5">
-                        <form action="<?= $this->view->controller; ?>ver/pagina/<?= $this->view->btn['current']; ?>" class="search-form" onsubmit="return false">
+                        <form action="<?= $this->view->controller; ?>ver/pagina" class="search-form" onsubmit="return false">
                             <div class="input-group search-input-box">
                                 <input type="text" class="form-control search-input" placeholder="Nº Empenho, OM, Status ou Data (DD-MM-YYYY)">
                                 <span class="input-group-btn">
@@ -85,9 +85,9 @@ $pagination = Pagination::make($this);
     function btnSearch() {
         var searchInput = $('.search-input');
         var searchValue = searchInput.val();
-        var formAction = $('.search-form').attr('action');
-        if (searchValue && formAction) {
-            window.location = formAction + '/busca/' + searchValue;
+        var url = 'relatorio/empenho/';
+        if (searchValue && url) {
+            window.location = url + 'busca/' + searchValue;
         } else {
             searchInput.focus();
         }

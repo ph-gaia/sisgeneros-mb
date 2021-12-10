@@ -66,7 +66,6 @@ class SolicitacaoEmpenhoModel extends CRUD
             . " WHERE req_inv.status = 'NF-PAGA' ";
 
         $params = $controller->getParametro();
-        $dados = [];
 
         // search by Om
         if (isset($params['om']) && intval($params['om']) !== 0) {
@@ -126,6 +125,82 @@ class SolicitacaoEmpenhoModel extends CRUD
         }
 
         $query .= " GROUP BY req_inv.code ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findIndicadorEmissaoEntrega(ControllerAbstract $controller)
+    {
+        $query = ""
+            . " SELECT "
+            . " DATEDIFF(req_inv.date_delivery, req_inv.invoice_date_emission) as date_diff "
+            . " FROM requests_invoices as req_inv "
+            . " INNER JOIN invoices as inv ON inv.id = req_inv.invoices_id "
+            . " INNER JOIN oms ON oms.id = inv.oms_id "
+            . " WHERE req_inv.status in ('RECEBIDO', 'RECEBIDO-PARCIAL', 'NF-ENTREGUE','NF-LIQUIDADA', 'NF-PAGA') "
+            . " AND req_inv.date_delivery IS NOT NULL AND req_inv.invoice_date_emission IS NOT NULL ";
+
+        $params = $controller->getParametro();
+
+        // search by Om
+        if (isset($params['om']) && intval($params['om']) !== 0) {
+            $query .= " AND inv.oms_id = {$params['om']} ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
+            $date = Utils::dateDatabaseFormate($params['dateInit']);
+
+            $query .= " AND req_inv.created_at >= '{$date}' ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
+            $date = Utils::dateDatabaseFormate($params['dateEnd']);
+
+            $query .= " AND req_inv.created_at <= '{$date}' ";
+        }
+
+        $query .= " GROUP BY req_inv.code ";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function findNfPagasPorFornecedor(ControllerAbstract $controller)
+    {
+        $query = ""
+            . " SELECT oms.*, oms.name AS oms_name, sup.*, "
+            . " sup.name as supplier_name, SUM(req_inv.value) as total, req_inv.* "
+            . " FROM requests_invoices as req_inv "
+            . " INNER JOIN invoices as inv ON inv.id = req_inv.invoices_id "
+            . " INNER JOIN oms ON oms.id = inv.oms_id "
+            . " INNER JOIN suppliers as sup ON sup.id = req_inv.suppliers_id "
+            . " WHERE req_inv.status LIKE 'NF-PAGA' ";
+
+        $params = $controller->getParametro();
+
+        // search by Om
+        if (isset($params['om']) && intval($params['om']) !== 0) {
+            $query .= " AND inv.oms_id = {$params['om']} ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateInit']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateInit'])) {
+            $date = Utils::dateDatabaseFormate($params['dateInit']);
+
+            $query .= " AND req_inv.created_at >= '{$date}' ";
+        }
+
+        // search by Date Init
+        if (isset($params['dateEnd']) && preg_match('/\d{2}-\d{2}-\d{4}/', $params['dateEnd'])) {
+            $date = Utils::dateDatabaseFormate($params['dateEnd']);
+
+            $query .= " AND req_inv.created_at <= '{$date}' ";
+        }
+
+        $query .= " GROUP BY req_inv.code ORDER BY sup.id; ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -212,6 +287,8 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setInvoice(filter_input(INPUT_POST, 'nota_fiscal'));
         $this->setAction(filter_input(INPUT_POST, 'method_action'));
         $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
+        $this->setDateEmission($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document_emission')));
+        $this->setDateDelivery($this->abstractDateValidate(filter_input(INPUT_POST, 'date_delivery')));
 
         $status = ($this->getAction() == 'add') ? " status = 'NF-ENTREGUE', " : "";
         $query = "
@@ -219,6 +296,8 @@ class SolicitacaoEmpenhoModel extends CRUD
             . $status .
             "invoice_date = '" . date('Y-m-d', strtotime($this->getDataDocumento())) . "',
             invoice = '" . $this->getInvoice() . "',
+            invoice_date_emission = '" . date('Y-m-d', strtotime($this->getDateEmission())) . "',
+            date_delivery = '" . date('Y-m-d', strtotime($this->getDateDelivery())) . "',
             updated_at = '" . date('Y-m-d H:i:s') . "'
             WHERE code = ? and invoices_id = ?";
 
@@ -235,6 +314,7 @@ class SolicitacaoEmpenhoModel extends CRUD
         $this->setNumPedido(filter_input(INPUT_POST, 'number_request'));
         $this->setAction(filter_input(INPUT_POST, 'method_action'));
         $this->setDataDocumento($this->abstractDateValidate(filter_input(INPUT_POST, 'date_document')));
+
 
         $status = ($this->getAction() == 'add') ? " status = 'NF-LIQUIDADA', " : "";
 
@@ -439,14 +519,14 @@ class SolicitacaoEmpenhoModel extends CRUD
             $date = Utils::dateDatabaseFormate($value);
             if (!v::date()->validate($date)) {
                 echo '<script>
-                window.location.replace("'. cfg::DEFAULT_URI . 'empenho/solicitacoes");
+                window.location.replace("' . cfg::DEFAULT_URI . 'empenho/solicitacoes");
                 alert("O campo de data deve ser preenchido corretamente.");</script>';
                 exit;
             }
             return $date;
         } catch (\Exception $e) {
             echo '<script>
-            window.location.replace("'. cfg::DEFAULT_URI . 'empenho/solicitacoes");
+            window.location.replace("' . cfg::DEFAULT_URI . 'empenho/solicitacoes");
             alert("' . $e->getMessage() . '");</script>';
             exit;
         }

@@ -25,15 +25,23 @@ class AcessoModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina)
+    public function paginator($pagina, $busca = null)
     {
         $innerJoin = " INNER JOIN oms ON users.oms_id = oms.id";
         $dados = [
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
             'maxResult' => 10,
-            'select' => 'users.*, oms.naval_indicative'
+            'select' => 'users.*, oms.naval_indicative',
         ];
+
+        if ($busca) {
+            $dados['where'] = " "
+            . " users.name LIKE :seach"
+            . " OR oms.naval_indicative LIKE :seach"
+            . " OR users.nip LIKE :seach";
+            $dados['bindValue'][':seach'] = '%' . $busca . '%';
+        }
 
         $this->paginator = new Paginator($dados);
     }

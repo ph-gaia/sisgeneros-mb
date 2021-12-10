@@ -1,0 +1,116 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Relatório de notas fiscais por navio</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="form-group">
+                            <select
+                                class="form-control"
+                                name="om"
+                                id="om">
+                                <option value="">OM</option>
+                                <?php foreach ($this->view->resultOms as $value): ?>
+                                    <option value="<?= $value['id'] ?>" <?= $value['id'] == $this->getParametro('om') ? 'selected' : '' ?>>
+                                        <?= $value['naval_indicative'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <input type="text"
+                                   name="dateInit"
+                                   id="dateInit"
+                                   data-mask="00-00-0000"
+                                   placeholder="Data inicial"
+                                   value="<?= $this->getParametro('dateInit'); ?>"
+                                   class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <input type="text"
+                                   name="dateEnd"
+                                   id="dateEnd"
+                                   data-mask="00-00-0000"
+                                   placeholder="Data final"
+                                   value="<?= $this->getParametro('dateEnd'); ?>"
+                                   class="form-control dateEnd">
+                        </div>
+                    </div>
+                    <div class="col-lg-1">
+                        <button class="btn btn-info btn-apply-search">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function showMessage(message, type) {
+        type = type || 'info';
+        if (message) {
+            var messageContainer = $('#resultado');
+            messageContainer.fadeIn(200);
+            messageContainer.html("<div class='alert alert-" + type + "'>" + message + "</div>");
+
+            setTimeout(function () {
+                messageContainer.fadeOut(200);
+            }, 6000);
+        }
+    }
+
+    $(document).ready(function () {
+        var btnApplySearch = $('.btn-apply-search');
+
+        $('#dateEnd').keypress(function(event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13') {
+                btnSearch();
+            }
+        });
+
+        btnApplySearch.click(function() {
+            btnSearch();
+        });
+
+        function btnSearch() {
+            var selectOm = $('#om').val();
+            var dateInit = $('#dateInit').val();
+            var dateEnd = $('#dateEnd').val();
+            var url = 'relatorio/nfpagas/';
+            var regexDate = /\d{2}-\d{2}-\d{4}/;
+
+            if (!selectOm && !dateInit && !dateEnd) {
+                return;
+            }
+
+            if (dateInit && !regexDate.test(dateInit)) {
+                showMessage('Data no formato incorreto', 'danger');
+                return;
+            }
+
+            if (dateEnd && !regexDate.test(dateEnd)) {
+                showMessage('Data no formato incorreto', 'danger');
+                return;
+            }
+
+            if (selectOm) {
+                url += 'om/' + selectOm + '/';
+            }
+            if (dateInit) {
+                url += 'dateInit/' + dateInit + '/';
+            }
+            if (dateEnd) {
+                url += 'dateEnd/' + dateEnd + '/';
+            }
+            window.location = url;
+        }
+    });
+</script>

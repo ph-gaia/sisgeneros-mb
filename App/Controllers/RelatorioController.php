@@ -170,4 +170,39 @@ class RelatorioController extends Controller implements CtrlInterface
 
         $this->render('mostra_indicador_tempo');
     }
+
+    public function emissaoEntregaAction()
+    {
+        $this->view->title = 'Relatório de Indicador data de emissão e data de entrega do material';
+
+        $model = new SolicitacaoEmpenhoModel();
+        $omModel = new OmModel();
+        $this->view->resultOms = $omModel->findAll(function ($db) {
+            $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
+        });
+
+        $this->view->result = $model->findIndicadorEmissaoEntrega($this);
+
+        $this->render('mostra_indicador_tempo_emissao_entrega');
+    }
+
+    public function nfpagasConfigAction()
+    {
+        $this->view->title = '';
+
+        $omModel = new OmModel();
+        $this->view->resultOms = $omModel->findAll(function ($db) {
+            $db->setaFiltros()->orderBy('oms.naval_indicative ASC');
+        });
+
+        $this->render('mostra_nf_pagas_config');
+    }
+
+    public function nfpagasAction()
+    {
+        $model = new SolicitacaoEmpenhoModel();
+        $this->view->result = $model->findNfPagasPorFornecedor($this);
+
+        $this->render('mostra_nf_pagas', true, 'blank');
+    }
 }

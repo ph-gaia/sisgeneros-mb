@@ -34,7 +34,7 @@ class OmModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina)
+    public function paginator($pagina, $busca = null)
     {
         $dados = [
             'entidade' => $this->entidade,
@@ -42,6 +42,14 @@ class OmModel extends CRUD
             'maxResult' => 10,
             'orderBy' => 'name ASC'
         ];
+
+        if ($busca) {
+            $dados['where'] = " "
+            . " oms.name LIKE :seach"
+            . " OR oms.naval_indicative LIKE :seach"
+            . " OR oms.uasg LIKE :seach";
+            $dados['bindValue'][':seach'] = '%' . $busca . '%';
+        }
 
         $paginator = new Paginator($dados);
         $this->resultadoPaginator = $paginator->getResultado();

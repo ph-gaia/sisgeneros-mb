@@ -62,7 +62,8 @@ class CreditoprovisionadoController extends Controller implements CtrlInterface
         $this->view->userLoggedIn = $this->access->authenticAccess(['ENCARREGADO', 'NORMAL', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ADMINISTRADOR', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO']);
         $model = new CreditoProvisionadoModel();
         $this->view->title = 'Lista de Todos os Créditos provisionados';
-        $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn);
+        $this->view->busca = $this->getParametro('busca');
+        $model->paginator($this->getParametro('pagina'), $this->view->userLoggedIn, $this->view->busca);
         $this->view->result = $model->getResultadoPaginator();
         foreach ($this->view->result as $key => $value) {
             $this->view->result[$key]['credito_comprometido'] = $model->saldoComprometido($value['oms_id'])['sum_value'];

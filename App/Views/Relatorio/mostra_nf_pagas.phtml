@@ -1,0 +1,109 @@
+<?php
+
+use App\Config\Configurations as cfg;
+use App\Helpers\View;
+
+setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set(cfg::TIMEZONE);
+
+$total = 0;
+?>
+<style>
+    body {
+        font-size: 12px !important;
+        background-color: #fff !important;
+    }
+
+    .table-striped>tbody>tr:nth-of-type(2n+1) {
+        background-color: #ccc !important;
+    }
+
+    .table-print {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0px auto;
+        text-align: center;
+    }
+
+    .table-info {
+        width: 100%;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .table-info>tbody>tr>td {
+        padding: 8px;
+        vertical-align: top;
+    }
+
+    .table-condensed>tfoot>tr>td {
+        padding: 2px !important;
+    }
+
+    .right {
+        text-align: right !important;
+    }
+
+    .left {
+        text-align: left !important;
+    }
+
+    .brasao {
+        width: 90px;
+    }
+
+    .cabecalho {
+        font-weight: bold;
+    }
+</style>
+<table class="table-print">
+    <tr>
+        <td>
+            <img src="images/brasao.png" class="brasao">
+        </td>
+    </tr>
+    <tr>
+        <td class="cabecalho text-uppercase">
+            MARINHA DO BRASIL
+            <br>
+            <?= $this->view->result[0]['oms_name']; ?>
+            <br>
+            <br>
+            RELATÓRIO MENSAL DE NOTAS FISCAIS PAGAS
+        </td>
+    </tr>
+    <tr>
+        <td class="tabela-informacoes">
+            <table class="table table-hover table-condensed" border="1">
+                <thead>
+                    <tr>
+                        <th class="text-center width-5-percent">Fornecedor</th>
+                        <th class="text-center width-5-percent">CNPJ</th>
+                        <th class="text-center width-5-percent">N° NF</th>
+                        <th class="text-center width-5-percent">Data NF</th>
+                        <th class="text-center width-5-percent">Valor NF (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($this->view->result as $value) : 
+                        $total += $value['total'];
+                        ?>
+                        <tr>
+                            <td><?= $value['supplier_name'] ?: ''; ?></td>
+                            <td><?= $value['cnpj'] ?: ''; ?></td>
+                            <td><?= $value['invoice'] ?: ''; ?></td>
+                            <td><?= date('d-m-Y', strtotime($value['invoice_date'])); ?></td>
+                            <td><?= $value['total'] ?: ''; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="right">Total NF</td>
+                        <td><?= View::floatToMoney($total, ''); ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </td>
+    </tr>
+</table>

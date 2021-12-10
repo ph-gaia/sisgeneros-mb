@@ -3,7 +3,16 @@
 use App\Helpers\Pagination;
 use App\Helpers\View;
 
-$pagination = Pagination::make($this);
+$busca = $this->getParametro('busca');
+$busca = $busca ? '/busca/' . $busca : '';
+
+$pagination = Pagination::make($this, function ($btn, $controllerName) use ($busca) {
+    return [
+        'previous' => "{$controllerName}ver/pagina/{$btn['previous']}" . $busca,
+        'next' => "{$controllerName}ver/pagina/{$btn['next']}" . $busca,
+        'current' => "{$controllerName}ver/pagina/" . Pagination::CURRENT_PAGE . $busca
+    ];
+});
 
 ?>
 <div id="page-wrapper">
@@ -21,7 +30,23 @@ $pagination = Pagination::make($this);
                     <?php endif ?>
                     </div>
                 </div>
-                <?= $pagination; ?>
+                <div class="row">
+                    <div class="col-md-7">
+                        <?= $pagination; ?>
+                    </div>
+                    <div class="col-lg-5">
+                        <form action="#" class="search-form" onsubmit="return false">
+                            <div class="input-group search-input-box">
+                                <input type="text" class="form-control search-input" placeholder="Nome ou CNPJ/CPF">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary search-button" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <table class="table">
                     <thead>
                         <tr>
@@ -58,3 +83,24 @@ $pagination = Pagination::make($this);
         </div>
     </div>
 </div>
+<script>
+    $('.search-button').click(function() {
+        btnSearch();
+    });
+    $('.search-input').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13') {
+            btnSearch();
+        }
+    });
+    function btnSearch() {
+        var searchInput = $('.search-input');
+        var searchValue = searchInput.val();
+        var url = 'fornecedor/ver/';
+        if (searchValue && url) {
+            window.location = url + 'busca/' + searchValue;
+        } else {
+            searchInput.focus();
+        }
+    }
+</script>

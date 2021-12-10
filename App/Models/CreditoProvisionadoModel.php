@@ -35,7 +35,7 @@ class CreditoProvisionadoModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina, $user)
+    public function paginator($pagina, $user, $busca = null)
     {
         $innerJoin = " AS credits INNER JOIN oms ON oms.id = credits.oms_id";
 
@@ -52,6 +52,10 @@ class CreditoProvisionadoModel extends CRUD
             $dados['bindValue'] = [':omsId' => $user['oms_id']];
         }
 
+        if ($busca) {
+            $dados['where'] = " oms.naval_indicative LIKE :seach ";
+            $dados['bindValue'][':seach'] = '%' . $busca . '%';
+        }
         $paginator = new Paginator($dados);
         $this->resultadoPaginator = $paginator->getResultado();
         $this->navPaginator = $paginator->getNaveBtn();

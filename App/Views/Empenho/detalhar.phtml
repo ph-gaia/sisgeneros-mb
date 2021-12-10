@@ -49,6 +49,28 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             data-mask-reverse="true"
                             required/>
                     </div>
+                    <div class="form-group">
+                        <label>Data da entrega do material: </label>
+                        <input
+                            type=text
+                            id="date_delivery"
+                            name="date_delivery"
+                            class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
+                            data-mask-reverse="true"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de emissão da Nota Fiscal: </label>
+                        <input
+                            type=text
+                            id="date_document_emission"
+                            name="date_document_emission"
+                            class="form-control"
+                            placeholder="Data no formato DD-MM-AAAA"
+                            data-mask="00-00-0000"
+                            data-mask-reverse="true"/>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -319,8 +341,8 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                         data-method-action="edit"
                                                         data-request="<?= $result['code'] ?>"
                                                         data-invoice="<?= $result['invoices_id'] ?>"
-                                                        data-nota-fiscal=<?= $result['invoice'] ?>
-                                                        data-nota-fiscal-date=<?= date('d-m-Y', strtotime($result['invoice_date'])) ?>
+                                                        data-nota-fiscal="<?= $result['invoice'] ?>"
+                                                        data-nota-fiscal-date="<?= date('d-m-Y', strtotime($result['invoice_date'])) ?>"
                                                         class="btn btn-success btn-sm btn-entregar">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
@@ -347,7 +369,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 </h5>
                                                 <strong>Nº:</strong> <?= $result['number_request'] ?? '-'; ?>
                                                 <br>
-                                                <strong>Data:</strong> <?= ($result['number_request_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                                <strong>Data:</strong> <?= ($result['number_request_date']) ? date('d-m-Y', strtotime($result['number_request_date'])) : '' ?>
                                             </div>
                                             <div class="col-lg-4">
                                                 <h5 class="alert-heading">
@@ -366,7 +388,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 </h5>
                                                 <strong>Nº:</strong> <?= $result['number_order_bank'] ?? '-'; ?>
                                                 <br>
-                                                <strong>Data:</strong> <?= ($result['number_order_bank_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                                <strong>Data:</strong> <?= ($result['number_order_bank_date']) ? date('d-m-Y', strtotime($result['number_order_bank_date'])) : '' ?>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -395,7 +417,13 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                         </a>
                                     <?php endif; ?>
                                     <?php if (isset($code) && in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])) : ?>
-                                        <button data-request="<?= $code ?>" data-invoice="<?= $idlista ?>" data-method-action="add" class="btn btn-success btn-sm btn-entregar">
+                                        <button
+                                            data-request="<?= $code ?>"
+                                            data-invoice="<?= $idlista ?>"
+                                            data-nota-fiscal="<?= $result['invoice'] ?>"
+                                            data-nota-fiscal-emissao-date="<?= date('d-m-Y', strtotime($result['invoice_date_emission'])) ?>"
+                                            data-entrega-date="<?= date('d-m-Y', strtotime($result['date_delivery'])) ?>"
+                                            data-method-action="add" class="btn btn-success btn-sm btn-entregar">
                                             <i class="fa fa-check"></i> Entregar NF
                                         </button>
                                     <?php endif; ?>
@@ -485,12 +513,16 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         var invoiceId = $(this).attr('data-invoice');
         var invoice = $(this).attr('data-nota-fiscal');
         var invoiceDate = $(this).attr('data-nota-fiscal-date');
+        var invoiceEmissionDate = $(this).attr('data-nota-fiscal-emissao-date');
+        var invoiceDeliveryDate = $(this).attr('data-entrega-date');
         var action = $(this).attr('data-method-action');
 
         $('#request_entregar_id').val(requestId);
         $('#invoice_entregar_id').val(invoiceId);
         $('#nota_fiscal').val(invoice);
         $('#date_document').val(invoiceDate);
+        $('#date_document_emission').val(invoiceEmissionDate);
+        $('#date_delivery').val(invoiceDeliveryDate);
         $('#method_action').val(action);
         $('#modalEntregarAction').modal('show');
     });
