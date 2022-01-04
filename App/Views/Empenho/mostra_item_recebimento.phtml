@@ -14,15 +14,10 @@ $idlista = $this->getParametro('idlista');
                     <div class="alert alert-info" role="alert">
                         Licitação: <strong><?= $this->view->result[0]['biddingsNumber']; ?></strong><br>
                         Fornecedor: <strong><?= $this->view->result[0]['suppliers_name']; ?></strong><br>
-                        Órgão: <strong><?= $this->view->result[0]['uasg'] . " - ". $this->view->result[0]['naval_indicative']; ?></strong><br>
+                        Órgão Responsável pela Licitação: <strong><?= $this->view->result[0]['uasg'] . " - ". $this->view->result[0]['naval_indicative']; ?></strong><br>
                         OM:
                         <strong>
                             <?= $this->view->result[0]['oms_name']; ?>
-                        </strong>
-                        <br>
-                        NF:
-                        <strong>
-                            <?= $this->view->result[0]['invoice']; ?>
                         </strong>
                         <br>
                         Solicitação:

@@ -42,9 +42,9 @@ $pagination = Pagination::make($this);
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Nº.</th>
+                            <th>Nº do empenho</th>
                             <th>OM</th>
-                            <th>Complemento</th>
+                            <th>Nº da Solicitação</th>
                             <th>Total Empenhado</th>
                             <th>Total Recebido</th>
                             <th>Status</th>
@@ -58,7 +58,7 @@ $pagination = Pagination::make($this);
                             <tr>
                                 <td><strong><?= $value['code']; ?></strong></td>
                                 <td><?= $value['naval_indicative']; ?></td>
-                                <td><?= $value['complement']; ?></td>
+                                <td><?= $value['request']; ?></td>
                                 <td><?= Utils::floatToMoney($value['total_requested']); ?></td>
                                 <td><?= Utils::floatToMoney($value['total_delivered']); ?></td>
                                 <td><?= $value['status']; ?></td>
@@ -72,9 +72,11 @@ $pagination = Pagination::make($this);
                                         <a href="<?= $this->view->controller; ?>detalhar/idlista/<?= $value['id']; ?>" class="btn btn-primary btn-sm">
                                             <i class="fa fa-copy"></i> Itens
                                         </a>
-                                        <a href="<?= $this->view->controller; ?>cancelarEmpenho/idlista/<?= $value['id']; ?>" class="btn btn-danger btn-sm">
-                                            <i class="fa fa-ban"></i> Cancelar
-                                        </a>
+                                        <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
+                                            <a href="<?= $this->view->controller; ?>cancelarEmpenho/idlista/<?= $value['id']; ?>" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-ban"></i> Cancelar
+                                            </a>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </td>
                             </tr>

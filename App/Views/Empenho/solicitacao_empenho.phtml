@@ -40,7 +40,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                             class="form-control"/>
                     </div>
                     <div class="form-group">
-                        <label>Data da entrega</label>
+                        <label>Data da entrega da NF no CeIM:</label>
                         <input
                             type=text
                             id="date_document"
@@ -52,7 +52,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                             required/>
                     </div>
                     <div class="form-group">
-                        <label>Data da entrega do material: </label>
+                        <label>Data do recebimento do material: </label>
                         <input
                             type=text
                             id="date_delivery"
@@ -178,7 +178,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
-                <h5>Solicitações das empresas</h5>
+                <h5>Pedidos às Empresas</h5>
                 <i class="fa fa-list"></i> <?= $this->view->title; ?>
 
                 <div class="row">
@@ -211,7 +211,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                             <div class="card-header" id="headingOne">
                                 <h5>
                                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                        Solicitação a empresa nº <?= substr($result['code'], -1); ?> do Empenho <?= $result['codeInvoice'] ?> - <?= $result['naval_indicative'] ?> - <span class="badge badge-primary"><?= $result['status']; ?></span>
+                                        Pedido à Empresa nº <?= substr($result['code'], -1); ?> do Empenho <?= $result['codeInvoice'] ?> - <?= $result['naval_indicative'] ?> - <span class="badge badge-primary"><?= $result['status']; ?></span>
                                     </button>
                                 </h5>
                             </div>
@@ -223,7 +223,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                             <div class="col-lg-4">
                                                 <h5 class="alert-heading">
                                                 Nota Fiscal
-                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['invoice'] && $result['invoice_date']): ?>
+                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['invoice'] && $result['invoice_date'] && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])): ?>
                                                     <button
                                                         data-method-action="edit"
                                                         data-request="<?= $result['code'] ?>"
@@ -239,7 +239,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                                 </h5>
                                                 <strong>Nº:</strong> <?= $result['invoice'] ?? '-'; ?>
                                                 <br>
-                                                <strong>Data:</strong> <?= ($result['invoice_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                                <strong>Data de emissão:</strong> <?= ($result['invoice_date_emission']) ? date('d-m-Y', strtotime($result['invoice_date_emission'])) : '' ?>
+                                                <br>
+                                                <strong>Data do recebimento do material:</strong> <?= ($result['date_delivery']) ? date('d-m-Y', strtotime($result['date_delivery'])) : '' ?>
+                                                <br>
+                                                <strong>Data da entrega da NF:</strong> <?= ($result['invoice_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
                                             </div>
                                             <div class="col-lg-4">
                                                 <h5 class="alert-heading">
@@ -337,7 +341,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($bus
                                                 <?php if ($result['status'] == 'SOLICITADO'): ?>
                                                 <th>Disponível</th>
                                                 <?php endif; ?>
-                                                <th>Status</th>
+                                                <th>Status do Pedido</th>
                                                 <th>UF</th>
                                                 <th>Nome</th>
                                                 <th>Valor (R$)</th>

@@ -131,7 +131,7 @@ $total = 0;
             <?= $this->view->resultOm['name']; ?>
             <br>
             <br>
-            Solicitação de Empenho (SOLEMP) -
+            SOLEMP de Gêneros -
             Nº <?= $this->view->resultSolicitacao['number']; ?>
         </td>
     </tr>
@@ -149,10 +149,10 @@ $total = 0;
                         <span>CNPJ:</span>
                         <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>
                     </td>
-                    <td class="informacoes right">
+                    <!-- <td class="informacoes right">
                         <span>Detalhes da empresa:</span>
-                        <?= $this->view->resultSolicitacao['suppliers_details']; ?>
-                    </td>
+                        <?php // $this->view->resultSolicitacao['suppliers_details']; ?>
+                    </td> -->
                 </tr>
                 <tr>
                     <td class="informacoes left">
@@ -161,13 +161,23 @@ $total = 0;
                             <?= $this->view->resultSolicitacao['types_invoices'] ?>
                         </span>
                     </td>
+                </tr>
+                <tr>
+                    <td class="informacoes left">
+                        <span>Modalidade:</span>
+                        <span class="modalidade text-normal">
+                            <?= $this->view->resultSolicitacao['modality'] ?>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
                     <?php if (isset($this->view->resultLicitacao['number'])) : ?>
-                        <td class="informacoes right text-uppercase">
+                        <td class="informacoes left text-uppercase">
                             <span>UASG Licitação:</span>
                             <?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?>
                         </td>
                     <?php else : ?>
-                        <td class="informacoes right text-uppercase">
+                        <td class="informacoes left text-uppercase">
                             <span>Licitação: NÃO LICITADO</span>
                         </td>
                     <?php endif; ?>
@@ -183,17 +193,11 @@ $total = 0;
                             <span>Licitação: NÃO LICITADO</span>
                         </td>
                     <?php endif; ?>
-                    <td class="informacoes right">
-                        <span>Data da Solemp:</span>
-                        <?= cfg::htrFileConfigs()->papeleta->cidade ?? '' ?>, <?= date('d/m/Y', strtotime('today')); ?>
-                    </td>
                 </tr>
                 <tr>
                     <td class="informacoes left">
-                        <span>Modalidade:</span>
-                        <span class="modalidade text-normal">
-                            <?= $this->view->resultSolicitacao['modality'] ?>
-                        </span>
+                        <span>Data da Solemp:</span>
+                        <?= cfg::htrFileConfigs()->papeleta->cidade ?? '' ?>, <?= date('d/m/Y', strtotime('today')); ?>
                     </td>
                 </tr>
             </table>
@@ -267,7 +271,7 @@ $total = 0;
                         <th class="text-center width-10-percent">Clasificação Item</th>
                         <th class="text-center width-10-percent">Centro de Custo</th>
                         <th class="text-center width-8-percent">Nº item</th>
-                        <th>Descrição</th>
+                        <th class="text-center">Descrição</th>
                         <th class="text-center width-8-percent">UF</th>
                         <th class="text-center width-8-percent">Qtd</th>
                         <th class="text-center width-10-percent">Preço Unit.</th>
@@ -282,14 +286,14 @@ $total = 0;
 
                         ?>
                         <tr>
-                            <td><?= $this->view->resultOm['classification_items'] ?: ''; ?></td>
-                            <td><?= $this->view->resultOm['cost_center']; ?></td>
-                            <td><?= $value['number'] ?: ''; ?></td>
-                            <td class="left"><?= $value['name']; ?></td>
-                            <td><?= $value['uf']; ?></td>
-                            <td><?= View::floatToMoney($value['quantity'], ''); ?></td>
-                            <td><?= View::floatToMoney($value['value'], ''); ?></td>
-                            <td><?= View::floatToMoney($totaItem, ''); ?></td>
+                            <td class="text-center"><?= $this->view->resultOm['classification_items'] ?: ''; ?></td>
+                            <td class="text-center"><?= $this->view->resultOm['cost_center']; ?></td>
+                            <td class="text-center"><?= $value['number'] ?: ''; ?></td>
+                            <td class="text-center"><?= $value['name']; ?></td>
+                            <td class="text-center"><?= $value['uf']; ?></td>
+                            <td class="text-center"><?= View::floatToMoney($value['quantity'], ''); ?></td>
+                            <td class="text-center"><?= View::floatToMoney($value['value'], ''); ?></td>
+                            <td class="text-center"><?= View::floatToMoney($totaItem, ''); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

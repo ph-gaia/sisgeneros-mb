@@ -23,7 +23,7 @@ class LicitacaoModel extends CRUD
         return $this->findAll();
     }
 
-    public function paginator($pagina, $dateLimit = null, $omId = null)
+    public function paginator($pagina, $dateLimit = null, $omId = null, $busca = null)
     {
         $innerJoin = " INNER JOIN biddings_oms_lists ON biddings.id = biddings_oms_lists.biddings_id ";
         $dados = [

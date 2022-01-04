@@ -4,7 +4,13 @@ use App\Helpers\Pagination;
 use App\Helpers\View;
 use App\Helpers\Utils;
 
-$pagination = Pagination::make($this);
+$pagination = Pagination::make($this, function ($btn, $controllerName) {
+    return [
+        'previous' => "{$controllerName}empenho/pagina/{$btn['previous']}",
+        'next' => "{$controllerName}empenho/pagina/{$btn['next']}",
+        'current' => "{$controllerName}empenho/pagina/" . Pagination::CURRENT_PAGE
+    ];
+});
 
 ?>
 <div id="page-wrapper">

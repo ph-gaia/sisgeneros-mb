@@ -47,15 +47,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     <thead>
                         <tr>
                             <th>Item</th>
-                            <th>Qtd</th>
+                            <th>Qtd Licitada</th>
                             <th>Qtd Comprometida</th>
                             <th>Qtd Empenhada</th>
                             <th>Qtd Disponível</th>
                             <th>Valor</th>
                             <th>UF</th>
-                            <th>Habilitado</th>
-                            <th>Nome</th>
+                            <th>Descrição item</th>
                             <th>Fornecedor</th>
+                            <th>Habilitado</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -69,14 +69,14 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                 <td style='font-size: 11px'><?= Utils::floatToMoney($value['quantity_available'], ""); ?></td>
                                 <td style='font-size: 11px'><?= Utils::floatToMoney($value['value']); ?></td>
                                 <td style='font-size: 11px'><?= $value['uf']; ?></td>
+                                <td style='font-size: 11px'><?= $value['name']; ?></td>
+                                <td style='font-size: 11px'>
+                                    <?= View::limitString($value['supplier'], 25); ?>
+                                </td>
                                 <td style='font-size: 11px'>
                                     <span class='label label-<?= $value['active'] === 'yes' ? 'success' : 'danger'; ?>'>
                                         <?= $value['active'] === 'yes' ? 'Sim' : 'Não'; ?>
                                     </span>
-                                </td>
-                                <td style='font-size: 11px'><?= $value['name']; ?></td>
-                                <td style='font-size: 11px'>
-                                    <?= View::limitString($value['supplier'], 25); ?>
                                 </td>
                                 <td>
                                 <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>

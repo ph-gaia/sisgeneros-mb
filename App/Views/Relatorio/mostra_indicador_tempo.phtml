@@ -44,7 +44,7 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                                    name="dateInit"
                                    id="dateInit"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de inicial"
+                                   placeholder="Data inicial"
                                    value="<?= $this->getParametro('dateInit'); ?>"
                                    class="form-control">
                         </div>
@@ -55,7 +55,7 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                                    name="dateEnd"
                                    id="dateEnd"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de final"
+                                   placeholder="Data final"
                                    value="<?= $this->getParametro('dateEnd'); ?>"
                                    class="form-control">
                         </div>
@@ -130,7 +130,18 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
     $(document).ready(function () {
         var btnApplySearch = $('.btn-apply-search');
 
-        btnApplySearch.click(function btnSearch() {
+        $('#dateEnd').keypress(function(event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13') {
+                btnSearch();
+            }
+        });
+
+        btnApplySearch.click(function() {
+            btnSearch();
+        });
+
+        function btnSearch() {
             var selectOm = $('#om').val();
             var dateInit = $('#dateInit').val();
             var dateEnd = $('#dateEnd').val();
@@ -161,6 +172,6 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
                 url += 'dateEnd/' + dateEnd + '/';
             }
             window.location = url;
-        });
+        }
     });
 </script>

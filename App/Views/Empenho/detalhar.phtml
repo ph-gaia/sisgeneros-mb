@@ -38,7 +38,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             class="form-control"/>
                     </div>
                     <div class="form-group">
-                        <label>Data do documento</label>
+                        <label>Data da entrega da NF no CeIM:</label>
                         <input
                             type=text
                             id="date_document"
@@ -50,7 +50,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             required/>
                     </div>
                     <div class="form-group">
-                        <label>Data da entrega do material: </label>
+                        <label>Data do recebimento do material: </label>
                         <input
                             type=text
                             id="date_delivery"
@@ -205,10 +205,19 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
-                <h5>Pedidos do Empenho</h5>
+                <h5>Empenhos</h5>
+                <i class="fa fa-list"></i> <?= $this->view->title; ?>
                 <?php if (isset($this->view->resultEmpenho['code'])) : ?>
                     <div class="alert alert-info" role="alert">
-                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong><button class="btn btn-success btn-sm btn-editar" data-invoice="<?= $this->view->resultEmpenho['code'] ?>"><i class="fa fa-edit"></i></button><br>
+                        Número do empenho: <strong><?= $this->view->resultEmpenho['code']; ?></strong>
+                        <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
+                            <button class="btn btn-success btn-sm btn-editar" data-invoice="<?= $this->view->resultEmpenho['code'] ?>"><i class="fa fa-edit"></i></button>
+                        <?php endif ?>
+                        <br>
+                        Nº da Solicitação de Gêneros: <strong><?= $this->view->resultEmpenho['request']; ?></strong><br>
+                        Licitação: <strong><?= $this->view->resultEmpenho['biddings']; ?></strong><br>
+                        Fornecedor: <strong><?= $this->view->resultEmpenho['suppliers']; ?></strong><br>
+                        Complemento: <strong><?= $this->view->resultEmpenho['complement']; ?></strong><br>
                         OM: <strong><?= $this->view->resultEmpenho['naval_indicative']; ?></strong><br>
                         Status: <strong><?= $this->view->resultEmpenho['status']; ?></strong><br>
                     </div>
@@ -218,13 +227,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                     <input type="hidden" name="code_invoice" value="<?= $this->view->resultEmpenho['code']; ?>">
                     <?php if (in_array($this->view->userLoggedIn['level'], ['ENCARREGADO', 'NORMAL', 'ADMINISTRADOR'])) : ?>
                         <button class="btn btn-primary">
-                            <i class="fa fa-check"></i> Gerar solicitação
+                            <i class="fa fa-check"></i> Gerar Pedido à Empresa
                         </button>
                     <?php endif ?>
                     <p class="help-block" style="color: #130f0f; font-weight: bold;">* Informe a quantidade para gerar a solicitação.</p>
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA', 'ADMINISTRADOR'])) : ?>
                     <a href="<?= $this->view->controller; ?>cancelarEmpenho/idlista/<?= $idlista ?>" style="margin-left: 5px;" class="btn btn-danger pull-right">
                         <i class="fa fa-ban"></i> Cancelar
                     </a>
+                    <?php endif; ?>
                     <a href="<?= $this->view->controller; ?>" class="btn btn-warning pull-right">
                         <i class="fa fa-arrow-left"></i> Voltar
                     </a>
@@ -324,7 +335,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                             <div class="card-header" id="headingOne">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne<?= $result['code'] ?>" aria-expanded="true" aria-controls="collapseOne">
-                                        Solicitação a empresa nº <?= substr($result['code'], -1) ?> do Empenho <?= $this->view->resultEmpenho['code'] ?>
+                                        Pedido à Empresa nº <?= substr($result['code'], -1) ?> do Empenho <?= $this->view->resultEmpenho['code'] ?>
                                     </button>
                                 </h5>
                             </div>
@@ -336,13 +347,15 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                             <div class="col-lg-4">
                                                 <h5 class="alert-heading">
                                                 Nota Fiscal
-                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['invoice'] && $result['invoice_date']): ?>
+                                                <?php if (in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA', 'ADMINISTRADOR']) && $result['invoice'] && $result['invoice_date'] && in_array($result['status'], ['RECEBIDO', 'RECEBIDO-PARCIAL'])): ?>
                                                     <button
                                                         data-method-action="edit"
                                                         data-request="<?= $result['code'] ?>"
                                                         data-invoice="<?= $result['invoices_id'] ?>"
                                                         data-nota-fiscal="<?= $result['invoice'] ?>"
                                                         data-nota-fiscal-date="<?= date('d-m-Y', strtotime($result['invoice_date'])) ?>"
+                                                        data-nota-fiscal-emissao-date="<?= date('d-m-Y', strtotime($result['invoice_date_emission'])) ?>"
+                                                        data-entrega-date="<?= date('d-m-Y', strtotime($result['date_delivery'])) ?>"
                                                         class="btn btn-success btn-sm btn-entregar">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
@@ -350,7 +363,11 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 </h5>
                                                 <strong>Nº:</strong> <?= $result['invoice'] ?? '-'; ?>
                                                 <br>
-                                                <strong>Data:</strong> <?= ($result['invoice_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
+                                                <strong>Data de emissão:</strong> <?= ($result['invoice_date_emission']) ? date('d-m-Y', strtotime($result['invoice_date_emission'])) : '' ?>
+                                                <br>
+                                                <strong>Data do recebimento do material:</strong> <?= ($result['date_delivery']) ? date('d-m-Y', strtotime($result['date_delivery'])) : '' ?>
+                                                <br>
+                                                <strong>Data da entrega da NF:</strong> <?= ($result['invoice_date']) ? date('d-m-Y', strtotime($result['invoice_date'])) : '' ?>
                                             </div>
                                             <div class="col-lg-4">
                                                 <h5 class="alert-heading">
@@ -446,7 +463,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                                                 <?php if ($result['status'] == 'SOLICITADO'): ?>
                                                 <th>Disponível</th>
                                                 <?php endif; ?>
-                                                <th>Status</th>
+                                                <th>Status do Pedido</th>
                                                 <th>UF</th>
                                                 <th>Nome</th>
                                                 <th>Valor (R$)</th>

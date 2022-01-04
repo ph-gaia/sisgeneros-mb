@@ -40,7 +40,7 @@
            aria-expanded="true"
            aria-controls="menuSolicitacoes">
             <i class="fa fa-list fa-fw"></i>
-            Solicitações <span class="fa arrow"></span>
+            Solicitações de Gêneros <span class="fa arrow"></span>
         </a>
         <div id="menuSolicitacoes"
              class="collapse"
@@ -95,7 +95,7 @@
 
     <li class="nav-item">
         <a class="nav-link" href="empenho/solicitacoes">
-            <i class="fa fa-suitcase"></i> Solicitações Empresas
+            <i class="fa fa-suitcase"></i> Pedidos às Empresas
         </a>
     </li>
     <?php endif; ?>
@@ -105,10 +105,36 @@
         <a class="nav-link collapsed"
             href="#"
             data-toggle="collapse"
+            data-target="#menuIndicators"
+            aria-expanded="false"
+            aria-controls="menuIndicators">
+            <i class="fa fa-line-chart fa-fw"></i> Indicadores
+            <span class="fa arrow"></span>
+        </a>
+        <div id="menuIndicators"
+                class="collapse"
+                aria-labelledby="headingPages"
+                data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+                <a class="collapse-item" href="relatorio/indicadorTempo/">
+                    <i class="fa fa-list"></i> Rel. Indicador de tempo
+                </a>
+                <a class="collapse-item" href="relatorio/emissaoEntrega/">
+                    <i class="fa fa-list"></i> Rel. Indicador de tempo NF
+                </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
             data-target="#menuReport"
             aria-expanded="false"
             aria-controls="menuReport">
-            <i class="fa fa-list-ol fa-fw"></i> Relatórios
+            <i class="fa fa-bar-chart fa-fw"></i> Relatórios
             <span class="fa arrow"></span>
         </a>
         <div id="menuReport"
@@ -125,12 +151,6 @@
                 </a>
                 <a class="collapse-item" href="relatorio/entrega/">
                     <i class="fa fa-list"></i> Rel. Aval. de Entrega
-                </a>
-                <a class="collapse-item" href="relatorio/indicadorTempo/">
-                    <i class="fa fa-list"></i> Rel. Indicador de tempo
-                </a>
-                <a class="collapse-item" href="relatorio/emissaoEntrega/">
-                    <i class="fa fa-list"></i> Rel. Indicador de tempo NF
                 </a>
                 <?php endif; ?>
                 <a class="collapse-item" href="relatorio/limiteDispensa/">
@@ -155,7 +175,7 @@
             data-target="#menuCredito"
             aria-expanded="false"
             aria-controls="menuCredito">
-            <i class="fa fa-credit-card fa-fw"></i> Crédito Provisionado
+            <i class="fa fa-credit-card fa-fw"></i> Crédito Disponível
             <span class="fa arrow"></span>
         </a>
         <div id="menuCredito"
@@ -209,8 +229,8 @@
             data-target="#OrgMilitar"
             aria-expanded="false"
             aria-controls="OrgMilitar">
-            <i class="fa fa-university fa-fw"></i> Organização Militar
-            <i class="fa arrow-down"></i>
+            <i class="fa fa-university fa-fw"></i> Organizações Militares
+            <span class="fa arrow"></span>
         </a>
         <div id="OrgMilitar"
                 class="collapse"
@@ -236,7 +256,7 @@
                 data-target="#menuFornecedor"
                 aria-expanded="true"
                 aria-controls="menuFornecedor">
-                <i class="fa fa-suitcase fa-fw"></i> Fornecedor
+                <i class="fa fa-suitcase fa-fw"></i> Fornecedores
                 <span class="fa arrow"></span>
             </a>
             <div id="menuFornecedor"
@@ -286,114 +306,40 @@
         </li>
     <?php endif; ?>
 
-    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
+    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA'])) : ?>
         <li class="nav-item">
             <a class="nav-link collapsed"
                href="#"
                data-toggle="collapse"
-               data-target="#ingredientes"
+               data-target="#cardapiosPadroes"
                aria-expanded="false"
-               aria-controls="ingredientes">
-                <i class="fa fa-cutlery fa-fw"></i> Ingredientes
+               aria-controls="cardapiosPadroes">
+                <i class="fa fa-cutlery fa-fw"></i> Cardápios Padronizados
                 <span class="fa arrow"></span>
             </a>
-            <div id="ingredientes"
+            <div id="cardapiosPadroes"
                  class="collapse"
                  aria-labelledby="headingPages"
                  data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="ingredientes/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
+                        <i class="fa fa-cutlery"></i> Ingredientes
                     </a>
-                    <a class="collapse-item" href="ingredientes/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-               href="#"
-               data-toggle="collapse"
-               data-target="#meals"
-               aria-expanded="false"
-               aria-controls="meals">
-                <i class="fa fa-spoon fa-fw"></i> Refeições
-                <span class="fa arrow"></span>
-            </a>
-            <div id="meals"
-                 class="collapse"
-                 aria-labelledby="headingPages"
-                 data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="meals/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
+                        <i class="fa fa-spoon"></i> Refeições
                     </a>
-                    <a class="collapse-item" href="meals/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                </div>
-            </div>
-        </li>
-    <?php endif; ?>
-
-    <?php if (!in_array($this->view->userLoggedIn['level'], ['CONTROLADOR_FINANCA'])) : ?>
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-                href="#"
-                data-toggle="collapse"
-                data-target="#recipespatterns"
-                aria-expanded="false"
-                aria-controls="recipespatterns">
-                <i class="fa fa-table fa-fw"></i> Receitas Padrões
-                <span class="fa arrow"></span>
-            </a>
-            <div id="recipespatterns"
-                    class="collapse"
-                    aria-labelledby="headingPages"
-                    data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="recipespatterns/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
+                        <i class="fa fa-table"></i> Receitas Padrões
                     </a>
-                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>
-                    <a class="collapse-item" href="recipespatterns/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
-                    </a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </li>
-    <?php endif; ?>
-
-    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR'])) : ?>
-        <li class="nav-item">
-            <a class="nav-link collapsed"
-            href="#"
-            data-toggle="collapse"
-            data-target="#cardapio"
-            aria-expanded="false"
-            aria-controls="cardapio">
-                <i class="fa fa-bars fa-fw"></i> Cardápio
-                <span class="fa arrow"></span>
-            </a>
-            <div id="cardapio"
-                class="collapse"
-                aria-labelledby="headingPages"
-                data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
+                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'FISCAL', 'ORDENADOR'])) : ?>
                     <a class="collapse-item" href="cardapio/ver">
-                        <i class="fa fa-cog"></i> Gerenciar
-                    </a>
-                    <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO'])) : ?>
-                    <a class="collapse-item" href="cardapio/novo/">
-                        <i class="fa fa-plus-circle"></i> Novo Registro
+                        <i class="fa fa-bars"></i> Cardápio
                     </a>
                     <?php endif; ?>
                 </div>
             </div>
         </li>
+
     <?php endif; ?>
 
     <?php if (in_array($this->view->userLoggedIn['level'], ['ADMINISTRADOR', 'CONTROLADOR_OBTENCAO'])) : ?>

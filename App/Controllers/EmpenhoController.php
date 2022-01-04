@@ -47,7 +47,7 @@ class EmpenhoController extends Controller implements CtrlInterface
         $model = new EmpenhoModel();
         $items = new EmpenhoItemsModel();
         $itemsEmpenho = new SolicitacaoEmpenhoModel();
-        $this->view->title = 'Itens do empenho';
+        $this->view->title = 'Detalhes do empenho';
         $this->view->idlista = $this->getParametro('idlista');
         $this->view->resultEmpenho = $model->findByIdlista($this->getParametro('idlista'));
         $items->paginator($this->getParametro('pagina'), $this->getParametro('idlista'));
@@ -91,7 +91,7 @@ class EmpenhoController extends Controller implements CtrlInterface
     {
         $this->view->userLoggedIn = $this->access->setRedirect('solicitacao/')
             ->clearAccessList()
-            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'CONTROLADOR_FINANCA']);
+            ->authenticAccess(['ADMINISTRADOR', 'NORMAL', 'ENCARREGADO', 'CONTROLADOR_FINANCA', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO']);
 
         $this->view->title = 'Lista de solicitações de empresas';
 

@@ -516,7 +516,8 @@ class SolicitacaoModel extends CRUD
                 . "Status: ELABORADO.</strong><br>"
                 . "<a href='" . cfg::DEFAULT_URI . "solicitacao/detalhar/idlista/{$lastId}' class='btn btn-info'>"
                 . '<i class="fa fa-info-circle"></i> Detalhar Solicitação</a>'
-                . '<script>resetForm(); </script>', 'success');
+                . '<meta http-equiv="refresh" content="5;URL="' . cfg::DEFAULT_URI . 'solicitacao/item/fornecedor/' . $this->getSuppliersId() . '/idlista/' . $this->getBiddingsId() .'" />'
+                . '<script>setTimeout(function(){ window.location = "' . cfg::DEFAULT_URI . 'solicitacao/item/fornecedor/' . $this->getSuppliersId() . '/idlista/' . $this->getBiddingsId() . '"; }, 5000); </script>', 'success');
         }
     }
 
@@ -623,7 +624,7 @@ class SolicitacaoModel extends CRUD
             );
         }
 
-        if ($action == 'CANCELADO') {
+        if (in_array($action, ['CANCELADO', 'REJEITADO'])) {
             $query = "" .
                 " SELECT C.id, B.quantity as requested FROM requests as A " .
                 " INNER JOIN requests_items as B ON B.requests_id = A.id " .

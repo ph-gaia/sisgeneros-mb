@@ -14,9 +14,9 @@ if (isset($this->view->result) && $total = count($this->view->result)) {
 
 $pagination = Pagination::make($this, function ($btn, $controllerName) {
         return [
-            'previous' => "{$controllerName}solicitacao/pagina/{$btn['previous']}",
-            'next' => "{$controllerName}solicitacao/pagina/{$btn['next']}",
-            'current' => "{$controllerName}solicitacao/pagina/" . Pagination::CURRENT_PAGE
+            'previous' => "{$controllerName}entrega/pagina/{$btn['previous']}",
+            'next' => "{$controllerName}entrega/pagina/{$btn['next']}",
+            'current' => "{$controllerName}entrega/pagina/" . Pagination::CURRENT_PAGE
         ];
     });
 
@@ -72,7 +72,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                    name="dateInit"
                                    id="dateInit"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de inicial"
+                                   placeholder="Data inicial"
                                    value="<?= $this->getParametro('dateInit'); ?>"
                                    class="form-control">
                         </div>
@@ -83,7 +83,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                    name="dateEnd"
                                    id="dateEnd"
                                    data-mask="00-00-0000"
-                                   placeholder="Data de final"
+                                   placeholder="Data final"
                                    value="<?= $this->getParametro('dateEnd'); ?>"
                                    class="form-control">
                         </div>
@@ -129,7 +129,6 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) {
                                 </td>
                                 <td>
                                     <?= $value['biddings_number']; ?>
-                                    <i class="fa fa-info-circle text-info" title="<?= $value['biddings_uasg_name']; ?>"></i>
                                 </td>
                                 <td>
                                     <?= $value['om_naval_indicative']; ?>

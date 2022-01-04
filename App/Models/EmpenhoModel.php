@@ -32,13 +32,16 @@ class EmpenhoModel extends CRUD
         $innerJoin = " INNER JOIN oms ON oms.id = invoices.oms_id ";
         $select = 'invoices.*, oms.naval_indicative, ';
         $select .= ' (SELECT SUM(quantity * value) FROM invoices_items WHERE invoices_id = invoices.id) as total_requested, ';
-        $select .= ' (SELECT SUM(delivered * value) FROM invoices_items WHERE invoices_id = invoices.id) as total_delivered';
+        $select .= ' (SELECT SUM(delivered * value) FROM invoices_items WHERE invoices_id = invoices.id) as total_delivered, ';
+        $select .= ' (SELECT distinct requests.number FROM invoices_items 
+                        INNER JOIN requests ON requests.id = invoices_items.requests_id
+                        WHERE invoices_items.invoices_id = invoices.id) as request ';
 
         $dados = [
             'select' => $select,
             'entidade' => $this->entidade . $innerJoin,
             'pagina' => $pagina,
-            'maxResult' => 100,
+            'maxResult' => 350,
             'orderBy' => 'invoices.updated_at DESC'
         ];
 
@@ -94,7 +97,16 @@ class EmpenhoModel extends CRUD
     {
         $query = ""
             . " SELECT "
-            . " invoices.*, oms.naval_indicative "
+            . " invoices.*, oms.naval_indicative, "
+            . " (SELECT distinct requests.number FROM invoices_items 
+                INNER JOIN requests ON requests.id = invoices_items.requests_id
+                WHERE invoices_items.invoices_id = invoices.id) as request, "
+            . " (SELECT distinct suppliers.name FROM invoices_items 
+                INNER JOIN suppliers ON suppliers.id = invoices_items.suppliers_id
+                WHERE invoices_items.invoices_id = invoices.id) as suppliers, "
+            . " (SELECT distinct biddings.number FROM invoices_items 
+                INNER JOIN biddings ON biddings.id = invoices_items.biddings_id
+                WHERE invoices_items.invoices_id = invoices.id) as biddings "
             . " FROM {$this->entidade} "
             . " INNER JOIN oms ON oms.id = invoices.oms_id "
             . " WHERE invoices.id = :requestId ";
@@ -107,6 +119,12 @@ class EmpenhoModel extends CRUD
     {
         // Valida dados
         $this->validaAll($user);
+
+        $isInvoice = $this->findByCode($this->getCode());
+
+        if ($isInvoice) {
+            msg::showMsg('Já existe um empenho com esse código', 'danger');
+        }
 
         $dados = [
             'oms_id' => $this->getOmsId(),
@@ -239,7 +257,7 @@ class EmpenhoModel extends CRUD
             }
 
             // atualizando a quantidade comprometida da licitação
-            if ($value['quantidade'] > ($result['quantity'] - $result['delivered'])) {
+            if ($value['quantidade'] > ($result['quantity'] - $result['delivered'] - $value['solicitada'])) {
                 msg::showMsg('A quantidade para cancelar deve ser igual ou inferior a quantidade disponível', 'danger');
             }
 
@@ -383,7 +401,7 @@ class EmpenhoModel extends CRUD
 
         if (count($result) > 1) {
             msg::showMsg('Verifique as solicitações selecionadas, ' .
-                'só é possível empenhar mais de um pedido, caso a solicitação possua a mesma Licitação, ' .
+                'só é possível empenhar mais de um pedido, caso a solicitação possua a mesma Licitação e Fornecedor, ' .
                 'Fornecedor e Organização Militar', 'danger');
         }
     }

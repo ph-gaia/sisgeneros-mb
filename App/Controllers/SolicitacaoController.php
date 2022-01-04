@@ -43,7 +43,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
             ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
         $licitacao = new Licitacao();
-        $this->view->title = 'Licitações Disponíveis';
+        $this->view->title = ' Licitado - PE/Empresa';
         $licitacao->paginator($this->getParametro('pagina'), date("Y-m-d", time()), $this->view->userLoggedIn['oms_id']);
         $this->view->result = $licitacao->getResultadoPaginator();
         $this->view->btn = $licitacao->getNavePaginator();
@@ -56,7 +56,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
             ->clearAccessList()
             ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
-        $this->view->title = "Adicionar itens";
+        $this->view->title = "Não Licitado";
         $this->view->resultFornecedor = (new FornecedorModel())->findAll(function ($e) {
             return $e->setaCampos(['id', 'name', 'cnpj'])
                 ->setaFiltros()
@@ -527,7 +527,7 @@ class SolicitacaoController extends Controller implements CtrlInterface
             ->clearAccessList()
             ->authenticAccess(['ADMINISTRADOR', 'FISCAL', 'FISCAL_SUBSTITUTO', 'ENCARREGADO', 'NORMAL', 'ORDENADOR', 'ORDENADOR_SUBSTITUTO', 'CONTROLADOR_OBTENCAO', 'CONTROLADOR_FINANCA']);
 
-        $this->view->title = 'Busca de itens licitados';
+        $this->view->title = 'Licitado - Item';
         $this->render('mostra_busca_fornecedor');
     }
 }

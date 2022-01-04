@@ -59,7 +59,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
                 <?php if (isset($this->view->resultLicitacao['number'])) : ?>
                     <div class="alert alert-info" role="alert">
                         Licitação: <strong><?= $this->view->resultLicitacao['number']; ?></strong><br>
-                        Órgão: <strong><?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
+                        Órgão Responsável pela Licitação: <strong><?= $this->view->resultLicitacao['uasg']; ?> - <?= $this->view->resultLicitacao['uasg_name']; ?></strong><br>
                         Fornecedor:
                         <strong>
                             <?= $this->view->resultSolicitacao['suppliers_cnpj']; ?>

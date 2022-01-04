@@ -137,7 +137,7 @@ class RelatorioController extends Controller implements CtrlInterface
 
     public function limiteDispensaAction()
     {
-        $this->view->title = 'Relatório de Limite de despensa de licitação';
+        $this->view->title = 'Relatório de Limite de dispensa de licitação';
 
         $model = new Solicitacao();
         $omModel = new OmModel();
