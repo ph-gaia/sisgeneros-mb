@@ -540,7 +540,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         $('#date_document').val(invoiceDate);
         $('#date_document_emission').val(invoiceEmissionDate);
         $('#date_delivery').val(invoiceDeliveryDate);
-        $('#method_action').val(action);
+        $('#method_action_entregar').val(action);
         $('#modalEntregarAction').modal('show');
     });
     $('.btn-liquidar').click(function() {
@@ -554,7 +554,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         $('#invoice_id').val(invoiceId);
         $('#number_request').val(nsNumber);
         $('#date_document_liquidar').val(nsNumberDate);
-        $('#method_action').val(action);
+        $('#method_action_liquidar').val(action);
         $('#modalLiquidarAction').modal('show');
     });
     $('.btn-pagar').click(function() {
@@ -568,7 +568,7 @@ $pagination = Pagination::make($this, function ($btn, $controllerName) use ($idl
         $('#invoice_pagar_id').val(invoiceId);
         $('#order_bank').val(obNumber);
         $('#date_document_ob').val(obNumberDate);
-        $('#method_action').val(action);
+        $('#method_action_pagar').val(action);
         $('#modalPagarAction').modal('show');
     });
     $('.btn-editar').click(function() {
